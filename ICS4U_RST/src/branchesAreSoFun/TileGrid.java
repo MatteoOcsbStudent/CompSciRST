@@ -1,5 +1,7 @@
 package branchesAreSoFun;
 
+import java.io.File;
+
 import simpleIO.Console;
 
 public class TileGrid {
@@ -8,9 +10,27 @@ public class TileGrid {
 	private int CAMERAHEIGHT, CAMERAWIDTH = 20;
 
 	public TileGrid(String mapName) {
+		
+		File tileLayout;
+		
 		switch (mapName) {
 		
-		case 
+		case "routeOne":
+			tileLayout = new File("");
+			break;
+		
+		case "___ town":
+			tileLayout = new File("");
+			break;
+			
+		case "routeTwo":
+			tileLayout = new File("");
+			break;
+		
+		case "___ city":
+			tileLayout = new File("");
+			break;
+			
 		}
 		
 	}
