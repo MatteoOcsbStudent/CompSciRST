@@ -1,5 +1,6 @@
 package branchesAreSoFun;
 
+import javafx.scene.image.Image;
 import simpleIO.Console;
 
 public class TileGrid {
@@ -10,9 +11,18 @@ public class TileGrid {
 	public TileGrid(String mapName) {
 		switch (mapName) {
 		
-		case 
+		case "":
+			
+			break;
 		}
+	}
+	
+	public Image getTexture(int row, int col) {
+		
+		
 		
 	}
+	
+	
 }
 
