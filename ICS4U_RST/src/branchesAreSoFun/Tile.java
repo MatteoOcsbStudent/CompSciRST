@@ -4,11 +4,11 @@ import javafx.scene.image.Image;
 
 public class Tile {
 
-	private Image texture;
-	private Image DIRT;
-	private Image GRASS;
-	private Image TALLGRASS;
-	private Image TREE;
+	private String texture;
+	private String DIRT = "/images/DirtTile.png";
+	private String GRASS = "/images/GrassTile.png";
+	private String TALLGRASS = "/images/TallGrassTile.png";
+	private String TREE = "/images/TreeTile.png";
 	
 	public Tile(String tileType) {
 		switch (tileType) {
@@ -31,7 +31,7 @@ public class Tile {
 		}
 	}
 	
-	public Image getTexture() {
+	public String getTexture() {
 		return texture;
 	}
 }
