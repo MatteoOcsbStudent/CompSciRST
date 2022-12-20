@@ -1,6 +1,10 @@
 package branchesAreSoFun;
 
+
 import java.io.File;
+
+
+import javafx.scene.image.Image;
 
 import simpleIO.Console;
 
@@ -15,6 +19,7 @@ public class TileGrid {
 		
 		switch (mapName) {
 		
+
 		case "routeOne":
 			tileLayout = new File("");
 			break;
@@ -31,8 +36,19 @@ public class TileGrid {
 			tileLayout = new File("");
 			break;
 			
+
+		case "":
+			
+			break;
+
 		}
-		
 	}
+	
+	public Image getTexture(int row, int col) {
+		
+			
+	}
+	
+	
 }
 
