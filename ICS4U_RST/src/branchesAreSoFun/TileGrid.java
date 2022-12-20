@@ -37,7 +37,13 @@ public class TileGrid {
 			break;
 			
 
-		case "":
+		case "test":
+			for (int i = 0; i < 10; i++) {
+				for (int j = 0; j < 10; j++) {
+					map[i][j] = new Tile ("Tree");
+					
+				}
+			}
 			
 			break;
 
@@ -46,7 +52,7 @@ public class TileGrid {
 	
 	public Image getTexture(int row, int col) {
 		
-			
+			return map[row][col].getTexture();
 	}
 	
 	

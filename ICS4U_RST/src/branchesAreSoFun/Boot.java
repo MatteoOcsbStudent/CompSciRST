@@ -30,10 +30,13 @@ public class Boot extends Application{
 			HBox hbox = new HBox();
 			vbox.getChildren().add(hbox);
 			
+			TileGrid map = new TileGrid("test");
 			
 			for (int i = 0; i < 10; i++) {
 				for(int j = 0; j < 10; j++) {
-					new ImageView(.getTexture(i , j))
+					Image tile = new Image(map.getTexture(i, j));
+					ImageView imgTile = new ImageView(tile);
+					hbox.getChildren().add(imgTile);
 				}
 			}
 	
