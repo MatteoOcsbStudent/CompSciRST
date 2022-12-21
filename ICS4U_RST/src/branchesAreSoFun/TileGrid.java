@@ -1,25 +1,23 @@
 package branchesAreSoFun;
 
-
 import java.io.File;
-
-
 import javafx.scene.image.Image;
-
 import simpleIO.Console;
 
 public class TileGrid {
 
-	public Tile[][] map;
+	public Tile[][] map = new Tile [10][10];
 	private int CAMERAHEIGHT, CAMERAWIDTH = 20;
 
+	public TileGrid() {
+		
+	}
 	public TileGrid(String mapName) {
 		
 		File tileLayout;
 		
 		switch (mapName) {
 		
-
 		case "routeOne":
 			tileLayout = new File("");
 			break;
@@ -37,16 +35,20 @@ public class TileGrid {
 			break;
 			
 
-		case "":
+		case "test":
+			for (int i = 0; i < 10; i++) {
+				for (int j = 0; j < 10; j++) {
+					map[i][j] = new Tile ("Tree");
+				}
+			}
 			
 			break;
 
 		}
 	}
 	
-	public Image getTexture(int row, int col) {
-		
-			
+	public Tile getTile(int row, int col) {
+			return map[row][col];
 	}
 	
 	

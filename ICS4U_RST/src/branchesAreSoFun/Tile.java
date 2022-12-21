@@ -1,37 +1,40 @@
 package branchesAreSoFun;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
-public class Tile {
+public class Tile extends ImageView{
 
-	private Image texture;
-	private Image DIRT;
-	private Image GRASS;
-	private Image TALLGRASS;
-	private Image TREE;
+	private final Image imgDIRT = new Image(getClass().getResource("/images/DirtTile.png").toString());
+	private final Image imgGRASS = new Image(getClass().getResource("/images/GrassTile.png").toString());
+	private final Image imgTALLGRASS = new Image(getClass().getResource("/images/TallGrassTile.png").toString());
+	private final Image imgTREE = new Image(getClass().getResource("/images/TreeTile.png").toString());
 	
+	public Tile() {
+		
+	}
 	public Tile(String tileType) {
+		
+		super();
+		
 		switch (tileType) {
 		
 		case "Dirt":
-			texture = DIRT;
+			this.setImage(imgDIRT);
 			break;
 			
 		case "Grass":
-			texture = GRASS;
+			this.setImage(imgGRASS);
 			break;
 			
 		case "TallGrass":
-			texture = TALLGRASS;
+			this.setImage(imgTALLGRASS);
 			break;
 			
 		case "Tree":
-			texture = TREE;
+			this.setImage(imgTREE);
 			break;
 		}
 	}
 	
-	public Image getTexture() {
-		return texture;
-	}
 }
