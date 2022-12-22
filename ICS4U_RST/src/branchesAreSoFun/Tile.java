@@ -9,6 +9,7 @@ public class Tile extends ImageView{
 	private final Image imgGRASS = new Image(getClass().getResource("/images/GrassTile.png").toString());
 	private final Image imgTALLGRASS = new Image(getClass().getResource("/images/TallGrassTile.png").toString());
 	private final Image imgTREE = new Image(getClass().getResource("/images/TreeTile.png").toString());
+	private final int DIMENSION = 32;
 	
 	public Tile() {
 		
@@ -16,6 +17,9 @@ public class Tile extends ImageView{
 	public Tile(String tileType) {
 		
 		super();
+		
+		this.setFitWidth(DIMENSION);
+		this.setFitHeight(DIMENSION);
 		
 		switch (tileType) {
 		
