@@ -9,8 +9,7 @@ import java.io.IOException;
 
 public class TileGrid {
 
-	private final int CAMERAHEIGHT = 13;
-	private final int CAMERAWIDTH = 21; 
+
 	private Tile[][] map;
 	private int mapWidth;
 	private int mapHeight;
@@ -29,7 +28,7 @@ public class TileGrid {
 		case "routeOne":
 			tileLayout = new File("data/routeOne.map");
 			playerX = 14;
-			playerY = 49;
+			playerY = 50;
 			break;
 		
 		case "___ town":
@@ -106,14 +105,6 @@ public class TileGrid {
 	
 	public Tile getTile(int row, int col) {
 			return map[row][col];
-	}
-	
-	public int getCameraHeight () {
-		return CAMERAHEIGHT;
-	}
-	
-	public int getCameraWidth () {
-		return CAMERAWIDTH;
 	}
 	
 	public int getPlayerX () {

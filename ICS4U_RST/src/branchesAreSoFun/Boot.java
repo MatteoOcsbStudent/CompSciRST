@@ -11,7 +11,8 @@ import javafx.stage.Stage;
 public class Boot extends Application {
 
 	static final int TILESIZE = 10;
-
+	private final int CAMERAHEIGHT = 13;
+	private final int CAMERAWIDTH = 21; 
 	TileGrid map = new TileGrid("routeOne");
 
 	@Override
@@ -19,15 +20,24 @@ public class Boot extends Application {
 
 		GridPane root = new GridPane();
 		
-		int rootRow =0;
-		int rootCol =0;
+		int rootRow =-1;
+		int rootCol =-1;
 		
 		
-		for (int row = map.getPlayerY() - map.getCameraHeight(); row < map.getPlayerY(); row++) {
+//		for(int row = 0; row < 20; row ++) {
+//		for (int col = 0; col < 21; col++) {
+//			root.add(map.getTile(row, col), row, col);
+//			}
+//		}
+		
+		
+		//CHECK (map.getCameraHeight() - 1), it works, but isn't clean
+		for (int row = map.getPlayerY() - (CAMERAHEIGHT - 1); row <= map.getPlayerY(); row++) {
 			rootRow++;
-			for (int col = map.getPlayerX()- map.getCameraWidth()/2 ; col < map.getPlayerX() + map.getCameraWidth()/2; col++) {
+			rootCol= - 1;
+			for (int col = map.getPlayerX()- (CAMERAWIDTH/2) ; col <= map.getPlayerX() + (CAMERAWIDTH/2); col++) {
 				rootCol++;
-				root.add(map.getTile(row, col), rootRow, rootCol);
+				root.add(map.getTile(row, col), rootCol, rootRow);
 			}
 		}
 
