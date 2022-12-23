@@ -116,5 +116,20 @@ public class TileGrid {
 		return playerY;
 	}
 	
+	public int getMapHeight() {
+		return mapHeight;
+	}
+	
+	public int getMapWidth() {
+		return mapWidth;
+	}
+	
+	public void setPlayerX(int movement) {
+		playerX+=movement;
+	}
+	
+	public void setPlayerY(int movement) {
+		playerY+=movement;
+	}
 }
 
