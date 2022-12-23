@@ -5,10 +5,13 @@ import javafx.scene.image.ImageView;
 
 public class Tile extends ImageView{
 
+	//Tile textures
 	private final Image imgDIRT = new Image(getClass().getResource("/images/DirtTile.png").toString());
 	private final Image imgGRASS = new Image(getClass().getResource("/images/GrassTile.png").toString());
 	private final Image imgTALLGRASS = new Image(getClass().getResource("/images/TallGrassTile.png").toString());
 	private final Image imgTREE = new Image(getClass().getResource("/images/TreeTile.png").toString());
+	
+	//Size
 	private final int DIMENSION = 32;
 	
 	public Tile() {
@@ -21,6 +24,7 @@ public class Tile extends ImageView{
 		this.setFitWidth(DIMENSION);
 		this.setFitHeight(DIMENSION);
 		
+		//Sets texture 
 		switch (tileType) {
 		
 		case "Dirt":
