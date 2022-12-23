@@ -9,10 +9,14 @@ import java.io.IOException;
 
 public class TileGrid {
 
-
+	//Double array of Tiles
 	private Tile[][] map;
+	
+	//Dimensions of loaded map
 	private int mapWidth;
 	private int mapHeight;
+	
+	//Player index location
 	private int playerX;
 	private int playerY;
 
@@ -23,6 +27,7 @@ public class TileGrid {
 		
 		File tileLayout = null;
 		
+		//Declares file and spawnpoint based on chosen map
 		switch (mapName) {
 		
 		case "routeOne":
@@ -42,30 +47,26 @@ public class TileGrid {
 		case "___ city":
 			tileLayout = new File("");
 			break;
-			
-
-		/*case "test":
-			for (int i = 0; i < CAMERAWIDTH; i++) {
-				for (int j = 0; j < CAMERAHEIGHT; j++) {
-					map[i][j] = new Tile ("Tree");
-				}
-			}
-			
-			break;*/
 
 		}
 		
+		//Reads map textfile
 		try {
 			FileReader mapReader = new FileReader(tileLayout);
 			BufferedReader mapStream = new BufferedReader(mapReader);
 			
+			//Reads dimensions
 			mapWidth = Integer.valueOf(mapStream.readLine());
 			mapHeight = Integer.valueOf(mapStream.readLine());
 			
+			//Declares map double array dimensions
 			map = new Tile [mapHeight][mapWidth];
 			
+			//Reads a row
 			for (int y = 0; y < mapHeight; y++) {
 				String temp = mapStream.readLine();
+				
+				//Reads each character in the row, declaring corresponding tile at the index
 				for (int x = 0; x < temp.length(); x++) {
 					char tileType = temp.charAt(x);
 					
