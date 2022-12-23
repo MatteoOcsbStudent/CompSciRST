@@ -21,7 +21,7 @@ public class Boot extends Application {
 
 		GridPane root = new GridPane();
 		StackPane playerStack = new StackPane();
-		ImageView player = new ImageView(getClass().getResource("/images/Gym/Gym1.png").toString());
+		ImageView player = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
 		int rootRow =-1;
 		int rootCol =-1;
 		
