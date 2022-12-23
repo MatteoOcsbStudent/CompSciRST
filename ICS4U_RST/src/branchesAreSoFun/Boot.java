@@ -18,16 +18,16 @@ public class Boot extends Application {
 	public void start(Stage myStage) throws Exception {
 
 		GridPane root = new GridPane();
-
-		/*for (int i = 0; i < map.getCameraWidth(); i++) {
-			for (int j = 0; j < map.getCameraHeight(); j++) {
-				root.add(map.getTile(i, j), i, j);
-			}
-		} */
 		
-		for (int i = 0; i < 30; i++) {
-			for (int j = 0; j < 14; j++) {
-				root.add(map.getTile(i, j), i, j);
+		int rootRow =0;
+		int rootCol =0;
+		
+		
+		for (int row = map.getPlayerY() - map.getCameraHeight(); row < map.getPlayerY(); row++) {
+			rootRow++;
+			for (int col = map.getPlayerX()- map.getCameraWidth()/2 ; col < map.getPlayerX() + map.getCameraWidth()/2; col++) {
+				rootCol++;
+				root.add(map.getTile(row, col), rootRow, rootCol);
 			}
 		}
 
@@ -36,6 +36,8 @@ public class Boot extends Application {
 		myStage.setTitle("Test");
 		myStage.setScene(scene);
 		myStage.show();
+		
+		
 
 	}
 

@@ -14,6 +14,8 @@ public class TileGrid {
 	private Tile[][] map;
 	private int mapWidth;
 	private int mapHeight;
+	private int playerX;
+	private int playerY;
 
 	public TileGrid() {
 		
@@ -26,6 +28,8 @@ public class TileGrid {
 		
 		case "routeOne":
 			tileLayout = new File("data/routeOne.map");
+			playerX = 14;
+			playerY = 49;
 			break;
 		
 		case "___ town":
@@ -59,7 +63,7 @@ public class TileGrid {
 			mapWidth = Integer.valueOf(mapStream.readLine());
 			mapHeight = Integer.valueOf(mapStream.readLine());
 			
-			map = new Tile [mapWidth][mapHeight];
+			map = new Tile [mapHeight][mapWidth];
 			
 			for (int y = 0; y < mapHeight; y++) {
 				String temp = mapStream.readLine();
@@ -69,19 +73,19 @@ public class TileGrid {
 					switch (tileType) {
 					
 					case 'T':
-						map[x][y] = new Tile("Tree");
+						map[y][x] = new Tile("Tree");
 						break;
 					
 					case 'D':
-						map[x][y] = new Tile("Dirt");
+						map[y][x] = new Tile("Dirt");
 						break;
 						
 					case 'W':
-						map[x][y] = new Tile("TallGrass");
+						map[y][x] = new Tile("TallGrass");
 						break;
 						
 					case 'G':
-						map[x][y] = new Tile("Grass");
+						map[y][x] = new Tile("Grass");
 						break;
 					
 					}
@@ -110,6 +114,14 @@ public class TileGrid {
 	
 	public int getCameraWidth () {
 		return CAMERAWIDTH;
+	}
+	
+	public int getPlayerX () {
+		return playerX;
+	}
+	
+	public int getPlayerY () {
+		return playerY;
 	}
 	
 }
