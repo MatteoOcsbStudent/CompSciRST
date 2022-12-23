@@ -9,11 +9,16 @@ import java.io.IOException;
 
 public class TileGrid {
 
-	private final int CAMERAHEIGHT = 13;
-	private final int CAMERAWIDTH = 21; 
+	//Double array of Tiles
 	private Tile[][] map;
+	
+	//Dimensions of loaded map
 	private int mapWidth;
 	private int mapHeight;
+	
+	//Player index location
+	private int playerX;
+	private int playerY;
 
 	public TileGrid() {
 		
@@ -22,10 +27,13 @@ public class TileGrid {
 		
 		File tileLayout = null;
 		
+		//Declares file and spawnpoint based on chosen map
 		switch (mapName) {
 		
 		case "routeOne":
 			tileLayout = new File("data/routeOne.map");
+			playerX = 14;
+			playerY = 50;
 			break;
 		
 		case "___ town":
@@ -39,49 +47,45 @@ public class TileGrid {
 		case "___ city":
 			tileLayout = new File("");
 			break;
-			
-
-		/*case "test":
-			for (int i = 0; i < CAMERAWIDTH; i++) {
-				for (int j = 0; j < CAMERAHEIGHT; j++) {
-					map[i][j] = new Tile ("Tree");
-				}
-			}
-			
-			break;*/
 
 		}
 		
+		//Reads map textfile
 		try {
 			FileReader mapReader = new FileReader(tileLayout);
 			BufferedReader mapStream = new BufferedReader(mapReader);
 			
+			//Reads dimensions
 			mapWidth = Integer.valueOf(mapStream.readLine());
 			mapHeight = Integer.valueOf(mapStream.readLine());
 			
-			map = new Tile [mapWidth][mapHeight];
+			//Declares map double array dimensions
+			map = new Tile [mapHeight][mapWidth];
 			
+			//Reads a row
 			for (int y = 0; y < mapHeight; y++) {
 				String temp = mapStream.readLine();
+				
+				//Reads each character in the row, declaring corresponding tile at the index
 				for (int x = 0; x < temp.length(); x++) {
 					char tileType = temp.charAt(x);
 					
 					switch (tileType) {
 					
 					case 'T':
-						map[x][y] = new Tile("Tree");
+						map[y][x] = new Tile("Tree");
 						break;
 					
 					case 'D':
-						map[x][y] = new Tile("Dirt");
+						map[y][x] = new Tile("Dirt");
 						break;
 						
 					case 'W':
-						map[x][y] = new Tile("TallGrass");
+						map[y][x] = new Tile("TallGrass");
 						break;
 						
 					case 'G':
-						map[x][y] = new Tile("Grass");
+						map[y][x] = new Tile("Grass");
 						break;
 					
 					}
@@ -104,12 +108,12 @@ public class TileGrid {
 			return map[row][col];
 	}
 	
-	public int getCameraHeight () {
-		return CAMERAHEIGHT;
+	public int getPlayerX () {
+		return playerX;
 	}
 	
-	public int getCameraWidth () {
-		return CAMERAWIDTH;
+	public int getPlayerY () {
+		return playerY;
 	}
 	
 }
