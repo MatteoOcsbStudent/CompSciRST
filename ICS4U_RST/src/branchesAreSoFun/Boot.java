@@ -23,7 +23,8 @@ public class Boot extends Application {
 
 		//Declaring gridpane
 		GridPane root = new GridPane();
-		
+		StackPane playerStack = new StackPane();
+		ImageView player = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
 		int rootRow =-1;
 		int rootCol =-1;
 		
@@ -36,7 +37,8 @@ public class Boot extends Application {
 				root.add(map.getTile(row, col), rootCol, rootRow);
 			}
 		}
-		
+		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), player);
+		root.add(playerStack, 10, 12);
 		
 		Scene scene = new Scene(root);
 
