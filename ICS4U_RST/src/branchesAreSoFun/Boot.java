@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Boot extends Application {
@@ -19,7 +20,8 @@ public class Boot extends Application {
 	public void start(Stage myStage) throws Exception {
 
 		GridPane root = new GridPane();
-		
+		StackPane playerStack = new StackPane();
+		ImageView player = new ImageView(getClass().getResource("/images/Gym/Gym1.png").toString());
 		int rootRow =-1;
 		int rootCol =-1;
 		
@@ -40,6 +42,9 @@ public class Boot extends Application {
 				root.add(map.getTile(row, col), rootCol, rootRow);
 			}
 		}
+		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), player);
+		root.add(playerStack, 10, 12);
+		
 
 		Scene scene = new Scene(root);
 
