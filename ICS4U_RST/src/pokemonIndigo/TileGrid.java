@@ -1,4 +1,4 @@
-package branchesAreSoFun;
+package pokemonIndigo;
 
 import java.io.BufferedReader;
 import java.io.File;

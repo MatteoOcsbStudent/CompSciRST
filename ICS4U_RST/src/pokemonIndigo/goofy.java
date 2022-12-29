@@ -1,4 +1,4 @@
-package branchesAreSoFun;
+package pokemonIndigo;
 
 import simpleIO.Console;
 
