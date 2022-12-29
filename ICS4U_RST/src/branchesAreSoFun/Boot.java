@@ -103,19 +103,19 @@ public class Boot extends Application {
 		int displayLeft = CAMERAWIDTH;
 		int displayRight = CAMERAWIDTH;
 		
-		if (map.getPlayerY() + CAMERAHEIGHT > map.getMapHeight()) {
+		if (map.getPlayerY() + CAMERAHEIGHT >= map.getMapHeight()) {
 			displayDown = CAMERAHEIGHT - (map.getPlayerY() + CAMERAHEIGHT - map.getMapHeight());
 			displayUp = CAMERAHEIGHT + (map.getPlayerY() + CAMERAHEIGHT - map.getMapHeight());
 		
-		} else if (map.getPlayerX() + CAMERAWIDTH > map.getMapWidth()) {
+		} else if (map.getPlayerX() + CAMERAWIDTH >= map.getMapWidth()) {
 			displayRight = CAMERAWIDTH - (map.getPlayerX() + CAMERAWIDTH - map.getMapWidth());
 			displayLeft = CAMERAWIDTH + (map.getPlayerX() + CAMERAWIDTH - map.getMapWidth());
 		
-		} else if (map.getPlayerY() - CAMERAHEIGHT < 0) {
+		} else if (map.getPlayerY() - CAMERAHEIGHT <= 0) {
 			displayDown = CAMERAHEIGHT + (map.getPlayerY() - CAMERAHEIGHT);
 			displayUp = CAMERAHEIGHT - (map.getPlayerY() - CAMERAHEIGHT);
 		
-		} else if (map.getPlayerX() - CAMERAWIDTH < 0) {
+		} else if (map.getPlayerX() - CAMERAWIDTH <= 0) {
 			displayLeft = CAMERAWIDTH + (map.getPlayerY() - CAMERAWIDTH);
 			displayRight = CAMERAWIDTH - (map.getPlayerY() - CAMERAWIDTH);
 		
