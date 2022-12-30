@@ -62,16 +62,26 @@ public class Boot extends Application {
 		myStage.show();
 
 		// Moving player WASD
-		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				switch (event.getCode()) {
 				case W:
+					
+					//Makes sure you're not flying over trees
 					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != "Tree") {
+				
+						//Directional sprite
 						playerSprite = playerUp;
+						
+						//Moves player's tilegrid location and stackpane location
 						map.setPlayerY(-1);
 						playerStackY--;
+						
+						//Defines direction
 						direction = "Up";
+						
+						//Displays new board
 						displayBoard(root);
 					}
 					break;
@@ -168,20 +178,20 @@ public class Boot extends Application {
 		
 		//Top & Bottom
 		if ((botBarrier == true || topBarrier == true) && leftBarrier != true && rightBarrier != true) {
-			if (direction.equals("Left")) {
+			if (direction.equals("Left") && (map.getPlayerX() -1) != (map.getMapWidth() - (CAMERAWIDTH + 1))) {
 				playerStackX++;
 			}
-			if (direction.equals("Right")) {
+			if (direction.equals("Right") && (map.getPlayerX() + 1) != (CAMERAWIDTH + 1)) {
 				playerStackX--;
 			}
 		}
 		
 		//Left & Right
 		if ((leftBarrier == true || rightBarrier == true) && topBarrier != true && botBarrier != true) {
-			if (direction.equals("Up")) {
+			if (direction.equals("Up") && (map.getPlayerY() - 1) != (map.getMapHeight() - (CAMERAHEIGHT + 1))) {
 				playerStackY++;
 			}
-			if (direction.equals("Down")) {
+			if (direction.equals("Down") && (map.getPlayerY() - 1) != (CAMERAHEIGHT + 1)) {
 				playerStackY--;
 			}
 		} 
