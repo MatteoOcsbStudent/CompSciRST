@@ -1,11 +1,21 @@
 package pokemonIndigo;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class Pokemon {
 
+	int baseHP;
+	int baseAtk;
+	int baseDef;
+	int baseSpd;
 	int level;
 	int nextLevelUp;
 	int exp;
@@ -28,12 +38,68 @@ public class Pokemon {
 	ArrayList <Integer> movePoolLevels = new ArrayList <Integer>();
 	ArrayList <Move> currentMoves = new ArrayList <Move>();
 
-	public Pokemon(String species) {
+	public Pokemon(String species, int level) {
 		name = species;
+		
+		Image spriteFront = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Front.png").toString());
+		Image spriteBack = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Back.png").toString());
+		
+		File pokemonInfo = new File("data/pokemonFiles/" + name + ".txt");
+		
+		FileReader pokeFileReader;
+		
+		try {
+			pokeFileReader = new FileReader(pokemonInfo);
+			BufferedReader pokeStream = new BufferedReader(pokeFileReader);
+
+			types[0] = pokeStream.readLine();
+			types[1] = pokeStream.readLine();
+			
+			baseHP = Integer.parseInt(pokeStream.readLine());
+			baseAtk = Integer.parseInt(pokeStream.readLine());
+			baseDef = Integer.parseInt(pokeStream.readLine());
+			baseSpd = Integer.parseInt(pokeStream.readLine());
+			
+			int amountOfMoves = Integer.parseInt(pokeStream.readLine());
+			
+			for (int i = 0; i < amountOfMoves; i++) {
+				movePool.add(new Move(pokeStream.readLine()));
+				movePoolLevels.add(Integer.parseInt(pokeStream.readLine()));
+			}
+			
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		for (int i = 1; i < level; i++) {
+			levelUp();
+		}
 	}
 	
 	public void levelUp () {
 		level++;
+		
+		//HP Stat
+		int hpIncrease = (int) Math.ceil(baseHP/50);
+		totalHP += hpIncrease;
+		currentHP += hpIncrease;
+		
+		//Atk stat
+		int atkIncrease = (int) Math.ceil(baseAtk/50);
+		attack += atkIncrease;
+		
+		//Def stat
+		int defIncrease = (int) Math.ceil(baseDef/50);
+		defense += defIncrease;
+		
+		int spdIncrease = (int) Math.ceil(baseSpd/50);
+		speed += spdIncrease;
 	}
 	
 	public void hpChange(int damage) {
