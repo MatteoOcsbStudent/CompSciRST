@@ -189,7 +189,7 @@ public class Boot extends Application {
 			if (direction.equals("Up") && (map.getPlayerY() - 1) != (map.getMapHeight() - (CAMERAHEIGHT + 1))) {
 				playerStackY++;
 			}
-			if (direction.equals("Down") && (map.getPlayerY() - 1) != (CAMERAHEIGHT + 1)) {
+			if (direction.equals("Down") && (map.getPlayerY() - 1) != (CAMERAHEIGHT - 1)) {
 				playerStackY--;
 			}
 		}
