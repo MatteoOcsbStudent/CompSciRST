@@ -31,7 +31,7 @@ public class TileGrid {
 		switch (mapName) {
 		
 		case "routeOne":
-			tileLayout = new File("data/routeOne.map");
+			tileLayout = new File("data/maps/routeOne.map");
 			playerX = 14;
 			playerY = 50;
 			break;
