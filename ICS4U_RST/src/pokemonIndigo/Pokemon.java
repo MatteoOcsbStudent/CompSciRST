@@ -95,7 +95,7 @@ public class Pokemon {
 
 				evoLevels[i] = Integer.parseInt(pokeStream.readLine());
 
-				// Skipping evolution types
+				// Skipping evolution's types
 				for (int skip = 0; skip < 2; skip++) {
 					pokeStream.readLine();
 				}
@@ -133,8 +133,9 @@ public class Pokemon {
 		}
 
 		// HP Stat
-
+		int temp = totalHP;
 		totalHP = ((2 * baseHP * level) / 100) + level + 10;
+		currentHP = totalHP - (temp - currentHP);
 
 		// Atk stat
 
