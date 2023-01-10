@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import simpleIO.Console;
 
 public class Boot extends Application {
 
@@ -43,6 +44,8 @@ public class Boot extends Application {
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
+		
+		Pokemon temp = new Pokemon("Torchic", 35);
 
 		// Declaring gridpane
 		GridPane root = new GridPane();
