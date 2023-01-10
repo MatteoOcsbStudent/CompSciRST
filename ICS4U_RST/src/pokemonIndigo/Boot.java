@@ -39,9 +39,9 @@ public class Boot extends Application {
 	public void start(Stage myStage) throws Exception {
 
 		// Temp hardcoded map loading
-		map = new TileGrid("routeOne");
-		playerStackX = 10;
-		playerStackY = 11;
+		map = new TileGrid("orilonTown");
+		playerStackX = 1;
+		playerStackY = 1;
 		direction = "Up";
 
 		// Declaring gridpane
@@ -68,7 +68,7 @@ public class Boot extends Application {
 				case W:
 
 					// Makes sure you're not flying over trees
-					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != "Tree") {
+					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != true) {
 
 						// Directional sprite
 						playerSprite = playerUp;
@@ -86,7 +86,7 @@ public class Boot extends Application {
 					break;
 
 				case A:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != "Tree") {
+					if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
 						playerSprite = playerLeft;
 						map.setPlayerX(-1);
 						playerStackX--;
@@ -97,7 +97,7 @@ public class Boot extends Application {
 					break;
 
 				case S:
-					if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != "Tree") {
+					if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
 						playerSprite = playerDown;
 						map.setPlayerY(1);
 						playerStackY++;
@@ -107,7 +107,7 @@ public class Boot extends Application {
 					break;
 
 				case D:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != "Tree") {
+					if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
 						playerSprite = playerRight;
 						map.setPlayerX(1);
 						playerStackX++;

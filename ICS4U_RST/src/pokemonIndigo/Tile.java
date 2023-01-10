@@ -10,7 +10,7 @@ public class Tile extends ImageView{
 	private final Image imgGRASS = new Image(getClass().getResource("/images/GrassTile.png").toString());
 	private final Image imgTALLGRASS = new Image(getClass().getResource("/images/TallGrassTile.png").toString());
 	private final Image imgTREE = new Image(getClass().getResource("/images/TreeTile.png").toString());
-	private String texture;
+	private boolean barrier = false;
 	//Size
 	private final int DIMENSION = 32;
 	
@@ -29,28 +29,39 @@ public class Tile extends ImageView{
 		
 		case "Dirt":
 			this.setImage(imgDIRT);
-			texture = "Dirt";
 			break;
 			
 		case "Grass":
 			this.setImage(imgGRASS);
-			texture = "Grass";
 			break;
 			
 		case "TallGrass":
 			this.setImage(imgTALLGRASS);
-			texture = "TallGrass";
 			break;
 			
 		case "Tree":
 			this.setImage(imgTREE);
-			texture = "Tree";
+			barrier = true;
 			break;
 		}
 	}
 	
-	public String getTexture() {
-		return texture;
+	public Tile(String tileType, int position) {
+		
+		super();
+		
+		this.setFitWidth(DIMENSION);
+		this.setFitHeight(DIMENSION);
+		
+		switch (tileType) {
+		
+		case "PokemonCenter":
+			this.setImage(new Image(getClass().getResource("/images/PokemonCenter/PokemonCenter" + position + ".png").toString()));
+		}
+	}
+	
+	public Boolean getTexture() {
+		return barrier;
 	}
 	
 }
