@@ -1,5 +1,7 @@
 package pokemonIndigo;
 
+import java.awt.Color;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -28,6 +30,8 @@ public class Boot extends Application {
 
 	StackPane playerStack = new StackPane();
 
+	Scene loading, scene;
+
 	// Directional sprites
 	ImageView playerUp = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
 	ImageView playerLeft = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerLeft.png").toString());
@@ -36,6 +40,8 @@ public class Boot extends Application {
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
+
+	GridPane root;
 
 	TileGrid map;
 
@@ -52,7 +58,8 @@ public class Boot extends Application {
 		Pokemon temp = new Pokemon("Torchic", 35);
 
 		// Declaring gridpane
-		GridPane root = new GridPane();
+		root = new GridPane();
+		GridPane loadingPane = new GridPane();
 
 		// call board display
 		displayBoard(root);
@@ -61,7 +68,9 @@ public class Boot extends Application {
 		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerUp);
 		root.add(playerStack, playerStackX, playerStackY);
 
-		Scene scene = new Scene(root);
+		scene = new Scene(root);
+		loading = new Scene(loadingPane);
+		loading.setFill(javafx.scene.paint.Color.BLACK);
 
 		myStage.setTitle("Test");
 		myStage.setScene(scene);
@@ -74,6 +83,10 @@ public class Boot extends Application {
 				switch (event.getCode()) {
 				case W:
 
+					if (map.getPlayerY() == 0) {
+
+						nextMap(myStage);
+					} else
 					// Makes sure you're not flying over trees
 					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != true) {
 
@@ -93,7 +106,10 @@ public class Boot extends Application {
 					break;
 
 				case A:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
+
+					if (map.getPlayerX() == 0) {
+						nextMap(myStage);
+					} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
 						playerSprite = playerLeft;
 						map.setPlayerX(-1);
 						playerStackX--;
@@ -104,7 +120,9 @@ public class Boot extends Application {
 					break;
 
 				case S:
-					if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
+					if (map.getPlayerY() == map.getMapHeight() - 1) {
+						nextMap(myStage);
+					} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
 						playerSprite = playerDown;
 						map.setPlayerY(1);
 						playerStackY++;
@@ -114,7 +132,9 @@ public class Boot extends Application {
 					break;
 
 				case D:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
+					if (map.getPlayerX() == map.getMapWidth() - 1) {
+						nextMap(myStage);
+					} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
 						playerSprite = playerRight;
 						map.setPlayerX(1);
 						playerStackX++;
@@ -128,19 +148,20 @@ public class Boot extends Application {
 					break;
 
 				}
-
-				if (map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY()) == true) {
-					
-					playerStackX = map.getPlayerSpawnX();
-					playerStackY = map.getPlayerSpawnY();
-					map = new TileGrid(map.getNextMap(), map.getNextSpawn());
-					displayBoard(root);
-					currentMapName = map.getName();
-					
-				}
 			}
 		});
 
+	}
+
+	public void nextMap(Stage myStage) {
+
+		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
+		playerStackX = map.getPlayerSpawnX();
+		playerStackY = map.getPlayerSpawnY();
+		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+		displayBoard(root);
+		currentMapName = map.getName();
+		myStage.setScene(scene);
 	}
 
 	public void displayBoard(GridPane root) {
