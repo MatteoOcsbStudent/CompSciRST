@@ -1,5 +1,5 @@
-Normal
-40
+Flying
+65
 100
 Null
 0

@@ -1,5 +1,5 @@
-Normal
-40
+Fighting
+60
 100
 Null
 0

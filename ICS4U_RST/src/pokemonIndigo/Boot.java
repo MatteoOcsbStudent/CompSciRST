@@ -44,7 +44,7 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 		
-		Pokemon temp = new Pokemon("Torchic", 11);
+		Pokemon temp = new Pokemon("Torchic", 36);
 
 		// Declaring gridpane
 		GridPane root = new GridPane();

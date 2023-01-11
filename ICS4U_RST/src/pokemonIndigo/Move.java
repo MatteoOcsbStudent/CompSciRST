@@ -10,6 +10,8 @@ public class Move {
 	private int damage;
 	private int accuracy;
 	private int statusRate;
+	
+	private boolean priority;
 
 	private String name;
 	private String type;
@@ -28,6 +30,13 @@ public class Move {
 			accuracy = Integer.parseInt(moveStream.readLine());
 			status = moveStream.readLine();
 			statusRate = Integer.parseInt(moveStream.readLine());
+			String priorityString = moveStream.readLine();
+			
+			if (priorityString.equals("True")) {
+				priority = true;
+			} else { 
+				priority = false;
+			}
 			
 			moveFile.close();
 

@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javafx.scene.image.Image;
+import sortAlgorithim.Sort;
 
 public class Pokemon {
 
@@ -37,7 +37,7 @@ public class Pokemon {
 	ArrayList<Move> movePool = new ArrayList<Move>();
 	ArrayList<Integer> movePoolLevels = new ArrayList<Integer>();
 	ArrayList<Move> currentMoves = new ArrayList<Move>();
-	
+
 	File pokemonInfo;
 
 	public Pokemon(String species, int foundLevel) {
@@ -114,22 +114,51 @@ public class Pokemon {
 
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
-		}
-	}
 
+			if (level == movePoolLevels.get(i)) {
+				if (currentMoves.size() < 4) {
+					changeMoveSet(movePool.get(i));
+				} else {
+					int[] levelsLearned = new int[4];
+
+					for (int j = 0; j < 4; j++) {
+						for (int a = 0; a < movePool.size(); a++) {
+							if (currentMoves.get(j).getName().equals(movePool.get(a).getName())) {
+								levelsLearned[j] = a;
+							}
+						}
+					}
+					Sort.selectionSort(levelsLearned, 1);
+					int oldestMoveIndexMovePool = levelsLearned[0];
+
+					for (int b = 0; b < 4; b++) {
+
+						if (movePool.get(oldestMoveIndexMovePool).getName().equals(currentMoves.get(b).getName())) {
+							changeMoveSet(movePool.get(i), b);
+						}
+
+					}
+
+				}
+			}
+		}
+
+	}
+	
+	
 	public void levelUp() {
-		//Tracking level
+		// Tracking level
 		level++;
 
-		//Checking for evolution or move learning opportunity
+		// Checking for evolution or move learning opportunity
 		for (int i = 0; i < evoLevels.length; i++) {
 			if (level == evoLevels[i]) {
 				evolve(i);
 			}
-			
-			if (level == movePoolLevels.get(i)) {
-				changeMoveSet(movePool.get(i));
-			}
+
+			/*
+			 * if (level == movePoolLevels.get(i)) { changeMoveSet(movePool.get(i)); }
+			 */
 		}
 
 		// HP Stat
@@ -216,42 +245,39 @@ public class Pokemon {
 
 	public void evolve(int evolution) {
 
-		//Changing name
+		// Changing name
 		name = evolutions[evolution];
 
-		//Changing sprites
+		// Changing sprites
 		spriteFront = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Front.png").toString());
 		spriteBack = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Back.png").toString());
 
 		FileReader pokeFileReader;
 
-		
 		try {
 			pokeFileReader = new FileReader(pokemonInfo);
 			BufferedReader pokeStream = new BufferedReader(pokeFileReader);
 
-			//Skips down the file until data is found
+			// Skips down the file until data is found
 			String line = pokeStream.readLine();
 			do {
-				 line = pokeStream.readLine();
-			} while (line.equals(name) == false) ;
-			
+				line = pokeStream.readLine();
+			} while (line.equals(name) == false);
 
-			//Sets new base stats
+			// Sets new base stats
 			baseHP = Integer.parseInt(pokeStream.readLine());
 			baseAtk = Integer.parseInt(pokeStream.readLine());
 			baseDef = Integer.parseInt(pokeStream.readLine());
 			baseSpd = Integer.parseInt(pokeStream.readLine());
-			
-			//skip evolution level
+
+			// skip evolution level
 			pokeStream.readLine();
-			
-			//Reads new types
+
+			// Reads new types
 			types[0] = pokeStream.readLine();
 			types[1] = pokeStream.readLine();
-			
+
 			pokeFileReader.close();
-			
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -263,11 +289,11 @@ public class Pokemon {
 	}
 
 	public void changeMoveSet(Move newMove, int indexToReplace) {
-		
+
 		currentMoves.remove(indexToReplace);
 		currentMoves.add(indexToReplace, newMove);
 	}
-	
+
 	public void changeMoveSet(Move newMove) {
 		currentMoves.add(newMove);
 	}
