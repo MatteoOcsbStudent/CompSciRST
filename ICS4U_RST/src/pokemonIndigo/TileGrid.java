@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import simpleIO.Console;
+
 public class TileGrid {
 
 	// Double array of Tiles
@@ -19,11 +21,23 @@ public class TileGrid {
 	private int playerX;
 	private int playerY;
 
+	// The current name of the map saved on the side
+	String currentMapName;
+	String nextMap;
+
+	// spawnpoint number associated with location of player
+	private int spawnpoint;
+
+	private int playerSpawnX;
+	private int playerSpawnY;
+	
+	private boolean exit = false;
+
 	public TileGrid() {
 
 	}
 
-	public TileGrid(String mapName) {
+	public TileGrid(String mapName, int spawnpoint) {
 
 		File tileLayout = null;
 
@@ -32,16 +46,28 @@ public class TileGrid {
 
 		case "routeOne":
 			tileLayout = new File("data/maps/routeOne.map");
-			playerX = 14;
-			playerY = 50;
+			if (spawnpoint == 1) {
+				playerX = 14;
+				playerY = 50;
+			} else if (spawnpoint == 2) {
+				playerX = 24;
+				playerY = 0;
+			}
+			currentMapName = "routeOne";
 			break;
 
 		case "orilonTown":
 			tileLayout = new File("data/maps/orilonTown.map");
-			playerX = 2;
-			playerY = 2;
+			if (spawnpoint == 1) {
+				playerX = 10;
+				playerY = 10;	
+			} else if (spawnpoint == 2) {	
+				playerX = 12;
+				playerY = 0;
+			}
+			currentMapName = "orilonTown";
 			break;
-
+			
 		case "routeTwo":
 			tileLayout = new File("");
 			break;
@@ -97,13 +123,57 @@ public class TileGrid {
 
 						for (int position = 0; position < 3; position++) {
 							map[y][x] = new Tile("PokemonCenter", (position + 1));
-							x += position;
+							x++;
 						}
+						x -= 3;
 
 						for (int position = 3; position < 6; position++) {
 							map[y + 1][x] = new Tile("PokemonCenter", (position + 1));
-							x += position - 3;
+							x++;
 						}
+						x--;
+						break;
+
+					case 'S':
+
+						for (int position = 0; position < 3; position++) {
+							map[y][x] = new Tile("HouseSmallRed", (position + 1));
+							x++;
+						}
+						x -= 3;
+
+						for (int position = 3; position < 6; position++) {
+							map[y + 1][x] = new Tile("HouseSmallRed", (position + 1));
+							x++;
+						}
+						x -= 3;
+
+						for (int position = 6; position < 9; position++) {
+							map[y + 2][x] = new Tile("HouseSmallRed", (position + 1));
+							x++;
+						}
+						x--;
+						break;
+
+					case 'B':
+
+						for (int position = 0; position < 4; position++) {
+							map[y][x] = new Tile("HouseBigRed", (position + 1));
+							x++;
+						}
+						x -= 4;
+
+						for (int position = 4; position < 8; position++) {
+							map[y + 1][x] = new Tile("HouseBigRed", (position + 1));
+							x++;
+						}
+						x -= 4;
+
+						for (int position = 8; position < 12; position++) {
+							map[y + 2][x] = new Tile("HouseBigRed", (position + 1));
+							x++;
+						}
+						x--;
 						break;
 					}
 				}
@@ -132,6 +202,14 @@ public class TileGrid {
 	public int getPlayerY() {
 		return playerY;
 	}
+	
+	public int getPlayerSpawnX() {
+		return playerSpawnX;
+	}
+
+	public int getPlayerSpawnY() {
+		return playerSpawnY;
+	}
 
 	public int getMapHeight() {
 		return mapHeight;
@@ -147,5 +225,53 @@ public class TileGrid {
 
 	public void setPlayerY(int movement) {
 		playerY += movement;
+	}
+
+	public boolean checkExit(String mapName, int row, int col) {
+
+		switch (mapName) {
+
+		case "orilonTown":
+			if ((row >= 10 && row <= 15) && (col == 0)) {
+				exit = true;
+				nextMap = "routeOne";
+				playerSpawnX = 10;
+				playerSpawnY = 11;
+				spawnpoint = 1;
+			} else {
+				exit = false;
+			}
+			break;
+		case "routeOne":
+			if ((playerX >= 9 && playerX <= 19) && (playerY == 50)) {
+				exit = true;
+				nextMap = "orilonTown";
+				playerSpawnX = 10;
+				playerSpawnY = 0;
+				spawnpoint = 2;
+			} else if ((playerX >= 23 && playerX <= 25) && playerY == 0) {
+				exit = true;
+				nextMap = "routeOne";
+				playerSpawnX = 10;
+				playerSpawnY = 11;
+				spawnpoint = 1;
+			} else {
+				exit = false;
+			}
+
+		}
+		return exit;
+	}
+
+	public String getNextMap() {
+		return nextMap;
+	}
+
+	public int getNextSpawn() {
+		return spawnpoint;
+	}
+
+	public String getName() {
+		return currentMapName;
 	}
 }

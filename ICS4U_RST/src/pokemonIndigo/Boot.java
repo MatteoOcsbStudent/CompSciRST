@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import simpleIO.Console;
 
 public class Boot extends Application {
 
@@ -21,6 +22,9 @@ public class Boot extends Application {
 
 	// Direction of movement
 	private String direction;
+
+	// The map name used for transitions
+	private String currentMapName;
 
 	StackPane playerStack = new StackPane();
 
@@ -39,10 +43,13 @@ public class Boot extends Application {
 	public void start(Stage myStage) throws Exception {
 
 		// Temp hardcoded map loading
-		map = new TileGrid("orilonTown");
-		playerStackX = 1;
-		playerStackY = 1;
+		map = new TileGrid("orilonTown", 1);
+		currentMapName = "orilonTown";
+		playerStackX = 10;
+		playerStackY = 11;
 		direction = "Up";
+
+		Pokemon temp = new Pokemon("Torchic", 35);
 
 		// Declaring gridpane
 		GridPane root = new GridPane();
@@ -120,6 +127,16 @@ public class Boot extends Application {
 				default:
 					break;
 
+				}
+
+				if (map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY()) == true) {
+					
+					playerStackX = map.getPlayerSpawnX();
+					playerStackY = map.getPlayerSpawnY();
+					map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+					displayBoard(root);
+					currentMapName = map.getName();
+					
 				}
 			}
 		});
@@ -217,7 +234,7 @@ public class Boot extends Application {
 			}
 		}
 
-		//Displays player sprite in correct location
+		// Displays player sprite in correct location
 		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerSprite);
 		root.add(playerStack, playerStackX, playerStackY);
 	}
