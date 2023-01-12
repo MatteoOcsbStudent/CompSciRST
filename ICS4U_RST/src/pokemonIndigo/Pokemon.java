@@ -114,14 +114,25 @@ public class Pokemon {
 			e.printStackTrace();
 		}
 
+		
+		//Levels up pokemon to instantiated level
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
 
+			//Checks for moves that can be learned
 			for (int c = 0; c < movePoolLevels.length; c++) {
+				
+				//Learns move at correct level 
 				if (level == movePoolLevels[c]) {
+					
+					//Learns move if theres space, max is 4
 					if (currentMoves.size() < 4) {
 						changeMoveSet(new Move(movePool[c]));
+					
+					//Checking for oldest move to replace if pokemon already has 4 moves
 					} else {
+						
+						//Populates an array with the index at which the moves a pokemon knows is in movePool
 						int[] levelsLearned = new int[4];
 
 						for (int j = 0; j < 4; j++) {
@@ -131,9 +142,14 @@ public class Pokemon {
 								}
 							}
 						}
+						
+						//Sorts levelsLearned in ascending order
 						Sort.selectionSort(levelsLearned, 1);
+						
+						//Defines the oldest move a pokemon knows from movePool
 						int oldestMoveIndexMovePool = levelsLearned[0];
 
+						//Replaces the oldest move in currentMoves with the new move to be leanred
 						for (int b = 0; b < 4; b++) {
 
 							if (movePool[oldestMoveIndexMovePool].equals(currentMoves.get(b).getName())) {
@@ -152,16 +168,12 @@ public class Pokemon {
 	public void levelUp() {
 		// Tracking level
 		level++;
-
+		nextLevelUp = level * level * level;
 		// Checking for evolution or move learning opportunity
 		for (int i = 0; i < evoLevels.length; i++) {
 			if (level == evoLevels[i]) {
 				evolve(i);
 			}
-
-			/*
-			 * if (level == movePoolLevels.get(i)) { changeMoveSet(movePool.get(i)); }
-			 */
 		}
 
 		// HP Stat
@@ -196,6 +208,10 @@ public class Pokemon {
 
 	public void gainExp(int expGain) {
 		exp += expGain;
+		
+		if (exp >= nextLevelUp) {
+			levelUp();
+		}
 	}
 
 	public int getLevel() {
@@ -292,7 +308,6 @@ public class Pokemon {
 	}
 
 	public void changeMoveSet(Move newMove, int indexToReplace) {
-
 		currentMoves.remove(indexToReplace);
 		currentMoves.add(indexToReplace, newMove);
 	}
