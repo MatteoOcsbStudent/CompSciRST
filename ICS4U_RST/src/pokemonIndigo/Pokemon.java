@@ -32,10 +32,10 @@ public class Pokemon {
 
 	String[] types = new String[2];
 	String[] evolutions;
+	String[] movePool;
+	int[] movePoolLevels;
 	int[] evoLevels;
 
-	ArrayList<Move> movePool = new ArrayList<Move>();
-	ArrayList<Integer> movePoolLevels = new ArrayList<Integer>();
 	ArrayList<Move> currentMoves = new ArrayList<Move>();
 
 	File pokemonInfo;
@@ -70,11 +70,13 @@ public class Pokemon {
 
 			// amount of moves to be read
 			int amountOfMoves = Integer.parseInt(pokeStream.readLine());
+			movePool = new String[amountOfMoves];
+			movePoolLevels = new int[amountOfMoves];
 
 			// Reading move names and levels at which they're learned
 			for (int i = 0; i < amountOfMoves; i++) {
-				movePool.add(new Move(pokeStream.readLine()));
-				movePoolLevels.add(Integer.parseInt(pokeStream.readLine()));
+				movePool[i] = pokeStream.readLine();
+				movePoolLevels[i] = Integer.parseInt(pokeStream.readLine());
 			}
 
 			// Amount of evolutions available
@@ -115,37 +117,38 @@ public class Pokemon {
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
 
-			if (level == movePoolLevels.get(i)) {
-				if (currentMoves.size() < 4) {
-					changeMoveSet(movePool.get(i));
-				} else {
-					int[] levelsLearned = new int[4];
+			for (int c = 0; c < movePoolLevels.length; c++) {
+				if (level == movePoolLevels[c]) {
+					if (currentMoves.size() < 4) {
+						changeMoveSet(new Move(movePool[c]));
+					} else {
+						int[] levelsLearned = new int[4];
 
-					for (int j = 0; j < 4; j++) {
-						for (int a = 0; a < movePool.size(); a++) {
-							if (currentMoves.get(j).getName().equals(movePool.get(a).getName())) {
-								levelsLearned[j] = a;
+						for (int j = 0; j < 4; j++) {
+							for (int a = 0; a < movePool.length; a++) {
+								if (currentMoves.get(j).getName().equals(movePool[a])) {
+									levelsLearned[j] = a;
+								}
 							}
 						}
-					}
-					Sort.selectionSort(levelsLearned, 1);
-					int oldestMoveIndexMovePool = levelsLearned[0];
+						Sort.selectionSort(levelsLearned, 1);
+						int oldestMoveIndexMovePool = levelsLearned[0];
 
-					for (int b = 0; b < 4; b++) {
+						for (int b = 0; b < 4; b++) {
 
-						if (movePool.get(oldestMoveIndexMovePool).getName().equals(currentMoves.get(b).getName())) {
-							changeMoveSet(movePool.get(i), b);
+							if (movePool[oldestMoveIndexMovePool].equals(currentMoves.get(b).getName())) {
+								changeMoveSet(new Move(movePool[c]), b);
+							}
+
 						}
 
 					}
-
 				}
 			}
 		}
 
 	}
-	
-	
+
 	public void levelUp() {
 		// Tracking level
 		level++;
