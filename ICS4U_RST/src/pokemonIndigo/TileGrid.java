@@ -264,6 +264,7 @@ public class TileGrid {
 	}
 
 	public String getNextMap() {
+		currentMapName = nextMap;
 		return nextMap;
 	}
 
