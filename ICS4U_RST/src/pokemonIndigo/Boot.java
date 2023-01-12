@@ -49,8 +49,8 @@ public class Boot extends Application {
 	public void start(Stage myStage) throws Exception {
 
 		// Temp hardcoded map loading
-		map = new TileGrid("orilonTown", 1);
-		currentMapName = "orilonTown";
+		map = new TileGrid("Orilon Town", 1);
+		currentMapName = "Orilon Town";
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
@@ -82,7 +82,12 @@ public class Boot extends Application {
 			public void handle(KeyEvent event) {
 				switch (event.getCode()) {
 				case W:
-
+					myStage.setScene(loading);
+					// Directional sprite
+					playerSprite = playerUp;
+					
+					// Defines direction
+					direction = "Up";
 					if (map.getPlayerY() == 0) {
 
 						nextMap(myStage);
@@ -90,15 +95,9 @@ public class Boot extends Application {
 					// Makes sure you're not flying over trees
 					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != true) {
 
-						// Directional sprite
-						playerSprite = playerUp;
-
 						// Moves player's tilegrid location and stackpane location
 						map.setPlayerY(-1);
 						playerStackY--;
-
-						// Defines direction
-						direction = "Up";
 
 						// Displays new board
 						displayBoard(root);
@@ -106,39 +105,38 @@ public class Boot extends Application {
 					break;
 
 				case A:
-
+					playerSprite = playerLeft;
+					direction = "Left";
 					if (map.getPlayerX() == 0) {
 						nextMap(myStage);
 					} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
-						playerSprite = playerLeft;
 						map.setPlayerX(-1);
 						playerStackX--;
-						direction = "Left";
 						displayBoard(root);
 
 					}
 					break;
 
 				case S:
+					playerSprite = playerDown;
+					direction = "Down";
 					if (map.getPlayerY() == map.getMapHeight() - 1) {
 						nextMap(myStage);
 					} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
-						playerSprite = playerDown;
 						map.setPlayerY(1);
 						playerStackY++;
-						direction = "Down";
 						displayBoard(root);
 					}
 					break;
 
 				case D:
+					playerSprite = playerRight;
+					direction = "Right";
 					if (map.getPlayerX() == map.getMapWidth() - 1) {
 						nextMap(myStage);
 					} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
-						playerSprite = playerRight;
 						map.setPlayerX(1);
 						playerStackX++;
-						direction = "Right";
 						displayBoard(root);
 
 					}

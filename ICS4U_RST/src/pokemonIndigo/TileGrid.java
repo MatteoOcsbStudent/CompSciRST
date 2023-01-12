@@ -44,7 +44,7 @@ public class TileGrid {
 		// Declares file and spawnpoint based on chosen map
 		switch (mapName) {
 
-		case "routeOne":
+		case "Route One":
 			tileLayout = new File("data/maps/routeOne.map");
 			if (spawnpoint == 1) {
 				playerX = 14;
@@ -53,10 +53,10 @@ public class TileGrid {
 				playerX = 24;
 				playerY = 0;
 			}
-			currentMapName = "routeOne";
+			currentMapName = "Route One";
 			break;
 
-		case "orilonTown":
+		case "Orilon Town":
 			tileLayout = new File("data/maps/orilonTown.map");
 			if (spawnpoint == 1) {
 				playerX = 10;
@@ -65,7 +65,7 @@ public class TileGrid {
 				playerX = 12;
 				playerY = 0;
 			}
-			currentMapName = "orilonTown";
+			currentMapName = "Orilon Town";
 			break;
 			
 		case "routeTwo":
@@ -231,10 +231,10 @@ public class TileGrid {
 
 		switch (mapName) {
 
-		case "orilonTown":
+		case "Orilon Town":
 			if ((row >= 10 && row <= 15) && (col == 0)) {
 				exit = true;
-				nextMap = "routeOne";
+				nextMap = "Route One";
 				playerSpawnX = 10;
 				playerSpawnY = 11;
 				spawnpoint = 1;
@@ -242,16 +242,16 @@ public class TileGrid {
 				exit = false;
 			}
 			break;
-		case "routeOne":
+		case "Route One":
 			if ((playerX >= 9 && playerX <= 19) && (playerY == 50)) {
 				exit = true;
-				nextMap = "orilonTown";
+				nextMap = "Orilon Town";
 				playerSpawnX = 10;
 				playerSpawnY = 0;
 				spawnpoint = 2;
 			} else if ((playerX >= 23 && playerX <= 25) && playerY == 0) {
 				exit = true;
-				nextMap = "routeOne";
+				nextMap = "Route One";
 				playerSpawnX = 10;
 				playerSpawnY = 11;
 				spawnpoint = 1;
