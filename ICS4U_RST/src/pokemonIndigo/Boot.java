@@ -21,6 +21,10 @@ public class Boot extends Application {
 
 	// Direction of movement
 	private String direction;
+	
+	// Records what menu is being used
+	private String menu;
+	
 
 	StackPane playerStack = new StackPane();
 
@@ -44,7 +48,8 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 		
-		Pokemon temp = new Pokemon("Torchic", 36);
+		Pokemon playerPoke = new Pokemon("Torchic", 36);
+		Pokemon opponent = new Pokemon("Totodile", 1);
 
 		// Declaring gridpane
 		GridPane root = new GridPane();
@@ -58,9 +63,23 @@ public class Boot extends Application {
 
 		Scene scene = new Scene(root);
 
-		myStage.setTitle("Test");
-		myStage.setScene(scene);
-		myStage.show();
+		/**
+		 * Battle Scene
+		 */
+		
+		GridPane battle = new GridPane();
+		Scene battleScene = new Scene(battle, 640, 384);
+		
+		ImageView playerPokeSprite = new ImageView(playerPoke.getBackSprite());
+		playerPokeSprite.setFitHeight(150);
+		playerPokeSprite.setFitWidth(150);
+		battle.add(playerPokeSprite, 0, 10, 10, 10);
+		
+		ImageView opponentPokeSprite = new ImageView(opponent.getFrontSprite());
+		opponentPokeSprite.setFitHeight(150);
+		opponentPokeSprite.setFitWidth(150);
+		battle.add(opponentPokeSprite, 10, 0, 10, 10);
+		
 
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -126,6 +145,9 @@ public class Boot extends Application {
 			}
 		});
 
+		myStage.setTitle("Pokemon Indigo");
+		myStage.setScene(scene);
+		myStage.show();	
 	}
 
 	public void displayBoard(GridPane root) {
