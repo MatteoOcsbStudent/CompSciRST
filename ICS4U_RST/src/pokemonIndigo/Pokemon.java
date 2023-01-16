@@ -205,6 +205,10 @@ public class Pokemon {
 	public String getStatus() {
 		return status;
 	}
+	
+	public void setStatus(String affliction) {
+		status = affliction;
+	}
 
 	public void gainExp(int expGain) {
 		exp += expGain;
