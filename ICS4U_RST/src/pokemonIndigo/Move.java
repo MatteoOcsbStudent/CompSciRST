@@ -35,7 +35,7 @@ public class Move {
 			if (priorityString.equals("True")) {
 				priority = true;
 			} else { 
-				priority = false;
+				priority = true;
 			}
 			
 			moveFile.close();
@@ -71,5 +71,9 @@ public class Move {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean isPriority() {
+		return priority;
 	}
 }

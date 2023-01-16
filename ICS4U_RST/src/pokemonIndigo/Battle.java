@@ -6,8 +6,17 @@ public class Battle {
 	Pokemon opponentPokemon;
 	
 	int turnCounter;
-	
 	boolean isTrainerBattle = false;
+
+	String statusAfflictionStart;
+	String statusAfflictionBattle;
+	String effectiveness;
+	String miss;
+	String caught;
+	String flee;
+	String attack;
+	String faint;
+	String loseWin;
 
 	public Battle (Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
@@ -39,13 +48,38 @@ public class Battle {
 			}
 		}
 		
+		switch(firstToMove.getStatus()) {
+			
+			case("Burn"):
+				statusAfflictionStart = firstToMove.getName() + " has been hurt by it's burn";
+				firstToMove.hpChange((int)firstToMove.getTotalHP()/16);
+				damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
+			break;
+			
+			case("Confusion"):
+				if (Math.random() < 0.5) {
+					damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
+				} else {
+					statusAfflictionBattle = firstToMove.getName() + " missed in confusion!";
+				}
+			break;
+				
+			case("Paralyze"):
+				if (Math.random() < 0.3) {
+					statusAfflictionBattle = firstToMove.getName() + " is fully paralyzed!";
+				} else {
+					damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
+				}
+			break;
+			case("Sleep"):
+				statusAfflictionStart = firstToMove.getName() + " is sleeping";
+		}
+		
+		
 		damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
 		
 		damageCalc(secondToMove, firstToMove, firstToMove.getMove(chosenMoveIndex));
-		
-		
-		
-		
+			
 	}
 	
 	public int damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
@@ -67,7 +101,22 @@ public class Battle {
 		
 		//Last part of damage equation
 		double damage = ((temp/50)+2) * stab * typeCompare(usedMove.getType(), defendingTypes[0]) * typeCompare(usedMove.getType(), defendingTypes[1]);
-		Math.round(damage);	
+		Math.round(damage);
+		
+		//Status moves
+		if (usedMove.getStatus() != "Null") {
+			
+			//Healing
+			if(usedMove.getStatus() == "Heal") {
+				attacking.hpChange((int)-damage/usedMove.getStatusRate());
+			}
+
+			//Applying status 
+			else if ((Math.random()*100) <= usedMove.getStatusRate()) {
+				defending.setStatus(usedMove.getStatus());
+			}
+		}
+		
 		return (int) damage;
 	}
 	

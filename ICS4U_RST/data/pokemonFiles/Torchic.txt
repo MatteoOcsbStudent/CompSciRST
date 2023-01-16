@@ -41,6 +41,6 @@ Blaziken
 115
 70
 80
-36
+32
 Fire
 Fighting
