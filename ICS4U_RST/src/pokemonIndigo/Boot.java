@@ -1,6 +1,7 @@
 package pokemonIndigo;
 
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.application.Application;
@@ -28,8 +29,8 @@ public class Boot extends Application {
 
 	Label lblLoadingScreen;
 	static final int LOADINGFONT = 30;
-	static final int GAPY = 180;
-	static final int GAPX = 50;
+	static final int GAPY = 200;
+	static final int GAPX = 200;
 	
 	// Locking movement
 	private boolean movementLock = false;
@@ -71,14 +72,13 @@ public class Boot extends Application {
 
 		// Declaring gridpane
 		root = new GridPane();
-		GridPane loadingPane = new GridPane();
-		loadingPane.setPadding(new Insets(GAPX, GAPX, GAPY, GAPY));
-		loadingPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+		StackPane loadingPane = new StackPane();
+		
 
 		lblLoadingScreen = new Label();
 		lblLoadingScreen.setTextFill(Color.WHITE);
 		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
-		loadingPane.add(lblLoadingScreen, 0, 0);
+		loadingPane.getChildren().addAll(new Rectangle(640, 384, Color.BLACK), lblLoadingScreen);
 		
 		// call board display
 		displayBoard(root);
@@ -172,15 +172,17 @@ public class Boot extends Application {
 	}
 
 	public void nextMap(Stage myStage) {
+	
+		//locks movement
 		movementLock = true;
 		myStage.setScene(loading);
 		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
+		currentMapName = map.getNextMap();
+		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
 		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
 		displayBoard(root);
-		currentMapName = map.getName();
-		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
 		myStage.setScene(scene);
 		movementLock = false;
 	}
