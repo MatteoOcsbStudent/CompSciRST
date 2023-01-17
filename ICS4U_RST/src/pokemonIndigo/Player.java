@@ -8,7 +8,6 @@ public class Player {
 
 	private ArrayList <Pokemon> team = new ArrayList<Pokemon>();
 	private String name;
-	private Image battleSprite;
 
 	public Player(String playerName) {
 		name = playerName;
@@ -16,10 +15,6 @@ public class Player {
 	
 	public void addPokemon(Pokemon newPokemon) {
 		team.add(newPokemon);
-	}
-	
-	public String getName () {
-		return name;
 	}
 	
 	public Pokemon getPokemon(int index) {
@@ -36,14 +31,13 @@ public class Player {
 		
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	public void removePokemon(int index) {
 		team.remove(index);
 	}
-	
-	public Image getBattleSprite() {
-		return battleSprite;
-	}
-
 }
 
 	

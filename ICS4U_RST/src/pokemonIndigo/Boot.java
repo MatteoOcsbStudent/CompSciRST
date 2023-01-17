@@ -2,11 +2,16 @@ package pokemonIndigo;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Boot extends Application {
@@ -14,6 +19,17 @@ public class Boot extends Application {
 	// Declares window dimensions
 	private final int CAMERAHEIGHT = 6;
 	private final int CAMERAWIDTH = 10;
+	
+	// size of pokemon sprites
+	private final int pokeSpriteDimension = 150;
+	
+	//font sizes
+	static final int LARGE_FONT = 25;
+	static final int MEDIUM_FONT = 18;
+	static final int SMALL_FONT = 12;
+	
+	//Padding & Insets
+	static final int GAP = 1;
 
 	// Player sprite location on gridpane
 	private int playerStackX;
@@ -48,8 +64,8 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 		
-		Pokemon playerPoke = new Pokemon("Torchic", 36);
-		Pokemon opponent = new Pokemon("Totodile", 1);
+		Pokemon playerPoke = new Pokemon("Torchic", 20);
+		Pokemon opponent = new Pokemon("Totodile", 36);
 
 		// Declaring gridpane
 		GridPane root = new GridPane();
@@ -67,18 +83,47 @@ public class Boot extends Application {
 		 * Battle Scene
 		 */
 		
-		GridPane battle = new GridPane();
-		Scene battleScene = new Scene(battle, 640, 384);
+		GridPane battleRoot = new GridPane();
+		Scene battleScene = new Scene(battleRoot, 640, 384);
+		battleRoot.setGridLinesVisible(false);
+		
+		battleRoot.setHgap(GAP);
+		battleRoot.setVgap(GAP);
+		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
 		ImageView playerPokeSprite = new ImageView(playerPoke.getBackSprite());
-		playerPokeSprite.setFitHeight(150);
-		playerPokeSprite.setFitWidth(150);
-		battle.add(playerPokeSprite, 0, 10, 10, 10);
+		playerPokeSprite.setFitHeight(pokeSpriteDimension);
+		playerPokeSprite.setFitWidth(pokeSpriteDimension);
+		battleRoot.add(playerPokeSprite, 0, 5, 10, 1);
 		
 		ImageView opponentPokeSprite = new ImageView(opponent.getFrontSprite());
-		opponentPokeSprite.setFitHeight(150);
-		opponentPokeSprite.setFitWidth(150);
-		battle.add(opponentPokeSprite, 10, 0, 10, 10);
+		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
+		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
+		battleRoot.add(opponentPokeSprite, 45, 0, 10, 1);
+		
+		Label lblfightButton = new Label ("     Fight     ");
+		lblfightButton.setFont(Font.font(LARGE_FONT));
+		lblfightButton.setTextFill(Color.BLACK);
+		battleRoot.add(lblfightButton, 0, 20, 10, 1);	
+		GridPane.setHalignment(lblfightButton, HPos.CENTER);
+		
+		Label lblPokemonButton = new Label ("     Pokemon     ");
+		lblPokemonButton.setFont(Font.font(LARGE_FONT));
+		lblPokemonButton.setTextFill(Color.BLACK);
+		battleRoot.add(lblPokemonButton, 15, 20, 10, 1);	
+		GridPane.setHalignment(lblPokemonButton, HPos.CENTER);
+		
+		Label lblCatchButton = new Label ("     Catch     ");
+		lblCatchButton.setFont(Font.font(LARGE_FONT));
+		lblCatchButton.setTextFill(Color.BLACK);
+		battleRoot.add(lblCatchButton, 30, 20, 10, 1);	
+		GridPane.setHalignment(lblCatchButton, HPos.CENTER);
+		
+		Label lblRunButton = new Label ("     Run     ");
+		lblRunButton.setFont(Font.font(LARGE_FONT));
+		lblRunButton.setTextFill(Color.BLACK);
+		battleRoot.add(lblRunButton, 45, 20, 10, 1);	
+		GridPane.setHalignment(lblRunButton, HPos.CENTER);
 		
 
 		// Moving player WASD
@@ -146,7 +191,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(scene);
+		myStage.setScene(battleScene);
 		myStage.show();	
 	}
 
