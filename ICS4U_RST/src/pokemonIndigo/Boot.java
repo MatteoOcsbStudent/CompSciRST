@@ -1,10 +1,18 @@
 package pokemonIndigo;
 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -19,10 +27,23 @@ public class Boot extends Application {
 	private int playerStackX;
 	private int playerStackY;
 
+	Label lblLoadingScreen;
+	static final int LOADINGFONT = 30;
+	static final int GAPY = 200;
+	static final int GAPX = 200;
+	
+	// Locking movement
+	private boolean movementLock = false;
+
 	// Direction of movement
 	private String direction;
 
+	// The map name used for transitions
+	private String currentMapName;
+
 	StackPane playerStack = new StackPane();
+
+	Scene loading, scene;
 
 	// Directional sprites
 	ImageView playerUp = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
@@ -33,13 +54,16 @@ public class Boot extends Application {
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
 
+	GridPane root;
+
 	TileGrid map;
 
 	@Override
 	public void start(Stage myStage) throws Exception {
 
 		// Temp hardcoded map loading
-		map = new TileGrid("routeOne");
+		map = new TileGrid("Orilon Town", 1);
+		currentMapName = "Orilon Town";
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
@@ -47,8 +71,15 @@ public class Boot extends Application {
 		Pokemon temp = new Pokemon("Torchic", 36);
 
 		// Declaring gridpane
-		GridPane root = new GridPane();
+		root = new GridPane();
+		StackPane loadingPane = new StackPane();
+		
 
+		lblLoadingScreen = new Label();
+		lblLoadingScreen.setTextFill(Color.WHITE);
+		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
+		loadingPane.getChildren().addAll(new Rectangle(640, 384, Color.BLACK), lblLoadingScreen);
+		
 		// call board display
 		displayBoard(root);
 
@@ -56,7 +87,8 @@ public class Boot extends Application {
 		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerUp);
 		root.add(playerStack, playerStackX, playerStackY);
 
-		Scene scene = new Scene(root);
+		scene = new Scene(root);
+		loading = new Scene(loadingPane, 641, 385);
 
 		myStage.setTitle("Test");
 		myStage.setScene(scene);
@@ -66,66 +98,113 @@ public class Boot extends Application {
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				switch (event.getCode()) {
-				case W:
 
-					// Makes sure you're not flying over trees
-					if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != "Tree") {
+				//Checks if the movement is locked before allowing you to move
+				if (movementLock == false) {
+					
+					switch (event.getCode()) {
+					case W:
 
 						// Directional sprite
 						playerSprite = playerUp;
 
-						// Moves player's tilegrid location and stackpane location
-						map.setPlayerY(-1);
-						playerStackY--;
-
 						// Defines direction
 						direction = "Up";
+						if (map.getPlayerY() == 0) {
+							nextMap(myStage);
+						} else
+						// Makes sure you're not flying over trees
+						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != true) {
 
-						// Displays new board
-						displayBoard(root);
-					}
-					break;
+							// Moves player's tilegrid location and stackpane location
+							map.setPlayerY(-1);
+							playerStackY--;
 
-				case A:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != "Tree") {
+							// Displays new board
+							displayBoard(root);
+						}
+						break;
+
+					case A:
 						playerSprite = playerLeft;
-						map.setPlayerX(-1);
-						playerStackX--;
 						direction = "Left";
-						displayBoard(root);
+						if (map.getPlayerX() == 0) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
+							map.setPlayerX(-1);
+							playerStackX--;
+							displayBoard(root);
 
-					}
-					break;
+						}
+						break;
 
-				case S:
-					if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != "Tree") {
+					case S:
 						playerSprite = playerDown;
-						map.setPlayerY(1);
-						playerStackY++;
 						direction = "Down";
-						displayBoard(root);
-					}
-					break;
+						if (map.getPlayerY() == map.getMapHeight() - 1) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
+							map.setPlayerY(1);
+							playerStackY++;
+							displayBoard(root);
+						}
+						break;
 
-				case D:
-					if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != "Tree") {
+					case D:
 						playerSprite = playerRight;
-						map.setPlayerX(1);
-						playerStackX++;
 						direction = "Right";
-						displayBoard(root);
+						if (map.getPlayerX() == map.getMapWidth() - 1) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
+							map.setPlayerX(1);
+							playerStackX++;
+							displayBoard(root);
+
+						}
+						break;
+
+					default:
+						break;
 
 					}
-					break;
-
-				default:
-					break;
-
 				}
 			}
 		});
 
+	}
+
+	public void nextMap(Stage myStage) {
+	
+		//locks movement
+		movementLock = true;
+		
+		//Checks to see if the player is on an exit tile
+		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
+		
+		//Changes the currentMapName to the next map's
+		currentMapName = map.getNextMap();
+		
+		//Changes the loading screen text to the new map's name
+		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
+		
+		//Sets the loading screen
+		myStage.setScene(loading);
+		
+		//Puts the player in their new spawnpoint
+		playerStackX = map.getPlayerSpawnX();
+		playerStackY = map.getPlayerSpawnY();
+		
+		//Instantiates the new map
+		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+		
+		//Displays the next map
+		displayBoard(root);
+		
+		//Sets the scene to the new map
+		myStage.setScene(scene);
+		
+		//removes the movement lock
+		movementLock = false;
 	}
 
 	public void displayBoard(GridPane root) {
@@ -219,7 +298,7 @@ public class Boot extends Application {
 			}
 		}
 
-		//Displays player sprite in correct location
+		// Displays player sprite in correct location
 		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerSprite);
 		root.add(playerStack, playerStackX, playerStackY);
 	}
