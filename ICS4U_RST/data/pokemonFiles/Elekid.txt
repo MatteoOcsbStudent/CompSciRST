@@ -41,6 +41,6 @@ Electivire
 123
 85
 95
-50
+45
 Electric
 Null

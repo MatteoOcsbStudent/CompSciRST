@@ -41,6 +41,6 @@ Gengar
 130
 75
 110
-48
+42
 Ghost
 Poison

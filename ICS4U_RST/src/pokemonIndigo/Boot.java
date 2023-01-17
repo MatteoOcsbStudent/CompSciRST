@@ -84,8 +84,8 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 		
-		Pokemon playerPoke = new Pokemon("Aron", 52);
-		Pokemon opponent = new Pokemon("Beldum", 52);
+		Pokemon playerPoke = new Pokemon("Yanma", 52);
+		Pokemon opponent = new Pokemon("Yanma", 52);
 
 		// Declaring gridpane
 		root = new GridPane();
@@ -232,7 +232,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(battleScene);
+		myStage.setScene(scene);
 		myStage.show();	
 	}
 
