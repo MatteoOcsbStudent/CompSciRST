@@ -4,7 +4,7 @@ Rock
 70
 100
 40
-30
+10
 Tackle
 1
 MetalClaw

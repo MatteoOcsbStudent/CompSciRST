@@ -84,8 +84,8 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 		
-		Pokemon playerPoke = new Pokemon("Torchic", 20);
-		Pokemon opponent = new Pokemon("Totodile", 36);
+		Pokemon playerPoke = new Pokemon("Aron", 52);
+		Pokemon opponent = new Pokemon("Beldum", 52);
 
 		// Declaring gridpane
 		root = new GridPane();
@@ -122,35 +122,35 @@ public class Boot extends Application {
 		ImageView playerPokeSprite = new ImageView(playerPoke.getBackSprite());
 		playerPokeSprite.setFitHeight(pokeSpriteDimension);
 		playerPokeSprite.setFitWidth(pokeSpriteDimension);
-		battleRoot.add(playerPokeSprite, 0, 5, 10, 1);
+		battleRoot.add(playerPokeSprite, 4, 10, 10, 1);
 		
 		ImageView opponentPokeSprite = new ImageView(opponent.getFrontSprite());
 		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
 		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
-		battleRoot.add(opponentPokeSprite, 45, 0, 10, 1);
+		battleRoot.add(opponentPokeSprite, 45, 5, 10, 1);
 		
 		Label lblfightButton = new Label ("     Fight     ");
 		lblfightButton.setFont(Font.font(LARGE_FONT));
 		lblfightButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblfightButton, 0, 20, 10, 1);	
+		battleRoot.add(lblfightButton, 0, 20, 15, 1);	
 		GridPane.setHalignment(lblfightButton, HPos.CENTER);
 		
 		Label lblPokemonButton = new Label ("     Pokemon     ");
 		lblPokemonButton.setFont(Font.font(LARGE_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblPokemonButton, 15, 20, 10, 1);	
+		battleRoot.add(lblPokemonButton, 15, 20, 15, 1);	
 		GridPane.setHalignment(lblPokemonButton, HPos.CENTER);
 		
 		Label lblCatchButton = new Label ("     Catch     ");
 		lblCatchButton.setFont(Font.font(LARGE_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblCatchButton, 30, 20, 10, 1);	
+		battleRoot.add(lblCatchButton, 30, 20, 15, 1);	
 		GridPane.setHalignment(lblCatchButton, HPos.CENTER);
 		
 		Label lblRunButton = new Label ("     Run     ");
 		lblRunButton.setFont(Font.font(LARGE_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblRunButton, 45, 20, 10, 1);	
+		battleRoot.add(lblRunButton, 45, 20, 15, 1);	
 		GridPane.setHalignment(lblRunButton, HPos.CENTER);
 		
 
