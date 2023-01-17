@@ -99,7 +99,9 @@ public class Boot extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 
+				//Checks if the movement is locked before allowing you to move
 				if (movementLock == false) {
+					
 					switch (event.getCode()) {
 					case W:
 
@@ -175,15 +177,33 @@ public class Boot extends Application {
 	
 		//locks movement
 		movementLock = true;
-		myStage.setScene(loading);
+		
+		//Checks to see if the player is on an exit tile
 		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
+		
+		//Changes the currentMapName to the next map's
 		currentMapName = map.getNextMap();
+		
+		//Changes the loading screen text to the new map's name
 		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
+		
+		//Sets the loading screen
+		myStage.setScene(loading);
+		
+		//Puts the player in their new spawnpoint
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
+		
+		//Instantiates the new map
 		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+		
+		//Displays the next map
 		displayBoard(root);
+		
+		//Sets the scene to the new map
 		myStage.setScene(scene);
+		
+		//removes the movement lock
 		movementLock = false;
 	}
 

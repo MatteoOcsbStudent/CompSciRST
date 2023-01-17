@@ -10,7 +10,10 @@ public class Tile extends ImageView {
 	private final Image imgGRASS = new Image(getClass().getResource("/images/GrassTile.png").toString());
 	private final Image imgTALLGRASS = new Image(getClass().getResource("/images/TallGrassTile.png").toString());
 	private final Image imgTREE = new Image(getClass().getResource("/images/TreeTile.png").toString());
+	
+	//Barrier boolean
 	private boolean barrier = false;
+	
 	// Size
 	private final int DIMENSION = 32;
 
@@ -62,8 +65,7 @@ public class Tile extends ImageView {
 			this.setImage(new Image(
 					getClass().getResource("/images/PokemonCenter/PokemonCenter" + position + ".png").toString()));
 
-			// Setting the building as a barrier except 5 (which is the door tile of the
-			// PokemonCenter)
+			// Setting the building as a barrier other than the door
 			if (position != 5) {
 				barrier = true;
 			}
@@ -86,6 +88,7 @@ public class Tile extends ImageView {
 		}
 	}
 
+	//Checks for barrier
 	public Boolean getTexture() {
 		return barrier;
 	}
