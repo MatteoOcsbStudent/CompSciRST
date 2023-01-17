@@ -67,6 +67,8 @@ public class Boot extends Application {
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
+		
+		Pokemon temp = new Pokemon("Torchic", 36);
 
 		Pokemon temp = new Pokemon("Torchic", 35);
 

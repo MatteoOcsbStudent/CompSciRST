@@ -27,13 +27,13 @@ SuckerPunch
 46
 FlareBlitz
 50
+2
 Combusken
 60
 85
 60
 55
 16
-2
 Fire
 Fighting
 Blaziken
@@ -41,7 +41,6 @@ Blaziken
 115
 70
 80
-36
-2
+32
 Fire
 Fighting
