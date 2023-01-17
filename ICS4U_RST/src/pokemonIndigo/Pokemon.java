@@ -48,6 +48,7 @@ public class Pokemon {
 		// Setting sprite based on pokemon name
 		spriteFront = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Front.png").toString());
 		spriteBack = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Back.png").toString());
+		
 
 		// Pulling information from file based on pokemon's name
 		pokemonInfo = new File("data/pokemonFiles/" + name + ".txt");

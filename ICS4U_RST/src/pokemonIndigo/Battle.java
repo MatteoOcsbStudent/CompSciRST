@@ -4,134 +4,270 @@ public class Battle {
 
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
+
+	Pokemon firstToMove;
+	Pokemon secondToMove;
 	
-	int turnCounter;
+	Move fasterMove;
+	Move slowerMove;
+
 	boolean isTrainerBattle = false;
 
 	String statusAfflictionStart;
 	String statusAfflictionBattle;
+	String statusApplied;
 	String effectiveness;
-	String miss;
+	String move;
 	String caught;
-	String flee;
-	String attack;
 	String faint;
-	String loseWin;
 
-	public Battle (Pokemon p1, Pokemon p2, boolean trainer) {
+	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
-		opponentPokemon = p2;	
+		opponentPokemon = p2;
 	}
-	
-	public void turnExecution(int chosenMoveIndex) {
+
+	public void turnPlan(Move playerMove, Move opponentMove) {
 		
-		Pokemon firstToMove;
-		Pokemon secondToMove;
-		
-		//Calculating which pokemon moves first
-		if (playerPokemon.getSpeed() > opponentPokemon.getSpeed()) {
+		// Calculating which pokemon moves first
+		//Stores the order which moves will be used
+		// Priority Tie goes to speed
+		if (playerMove.isPriority() == true && opponentMove.isPriority() == true) {
+			if (playerPokemon.getSpeed() > opponentPokemon.getSpeed()) {
+				firstToMove = playerPokemon;
+				fasterMove = playerMove;
+				secondToMove = opponentPokemon;
+				slowerMove = opponentMove;
+			} else if (opponentPokemon.getSpeed() > playerPokemon.getSpeed()) {
+				firstToMove = opponentPokemon;
+				fasterMove = opponentMove;
+				secondToMove = playerPokemon;
+				slowerMove = playerMove;
+				// Speed tie, 50/50
+			} else {
+				double coinToss = Math.random();
+				if (coinToss <= 0.5) {
+					firstToMove = playerPokemon;
+					fasterMove = playerMove;
+					secondToMove = opponentPokemon;
+					slowerMove = opponentMove;
+				} else {
+					firstToMove = opponentPokemon;
+					fasterMove = opponentMove;
+					secondToMove = playerPokemon;
+					slowerMove = playerMove;
+				}
+			}
+			//Priority
+		} else if (playerMove.isPriority() == true) {
 			firstToMove = playerPokemon;
+			fasterMove = playerMove;
 			secondToMove = opponentPokemon;
+			slowerMove = opponentMove;
+		} else if (opponentMove.isPriority() == true) {
+			firstToMove = opponentPokemon;
+			fasterMove = opponentMove;
+			secondToMove = playerPokemon;
+			slowerMove = playerMove;
+			
+			//If no priority, goes to speed
+		} else if (playerPokemon.getSpeed() > opponentPokemon.getSpeed()) {
+			firstToMove = playerPokemon;
+			fasterMove = playerMove;
+			secondToMove = opponentPokemon;
+			slowerMove = opponentMove;
 		} else if (opponentPokemon.getSpeed() > playerPokemon.getSpeed()) {
 			firstToMove = opponentPokemon;
+			fasterMove = opponentMove;
 			secondToMove = playerPokemon;
-		
-		//Speed tie, 50/50
+			slowerMove = playerMove;
+
+			// Speed tie, 50/50
 		} else {
 			double coinToss = Math.random();
 			if (coinToss <= 0.5) {
 				firstToMove = playerPokemon;
+				fasterMove = playerMove;
 				secondToMove = opponentPokemon;
+				slowerMove = opponentMove;
 			} else {
 				firstToMove = opponentPokemon;
+				fasterMove = opponentMove;
 				secondToMove = playerPokemon;
+				slowerMove = playerMove;
 			}
 		}
-		
-		switch(firstToMove.getStatus()) {
-			
-			case("Burn"):
-				statusAfflictionStart = firstToMove.getName() + " has been hurt by it's burn";
-				firstToMove.hpChange((int)firstToMove.getTotalHP()/16);
-				damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
-			break;
-			
-			case("Confusion"):
-				if (Math.random() < 0.5) {
-					damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
-				} else {
-					statusAfflictionBattle = firstToMove.getName() + " missed in confusion!";
-				}
-			break;
-				
-			case("Paralyze"):
-				if (Math.random() < 0.3) {
-					statusAfflictionBattle = firstToMove.getName() + " is fully paralyzed!";
-				} else {
-					damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
-				}
-			break;
-			case("Sleep"):
-				statusAfflictionStart = firstToMove.getName() + " is sleeping";
-		}
-		
-		
-		damageCalc(firstToMove, secondToMove, firstToMove.getMove(chosenMoveIndex));
-		
-		damageCalc(secondToMove, firstToMove, firstToMove.getMove(chosenMoveIndex));
-			
+
 	}
-	
-	public int damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
+
+	public void turnExecution(String firstOrSecond) {
+
+		//Intializing variables based on which pokemon is attacking
+		Pokemon attacking;
+		Pokemon defending;
+		Move usedMove;
 		
-		//Types of both pokemon
-		String [] attackingTypes = attacking.getTypes().split("-");
-		String [] defendingTypes = defending.getTypes().split("-");
-		
-		//Portion of damage equation
-		double temp = ((2*attacking.getLevel())/5.0 + 2) * usedMove.getDamage() * (attacking.getAttack()/defending.getDefense());
-		
-		//Calculating stab (same type attack bonus)
-		double stab;
-		if(attackingTypes[0] == usedMove.getType() || attackingTypes[1] == usedMove.getType()) {
-			stab = 1.5;
+		if (firstOrSecond.equals("First")) {
+			attacking = firstToMove;
+			defending = secondToMove;
+			usedMove = fasterMove;
 		} else {
-			stab = 1;
+			attacking = secondToMove;
+			defending = firstToMove;
+			usedMove = slowerMove;
 		}
-		
-		//Last part of damage equation
-		double damage = ((temp/50)+2) * stab * typeCompare(usedMove.getType(), defendingTypes[0]) * typeCompare(usedMove.getType(), defendingTypes[1]);
-		Math.round(damage);
-		
-		//Status moves
-		if (usedMove.getStatus() != "Null") {
-			
-			//Healing
-			if(usedMove.getStatus() == "Heal") {
-				attacking.hpChange((int)-damage/usedMove.getStatusRate());
+		// Status afflictions
+		switch (attacking.getStatus()) {
+
+		// Pokemon takes burn damage at the start of the turn
+		case ("Burn"):
+			statusAfflictionStart = attacking.getName() + " has been hurt by it's burn";
+			attacking.hpChange((int) attacking.getTotalHP() / 16);
+			damageCalc(attacking, defending, usedMove);
+			break;
+		// 50% chance of missing the move
+		case ("Confusion"):
+			if (Math.random() < 0.5) {
+				damageCalc(attacking, defending, usedMove);
+			} else {
+				statusAfflictionBattle = attacking.getName() + " missed in confusion!";
+			}
+			break;
+		// 30% chance of being fully paralyzed
+		case ("Paralyze"):
+			if (Math.random() < 0.3) {
+				statusAfflictionBattle = attacking.getName() + " is fully paralyzed!";
+			} else {
+				damageCalc(attacking, defending, usedMove);
+			}
+			break;
+		// can't move, 33% chance to break out of sleep
+		case ("Sleep"):
+			statusAfflictionBattle = attacking.getName() + " is sleeping";
+			if (Math.random() < 0.33) {
+				statusAfflictionBattle = attacking.getName() + " woke up!";
+				damageCalc(attacking, defending, usedMove);
+				attacking.setStatus("Null");
+			}
+			break;
+		// poison, takes 1/12 total hp
+		case ("Poison"):
+			statusAfflictionStart = attacking.getName() + " took damage from posion";
+			attacking.hpChange((int) attacking.getTotalHP() / 12);
+			damageCalc(attacking, defending, usedMove);
+			break;
+
+		// No status, moves normally
+		case ("Null"):
+			damageCalc(attacking, defending, usedMove);
+			break;
+		}
+
+	}
+
+	public Pokemon getFirstToMove() {
+		return firstToMove;
+	}
+
+	public Pokemon getSecondToMove() {
+		return secondToMove;
+	}
+
+	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
+
+		double damage = 0;
+
+		if (Math.random() * 100 > usedMove.getAccuracy()) {
+			// Types of both pokemon
+			String[] attackingTypes = attacking.getTypes().split("-");
+			String[] defendingTypes = defending.getTypes().split("-");
+
+			// Portion of damage equation
+			double temp = ((2 * attacking.getLevel()) / 5.0 + 2) * usedMove.getDamage()
+					* (attacking.getAttack() / defending.getDefense());
+
+			// Calculating stab (same type attack bonus)
+			double stab;
+			if (attackingTypes[0] == usedMove.getType() || attackingTypes[1] == usedMove.getType()) {
+				stab = 1.5;
+			} else {
+				stab = 1;
 			}
 
-			//Applying status 
-			else if ((Math.random()*100) <= usedMove.getStatusRate()) {
-				defending.setStatus(usedMove.getStatus());
+			// Last part of damage equation
+			damage = ((temp / 50) + 2) * stab * typeCompare(usedMove.getType(), defendingTypes[0])
+					* typeCompare(usedMove.getType(), defendingTypes[1]);
+			Math.round(damage);
+
+			// Status moves
+			if (usedMove.getStatus() != "Null") {
+
+				// Healing
+				if (usedMove.getStatus() == "Heal") {
+					attacking.hpChange((int) -damage / usedMove.getStatusRate());
+					statusApplied = attacking.getName() + " has healed themselves";
+				}
+
+				// Applying status
+				else if ((Math.random() * 100) <= usedMove.getStatusRate()) {
+					defending.setStatus(usedMove.getStatus());
+					statusApplied = defending.getName() + " has been afflicted with " + usedMove.getStatus();
+				}
 			}
+
+			move = attacking.getName() + " used " + usedMove.getName() + "!";
+
+		} else {
+			move = attacking.getName() + " missed!";
 		}
-		
-		return (int) damage;
+
+		// Applies damage
+		defending.hpChange((int) damage);
+		if (defending.currentHP < 0) {
+			faint = defending.getName() + " has fainted";
+		}
+
 	}
-	
+
 	public int typeCompare(String type1, String type2) {
-		
+
 		return 1;
 	}
-	public boolean catchPokemon() {
-		
-		return false;
+
+	public String catchPokemon() {
+
+		String result;
+		int catchRate;
+
+		// Catch catch a trainer's pokemon
+		if (isTrainerBattle = true) {
+			result = "You can't catch another trainer's Pokemon! are you crazy?";
+
+			// Calculates catch rate
+		} else {
+			catchRate = (((3 * opponentPokemon.getTotalHP()) - (2 * opponentPokemon.getCurrentHP())) * 200)
+					/ (3 * opponentPokemon.getTotalHP());
+
+			// If random number below catchrate, return that pokemon has been caught
+			if (Math.random() * 100 < catchRate) {
+				result = opponentPokemon.getName() + " has been caught!";
+			} else {
+				result = opponentPokemon.getName() + " has broke free!";
+			}
+		}
+
+		return result;
 	}
-	
+
 	public boolean flee() {
-		
-		return false;
+
+		// 85% chance of fleeing
+		boolean success = false;
+
+		if (Math.random() < 0.85) {
+			success = true;
+		}
+
+		return success;
 	}
 
 }
