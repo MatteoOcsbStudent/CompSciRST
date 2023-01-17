@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javafx.scene.image.Image;
 import simpleIO.Console;
 
 public class TileGrid {
@@ -34,7 +35,13 @@ public class TileGrid {
 
 	// Exit tile boolean
 	private boolean exit = false;
-
+	
+	//Background Images
+	private Image backgroundImageForest = new Image("images/BattleBackgrounds/Forest.png", 640, 348, false, false);
+	private Image backgroundImageGym = new Image("images/BattleBackgrounds/Gym.png", 640, 348, false, false);
+	private Image backgroundImage;
+	
+	
 	public TileGrid() {
 
 	}
@@ -50,7 +57,10 @@ public class TileGrid {
 
 			// Calls the map file
 			tileLayout = new File("data/maps/routeOne.map");
-
+			
+			//Sets Background image
+			backgroundImage = backgroundImageForest;
+			
 			// Sets the spawnpoint
 			if (spawnpoint == 1) {
 				playerX = 14;
@@ -66,6 +76,7 @@ public class TileGrid {
 
 		case "Orilon Town":
 			tileLayout = new File("data/maps/orilonTown.map");
+			backgroundImage = backgroundImageForest;
 			if (spawnpoint == 1) {
 				playerX = 10;
 				playerY = 10;
@@ -337,6 +348,10 @@ public class TileGrid {
 	public String getNextMap() {
 		currentMapName = nextMap;
 		return nextMap;
+	}
+	
+	public Image getBackgroundImage() {
+		return backgroundImage;
 	}
 
 	public int getNextSpawn() {
