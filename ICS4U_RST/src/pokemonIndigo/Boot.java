@@ -70,8 +70,6 @@ public class Boot extends Application {
 		
 		Pokemon temp = new Pokemon("Torchic", 36);
 
-		Pokemon temp = new Pokemon("Torchic", 35);
-
 		// Declaring gridpane
 		root = new GridPane();
 		StackPane loadingPane = new StackPane();
