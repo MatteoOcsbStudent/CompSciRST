@@ -43,7 +43,6 @@ public class Boot extends Application {
 
 	Label lblLoadingScreen;
 	static final int LOADINGFONT = 30;
-	static final int GAP = 200;
 	
 	// Locking movement
 	private boolean movementLock = false;
