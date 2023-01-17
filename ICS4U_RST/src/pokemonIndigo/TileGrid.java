@@ -125,6 +125,8 @@ public class TileGrid {
 					// TallGrass Tile
 					case 'W':
 						map[y][x] = new Tile("TallGrass");
+						
+						
 						break;
 
 					// Normal Grass Tile

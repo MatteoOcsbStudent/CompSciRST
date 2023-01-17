@@ -232,7 +232,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(battleScene);
+		myStage.setScene(scene);
 		myStage.show();	
 	}
 
