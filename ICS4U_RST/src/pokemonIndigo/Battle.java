@@ -13,17 +13,31 @@ public class Battle {
 
 	boolean isTrainerBattle = false;
 
-	String statusAfflictionStart;
-	String statusAfflictionBattle;
-	String statusApplied;
-	String effectiveness;
-	String move;
-	String caught;
-	String faint;
+	String nextPokemon = null;
+	String switchPokemon = null;
+	String encounter = null;
+	String statusAfflictionStart = null;
+	String statusAfflictionBattle = null;
+	String statusApplied = null;
+	String effectiveness = null;
+	String move = null;
+	String caught = null;
+	String faint = null;
+	String flee = null;
 
 	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
 		opponentPokemon = p2;
+		
+		isTrainerBattle = trainer;
+		if (isTrainerBattle == true) {
+			encounter = "A wild " + opponentPokemon.getName() + " has appeared!";
+		}
+		
+		if (isTrainerBattle == true) {
+			encounter = "Opponent sent out " + opponentPokemon.getName() + "!";
+		}
+		
 	}
 
 	public void turnPlan(Move playerMove, Move opponentMove) {
@@ -101,6 +115,8 @@ public class Battle {
 
 	public void turnExecution(String firstOrSecond) {
 
+		statusAfflictionStart = null;
+		statusAfflictionBattle = null;
 		//Intializing variables based on which pokemon is attacking
 		Pokemon attacking;
 		Pokemon defending;
@@ -174,9 +190,11 @@ public class Battle {
 
 	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
 
+		move = null;
+		statusApplied = null;
 		double damage = 0;
 
-		if (Math.random() * 100 > usedMove.getAccuracy()) {
+		if (Math.random() * 100 < usedMove.getAccuracy()) {
 			// Types of both pokemon
 			String[] attackingTypes = attacking.getTypes().split("-");
 			String[] defendingTypes = defending.getTypes().split("-");
@@ -229,7 +247,18 @@ public class Battle {
 	}
 
 	public int typeCompare(String type1, String type2) {
-
+	
+		int amp = 1;
+		
+		
+		if (amp == 0.5) {
+			effectiveness = "It was not very effective...";
+		}
+		
+		if (amp == 2 || amp == 4) {
+			effectiveness = "It was super effective!";
+		}
+		
 		return 1;
 	}
 
@@ -268,6 +297,69 @@ public class Battle {
 		}
 
 		return success;
+	}
+	
+	public void switchPokemon(Pokemon newPokemon) {
+		
+		playerPokemon = newPokemon;
+		switchPokemon = "You have sent out " + playerPokemon.getName();
+	}
+	
+	public void switchPokemon() {
+		
+		Pokemon temp = opponentPokemon;
+		
+		//TODO - opponentPokemon = arraylist.get(tempindex+1)
+	}
+	
+	public String toString(String choice) {
+		String response = null;
+		
+		if (choice.equals("encounter")) {
+			response = encounter;
+		}
+		
+		if(choice.equals("statusStart")) {
+			response = statusAfflictionStart;
+		}
+		
+		if(choice.equals("statusBattle")) {
+			response = statusAfflictionBattle;
+		}
+		
+		if(choice.equals("move")) {
+			response = move; 
+		}
+		
+		if (choice.equals("effectiveness")) {
+			response = effectiveness;
+		}
+		
+		if (choice.equals("statusApply")) {
+			response = statusApplied;
+		}
+		
+		if(choice.equals("faint")) {
+			response = faint;
+		}
+		
+		if(choice.equals("catch")) {
+			response = caught;
+		}
+		
+		if(choice.equals("flee")) {
+			response = caught;
+		}
+		
+		if(choice.equals("switch")) {
+			response = switchPokemon;
+		}
+		
+		if(choice.equals("nextPokemon")) {
+			response = nextPokemon;
+		}
+		
+		return response;
 	}
 
 }

@@ -24,22 +24,26 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import simpleIO.Console;
 
 public class Boot extends Application {
 
 	// Declares window dimensions
 	private final int CAMERAHEIGHT = 6;
 	private final int CAMERAWIDTH = 10;
-	
+
 	// size of pokemon sprites
 	private final int pokeSpriteDimension = 150;
-	
-	//font sizes
+
+	// which battle button is being selected
+	private int battleButtonIndex = 0;
+
+	// font sizes
 	static final int LARGE_FONT = 25;
 	static final int MEDIUM_FONT = 18;
 	static final int SMALL_FONT = 12;
-	
-	//Padding & Insets
+
+	// Padding & Insets
 	static final int GAP = 1;
 
 	// Player sprite location on gridpane
@@ -48,16 +52,15 @@ public class Boot extends Application {
 
 	Label lblLoadingScreen;
 	static final int LOADINGFONT = 30;
-	
+
 	// Locking movement
 	private boolean movementLock = false;
 
 	// Direction of movement
 	private String direction;
-	
+
 	// Records what menu is being used
-	private String menu;
-	
+	private String menu = "default";
 
 	// The map name used for transitions
 	private String currentMapName;
@@ -67,13 +70,19 @@ public class Boot extends Application {
 	Scene loading, scene, battleScene;
 
 	ImageView opponentPokeSprite, playerPokeSprite;
-	BackgroundImage backgroundImage; 
-	
+	BackgroundImage backgroundImage;
+
 	// Directional sprites
 	ImageView playerUp = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
 	ImageView playerLeft = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerLeft.png").toString());
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
+
+	// Battle labels/buttons
+	Label lblfightButton;
+	Label lblPokemonButton;
+	Label lblCatchButton;
+	Label lblRunButton;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
@@ -91,20 +100,19 @@ public class Boot extends Application {
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
-		
+
 		Pokemon playerPoke = new Pokemon("Yanma", 52);
 		Pokemon opponent = new Pokemon("Yanma", 52);
 
 		// Declaring gridpane
 		root = new GridPane();
 		StackPane loadingPane = new StackPane();
-		
 
 		lblLoadingScreen = new Label();
 		lblLoadingScreen.setTextFill(Color.WHITE);
 		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
 		loadingPane.getChildren().addAll(new Rectangle(640, 384, Color.BLACK), lblLoadingScreen);
-		
+
 		// call board display
 		displayBoard(root);
 
@@ -118,134 +126,164 @@ public class Boot extends Application {
 		/**
 		 * Battle Scene
 		 */
-		
+
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, 640, 384);
 		battleRoot.setGridLinesVisible(false);
-		
+
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
-		
+
 		playerPokeSprite = new ImageView(playerPoke.getBackSprite());
 		playerPokeSprite.setFitHeight(pokeSpriteDimension);
 		playerPokeSprite.setFitWidth(pokeSpriteDimension);
 		battleRoot.add(playerPokeSprite, 4, 10, 10, 1);
-		
+
 		opponentPokeSprite = new ImageView(opponent.getFrontSprite());
 		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
 		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
 		battleRoot.add(opponentPokeSprite, 45, 5, 10, 1);
-		
-		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-		          BackgroundSize.DEFAULT);
-		
+
+		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT,
+				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+
 		battleRoot.setBackground(new Background(backgroundImage));
-		
-		
-		Label lblfightButton = new Label ("     Fight     ");
+
+		lblfightButton = new Label("     Fight     ");
 		lblfightButton.setFont(Font.font(LARGE_FONT));
 		lblfightButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblfightButton, 0, 20, 15, 1);	
+		battleRoot.add(lblfightButton, 0, 20, 15, 1);
 		GridPane.setHalignment(lblfightButton, HPos.CENTER);
-		
-		Label lblPokemonButton = new Label ("     Pokemon     ");
+
+		lblPokemonButton = new Label("     Pokemon     ");
 		lblPokemonButton.setFont(Font.font(LARGE_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblPokemonButton, 15, 20, 15, 1);	
+		battleRoot.add(lblPokemonButton, 15, 20, 15, 1);
 		GridPane.setHalignment(lblPokemonButton, HPos.CENTER);
-		
-		Label lblCatchButton = new Label ("     Catch     ");
+
+		lblCatchButton = new Label("     Catch     ");
 		lblCatchButton.setFont(Font.font(LARGE_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblCatchButton, 30, 20, 15, 1);	
+		battleRoot.add(lblCatchButton, 30, 20, 15, 1);
 		GridPane.setHalignment(lblCatchButton, HPos.CENTER);
-		
-		Label lblRunButton = new Label ("     Run     ");
+
+		lblRunButton = new Label("     Run     ");
 		lblRunButton.setFont(Font.font(LARGE_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblRunButton, 45, 20, 15, 1);	
+		battleRoot.add(lblRunButton, 45, 20, 15, 1);
 		GridPane.setHalignment(lblRunButton, HPos.CENTER);
-		
 
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 
-				//Checks if the movement is locked before allowing you to move
+				// Checks if the movement is locked before allowing you to move
 				if (movementLock == false) {
-					
+
 					switch (event.getCode()) {
 					case W:
 
-						// Directional sprite
-						playerSprite = playerUp;
+						if (menu.equals("Battle")) {
+							//W doesn't do anything in battle menu
+						} else {
 
-						// Defines direction
-						direction = "Up";
-						if (map.getPlayerY() == 0) {
-							nextMap(myStage);
-						} else
-						// Makes sure you're not flying over trees and houses
-						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
+							// Directional sprite
+							playerSprite = playerUp;
 
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-								wildEncounter(myStage);
+							// Defines direction
+							direction = "Up";
+							if (map.getPlayerY() == 0) {
+								nextMap(myStage);
+							} else
+							// Makes sure you're not flying over trees and houses
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
+
+								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+									wildEncounter(myStage);
+								}
+								// Moves player's tilegrid location and stackpane location
+								map.setPlayerY(-1);
+								playerStackY--;
+
+								// Displays new board
+								displayBoard(root);
 							}
-							// Moves player's tilegrid location and stackpane location
-							map.setPlayerY(-1);
-							playerStackY--;
-
-							// Displays new board
-							displayBoard(root);
 						}
+
 						break;
 
 					case A:
-						playerSprite = playerLeft;
-						direction = "Left";
-						if (map.getPlayerX() == 0) {
-							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-								wildEncounter(myStage);
-							}
-							map.setPlayerX(-1);
-							playerStackX--;
-							displayBoard(root);
 
+						// Moves through highlighted buttons in a battle instead of movement
+						if (menu.equals("Battle")) {
+							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
+								battleButtonIndex = 4;
+								buttonUpdate();
+							} else {
+								battleButtonIndex--;
+								buttonUpdate();
+							}
+						} else {
+							playerSprite = playerLeft;
+							direction = "Left";
+							if (map.getPlayerX() == 0) {
+								nextMap(myStage);
+							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
+								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+									wildEncounter(myStage);
+								}
+								map.setPlayerX(-1);
+								playerStackX--;
+								displayBoard(root);
+							}
 						}
 						break;
 
 					case S:
-						playerSprite = playerDown;
-						direction = "Down";
-						if (map.getPlayerY() == map.getMapHeight() - 1) {
-							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-								wildEncounter(myStage);
+
+						if (menu.equals("Battle")) {
+							Console.print("Test");
+						} else {
+							playerSprite = playerDown;
+							direction = "Down";
+							if (map.getPlayerY() == map.getMapHeight() - 1) {
+								nextMap(myStage);
+							} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
+								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+									wildEncounter(myStage);
+								}
+								map.setPlayerY(1);
+								playerStackY++;
+								displayBoard(root);
 							}
-							map.setPlayerY(1);
-							playerStackY++;
-							displayBoard(root);
 						}
 						break;
 
 					case D:
-						playerSprite = playerRight;
-						direction = "Right";
-						if (map.getPlayerX() == map.getMapWidth() - 1) {
-							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-								wildEncounter(myStage);
-							}
-							map.setPlayerX(1);
-							playerStackX++;
-							displayBoard(root);
 
+						if (menu.equals("Battle")) {
+							if (battleButtonIndex == 4 || battleButtonIndex == 0) {
+								battleButtonIndex = 1;
+								buttonUpdate();
+							} else {
+								battleButtonIndex++;
+								buttonUpdate();
+							}
+						} else {
+							playerSprite = playerRight;
+							direction = "Right";
+							if (map.getPlayerX() == map.getMapWidth() - 1) {
+								nextMap(myStage);
+							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
+								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+									wildEncounter(myStage);
+								}
+								map.setPlayerX(1);
+								playerStackX++;
+								displayBoard(root);
+							}
 						}
 						break;
 
@@ -259,59 +297,85 @@ public class Boot extends Application {
 
 		myStage.setTitle("Pokemon Indigo");
 		myStage.setScene(scene);
-		myStage.show();	
+		myStage.show();
+
 	}
 
 	public void nextMap(Stage myStage) {
-	
-		//locks movement
+
+		// locks movement
 		movementLock = true;
-		
-		//Checks to see if the player is on an exit tile
+
+		// Checks to see if the player is on an exit tile
 		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
-		
-		//Changes the currentMapName to the next map's
+
+		// Changes the currentMapName to the next map's
 		currentMapName = map.getNextMap();
-		
-		//Changes the loading screen text to the new map's name
+
+		// Changes the loading screen text to the new map's name
 		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
-		
-		//Sets the loading screen
+
+		// Sets the loading screen
 		myStage.setScene(loading);
-		
-		//Puts the player in their new spawnpoint
+
+		// Puts the player in their new spawnpoint
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
-		
-		//Instantiates the new map
+
+		// Instantiates the new map
 		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
-		
-		//Displays the next map
+
+		// Displays the next map
 		displayBoard(root);
-		
-		//Sets the scene to the new map
+
+		// Sets the scene to the new map
 		myStage.setScene(scene);
-		
-		//removes the movement lock
+
+		// removes the movement lock
 		movementLock = false;
 	}
-	
+
+	public void buttonUpdate() {
+
+		switch (menu) {
+		case "Battle":
+
+			if (battleButtonIndex == 1) {
+				lblfightButton.setTextFill(Color.BLUE);	
+			}
+
+			if (battleButtonIndex == 2) {
+				lblPokemonButton.setTextFill(Color.BLUE);
+			}
+
+			if (battleButtonIndex == 3) {
+				lblCatchButton.setTextFill(Color.BLUE);
+			}
+
+			if (battleButtonIndex == 4) {
+				lblRunButton.setTextFill(Color.BLUE);
+			}
+
+		}
+	}
+
 	public void wildEncounter(Stage myStage) {
-		
-		//20% chance of wild encounter happening
+
+		// 20% chance of wild encounter happening
 		if (Math.random() * 100 < 20) {
-			
-			//Sets pokemon
+
+			// Sets pokemon
 			Pokemon playerPoke = new Pokemon("Torchic", 20);
 			Pokemon opponent = new Pokemon("Totodile", (playerPoke.getLevel() - 2));
-			
-			//Sets the sprites for the pokemon
+
+			// Sets the sprites for the pokemon
 			playerPokeSprite.setImage(playerPoke.getBackSprite());
 			opponentPokeSprite.setImage(opponent.getFrontSprite());
-			
-			//Battle Logic goes Here
-			
-			//Sets the Battle Scene
+
+			// Battle Logic goes Here
+
+			// Sets the Battle Scene
+			menu = "Battle";
 			myStage.setScene(battleScene);
 		}
 	}
