@@ -14,6 +14,8 @@ public class Tile extends ImageView {
 	//Barrier boolean
 	private boolean barrier = false;
 	
+	private boolean wildEncounter = false;
+	
 	// Size
 	private final int DIMENSION = 32;
 
@@ -41,6 +43,7 @@ public class Tile extends ImageView {
 
 		case "TallGrass":
 			this.setImage(imgTALLGRASS);
+			wildEncounter = true;
 			break;
 
 		case "Tree":
@@ -89,8 +92,12 @@ public class Tile extends ImageView {
 	}
 
 	//Checks for barrier
-	public Boolean getTexture() {
+	public Boolean checkBarrier() {
 		return barrier;
+	}
+	
+	public Boolean checkEncounter() {
+		return wildEncounter;
 	}
 
 }

@@ -10,10 +10,15 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -59,8 +64,11 @@ public class Boot extends Application {
 
 	StackPane playerStack = new StackPane();
 
-	Scene loading, scene;
+	Scene loading, scene, battleScene;
 
+	ImageView opponentPokeSprite, playerPokeSprite;
+	BackgroundImage backgroundImage; 
+	
 	// Directional sprites
 	ImageView playerUp = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerUp.png").toString());
 	ImageView playerLeft = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerLeft.png").toString());
@@ -105,29 +113,35 @@ public class Boot extends Application {
 		root.add(playerStack, playerStackX, playerStackY);
 
 		scene = new Scene(root);
-		loading = new Scene(loadingPane, 641, 385);
+		loading = new Scene(loadingPane, 640, 384);
 
 		/**
 		 * Battle Scene
 		 */
 		
 		GridPane battleRoot = new GridPane();
-		Scene battleScene = new Scene(battleRoot, 640, 384);
+		battleScene = new Scene(battleRoot, 640, 384);
 		battleRoot.setGridLinesVisible(false);
 		
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		
-		ImageView playerPokeSprite = new ImageView(playerPoke.getBackSprite());
+		playerPokeSprite = new ImageView(playerPoke.getBackSprite());
 		playerPokeSprite.setFitHeight(pokeSpriteDimension);
 		playerPokeSprite.setFitWidth(pokeSpriteDimension);
 		battleRoot.add(playerPokeSprite, 0, 5, 10, 1);
 		
-		ImageView opponentPokeSprite = new ImageView(opponent.getFrontSprite());
+		opponentPokeSprite = new ImageView(opponent.getFrontSprite());
 		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
 		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
 		battleRoot.add(opponentPokeSprite, 45, 0, 10, 1);
+		
+		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+		          BackgroundSize.DEFAULT);
+		
+		battleRoot.setBackground(new Background(backgroundImage));
+		
 		
 		Label lblfightButton = new Label ("     Fight     ");
 		lblfightButton.setFont(Font.font(LARGE_FONT));
@@ -173,9 +187,12 @@ public class Boot extends Application {
 						if (map.getPlayerY() == 0) {
 							nextMap(myStage);
 						} else
-						// Makes sure you're not flying over trees
-						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).getTexture() != true) {
+						// Makes sure you're not flying over trees and houses
+						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
 
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
+							}
 							// Moves player's tilegrid location and stackpane location
 							map.setPlayerY(-1);
 							playerStackY--;
@@ -190,7 +207,10 @@ public class Boot extends Application {
 						direction = "Left";
 						if (map.getPlayerX() == 0) {
 							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).getTexture() != true) {
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
+							}
 							map.setPlayerX(-1);
 							playerStackX--;
 							displayBoard(root);
@@ -203,7 +223,10 @@ public class Boot extends Application {
 						direction = "Down";
 						if (map.getPlayerY() == map.getMapHeight() - 1) {
 							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).getTexture() != true) {
+						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
+							}
 							map.setPlayerY(1);
 							playerStackY++;
 							displayBoard(root);
@@ -215,7 +238,10 @@ public class Boot extends Application {
 						direction = "Right";
 						if (map.getPlayerX() == map.getMapWidth() - 1) {
 							nextMap(myStage);
-						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).getTexture() != true) {
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
+							}
 							map.setPlayerX(1);
 							playerStackX++;
 							displayBoard(root);
@@ -232,7 +258,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(battleScene);
+		myStage.setScene(scene);
 		myStage.show();	
 	}
 
@@ -268,6 +294,26 @@ public class Boot extends Application {
 		
 		//removes the movement lock
 		movementLock = false;
+	}
+	
+	public void wildEncounter(Stage myStage) {
+		
+		//20% chance of wild encounter happening
+		if (Math.random() * 100 < 20) {
+			
+			//Sets pokemon
+			Pokemon playerPoke = new Pokemon("Torchic", 20);
+			Pokemon opponent = new Pokemon("Totodile", (playerPoke.getLevel() - 2));
+			
+			//Sets the sprites for the pokemon
+			playerPokeSprite.setImage(playerPoke.getBackSprite());
+			opponentPokeSprite.setImage(opponent.getFrontSprite());
+			
+			//Battle Logic goes Here
+			
+			//Sets the Battle Scene
+			myStage.setScene(battleScene);
+		}
 	}
 
 	public void displayBoard(GridPane root) {
