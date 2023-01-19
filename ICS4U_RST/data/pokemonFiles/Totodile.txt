@@ -7,27 +7,27 @@ Null
 12
 Scratch
 1
-WaterGun
+Water Gun
 6
-MudSlap
+Mud Slap
 8
 Bite
 13
-IceFang
+Ice Fang
 20
-RockSlide
+Rock Slide
 24
-WaterPulse
+Water Pulse
 26
 Crunch
 29
-LowKick
+Low Kick
 33
-AquaTail
+Aqua Tail
 36
-SuperPower
+Superpower
 40
-HydroPump
+Hydro Pump
 45
 2
 Croconaw

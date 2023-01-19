@@ -113,6 +113,7 @@ public class TileGrid {
 			for (int y = 0; y < mapHeight; y++) {
 				String temp = mapStream.readLine();
 
+	
 				// Reads each character in the row, declaring corresponding tile at the index
 				for (int x = 0; x < temp.length(); x++) {
 					char tileType = temp.charAt(x);

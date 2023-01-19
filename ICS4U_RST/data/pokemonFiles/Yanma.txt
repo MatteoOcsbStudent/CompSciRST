@@ -9,23 +9,23 @@ Gust
 1
 Tackle
 2
-QuickAttack
+Quick Attack
 6
-AerialAce
+Aerial Ace
 14
-LeechLife
+Leech Life
 22
-AncientPower
+Ancient Power
 33
-GigaDrain
+Giga Drain
 42
-NightSlash
+Night Slash
 48
 Slash
 54
-AirSlash
+Air Slash
 64
-BugBuzz
+Bug Buzz
 72
 1
 Nuzleaf

@@ -7,25 +7,25 @@ Null
 11
 Tackle
 1
-ThunderWave
+Thunder Wave
 4
-ThunderShock
+Thunder Shock
 12
 Bite
 15
 Spark
 18
-ThunderFang
+Thunder Fang
 24
-DoubleKick
+Double Kick
 31
 Crunch
 46
-FireFang
+Fire Fang
 56
-WildCharge
+Wild Charge
 64
-IceFang
+Ice Fang
 68
 2
 Luxio

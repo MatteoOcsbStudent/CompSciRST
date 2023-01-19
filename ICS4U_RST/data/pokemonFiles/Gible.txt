@@ -7,9 +7,9 @@ Ground
 11
 Tackle
 1
-SandTomb
+Sand Tomb
 4
-DragonBreath
+Dragon Breath
 12
 Bulldoze
 18
@@ -17,13 +17,13 @@ Bite
 25
 Slash
 34
-DragonClaw
+Dragon Claw
 42
 Crunch
 48
-TakeDown
+Takedown
 56
-DragonRush
+Dragon Rush
 64
 Stone-Edge
 72
