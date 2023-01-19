@@ -16,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -36,7 +37,7 @@ public class Boot extends Application {
 	private final int CAMERAWIDTH = 10;
 
 	// size of pokemon sprites
-	private final int pokeSpriteDimension = 148;
+	private final int POKESPRITEDIMENSION = 148;
 
 	// Scene height and width
 	private final int sceneHeight = 384;
@@ -77,6 +78,10 @@ public class Boot extends Application {
 	// The map name used for transitions
 	private String currentMapName;
 
+	// Global reference for pokemon
+	Pokemon playerPokemon;
+	Pokemon opponentPokemon;
+
 	// Player sprite stackpane
 	StackPane playerStack = new StackPane();
 
@@ -114,6 +119,15 @@ public class Boot extends Application {
 
 	// Battle reference
 	Battle battle;
+
+	// healthBars
+
+	ProgressBar playerHpBar;
+	ProgressBar opponentHpBar;
+
+	// xpBar
+
+	ProgressBar xpBar;
 
 	@Override
 	public void start(Stage myStage) throws Exception {
@@ -161,15 +175,30 @@ public class Boot extends Application {
 
 		// Player's pokemon image
 		playerPokeSprite = new ImageView();
-		playerPokeSprite.setFitHeight(pokeSpriteDimension);
-		playerPokeSprite.setFitWidth(pokeSpriteDimension);
+		playerPokeSprite.setFitHeight(POKESPRITEDIMENSION);
+		playerPokeSprite.setFitWidth(POKESPRITEDIMENSION);
 		battleRoot.add(playerPokeSprite, 0, 2, 1, 2);
+
+		// playerHpBar
+		playerHpBar = new ProgressBar();
+		playerHpBar.setPrefWidth(POKESPRITEDIMENSION);
+		playerHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
+		battleRoot.add(playerHpBar, 6, 2, 1, 2);
+
+		// xpBar
+		xpBar = new ProgressBar();
 
 		// Opponent pokemon image
 		opponentPokeSprite = new ImageView();
-		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
-		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
+		opponentPokeSprite.setFitHeight(POKESPRITEDIMENSION);
+		opponentPokeSprite.setFitWidth(POKESPRITEDIMENSION);
 		battleRoot.add(opponentPokeSprite, 6, 0, 1, 2);
+
+		// opponentHpBar
+		opponentHpBar = new ProgressBar();
+		opponentHpBar.setPrefWidth(POKESPRITEDIMENSION);
+		opponentHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
+		battleRoot.add(opponentHpBar, 0, 0, 1, 2);
 
 		// Background image
 		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT,
@@ -319,85 +348,103 @@ public class Boot extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 
-				switch (event.getCode()) {
+				if (movementLock == false) {
+					switch (event.getCode()) {
 
-				case A:
+					case A:
 
-					if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
-						// Scrolling through buttons right
-						if (battleButtonIndex == 1 || battleButtonIndex == 0) {
-							battleButtonIndex = 4;
-							buttonUpdate();
-						} else {
-							battleButtonIndex--;
-							buttonUpdate();
+						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
+							// Scrolling through buttons right
+							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
+								battleButtonIndex = 4;
+								buttonUpdate();
+							} else {
+								battleButtonIndex--;
+								buttonUpdate();
+							}
 						}
-					}
-					break;
-
-				case D:
-
-					if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
-						// Scrolling through buttons left
-						if (battleButtonIndex == 4 || battleButtonIndex == 0) {
-							battleButtonIndex = 1;
-							buttonUpdate();
-						} else {
-							battleButtonIndex++;
-							buttonUpdate();
-						}
-					}
-					break;
-
-				// 'Select' key. different functions based on menu
-				case C:
-					switch (battleMenu) {
-
-					case "Moves":
-						useMove(myStage);
 						break;
 
-					case "General":
+					case D:
 
-						switch (battleButtonIndex) {
-						case 1:
-							nextBattleMenu(myStage, "Moves");
+						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
+							// Scrolling through buttons left
+							if (battleButtonIndex == 4 || battleButtonIndex == 0) {
+								battleButtonIndex = 1;
+								buttonUpdate();
+							} else {
+								battleButtonIndex++;
+								buttonUpdate();
+							}
+						}
+						break;
+
+					// 'Select' key. different functions based on menu
+					case C:
+						switch (battleMenu) {
+
+						// Uses move
+						case "Moves":
+							useMove(myStage);
 							break;
-						case 2:
-							nextBattleMenu(myStage, "PokemonMenu");
+
+						// Changes next menu based on selected button
+						case "General":
+
+							switch (battleButtonIndex) {
+							case 1:
+								nextBattleMenu(myStage, "Moves");
+								break;
+							case 2:
+								nextBattleMenu(myStage, "PokemonMenu");
+								break;
+							case 3:
+								nextBattleMenu(myStage, "Flee");
+								break;
+							case 4:
+								nextBattleMenu(myStage, "Run");
+								break;
+							default:
+								break;
+
+							}
+
 							break;
-						case 3:
-							nextBattleMenu(myStage, "Flee");
+
+						// Cycles through battle responses
+						case "battleResponses":
+
+							if (lblBattleResponse.getText().contains("appeared!")) {
+								nextBattleMenu(myStage, "General");
+							} else {
+								if (nextBattleResponse() == true) {
+									nextBattleMenu(myStage, "General");
+								}
+							}
+
 							break;
-						case 4:
-							nextBattleMenu(myStage, "Run");
-							break;
+
 						default:
 							break;
-
 						}
 
 						break;
 
-					case "battleResponses":
+					case X:
 
-						if (lblBattleResponse.getText().contains("appeared!")) {
+						switch (battleMenu) {
+
+						// Goes back to general battle menu
+						case "Moves":
 							nextBattleMenu(myStage, "General");
-						} else {
-							nextBattleResponse();
-						}
+							break;
 
-						break;
+						}
 
 					default:
 						break;
+
 					}
-
-					break;
-
-				default:
-					break;
-
 				}
 			}
 		});
@@ -537,21 +584,21 @@ public class Boot extends Application {
 			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
 			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
 
-			if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 1) {
+			if (playerPokemon.getMovePoolSize() > 1) {
 				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
 				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
 			} else {
 				lblPokemonButton.setText("");
 			}
 
-			if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 2) {
+			if (playerPokemon.getMovePoolSize() > 2) {
 				lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
 				lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
 			} else {
 				lblCatchButton.setText("");
 			}
 
-			if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 3) {
+			if (playerPokemon.getMovePoolSize() > 3) {
 				lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
 				lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
 			} else {
@@ -564,10 +611,17 @@ public class Boot extends Application {
 
 		case "Catch":
 
+			// Catching pokemon
 			battleMenu = "battleResponses";
 			nextBattleMenu(myStage, "battleResponses");
 
 			lblBattleResponse.setText(battle.catchPokemon());
+
+			Timeline delayCatch = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
+				myStage.setScene(scene);
+			}));
+
+			delayCatch.play();
 
 			break;
 
@@ -580,17 +634,21 @@ public class Boot extends Application {
 			// If you got away, back to main scene
 			if (battle.flee() == true) {
 				lblBattleResponse.setText("You got away safely!");
+				battle.clearResponses();
+				responseCounter = 0;
+				movementLock = true;
 
-				Timeline delay = new Timeline(new KeyFrame(Duration.seconds(2.5), e -> {
+				Timeline delayRun = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
 					myStage.setScene(scene);
+					movementLock = false;
 				}));
 
-				delay.play();
+				delayRun.play();
 
 				// Otherwise, battle continues, opponent takes turn
 			} else {
 				lblBattleResponse.setText("You couldn't get away!");
-				battle.turnExecution("Opponent only");			
+				battle.turnExecution("Opponent only");
 			}
 
 			break;
@@ -605,31 +663,34 @@ public class Boot extends Application {
 
 		switch (battleButtonIndex) {
 
+		// Queues up a turn with selected move
 		case 1:
-			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(0));
+			battle.turnPlan(playerPokemon.getMove(0));
 			break;
 
 		case 2:
-			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(1));
+			battle.turnPlan(playerPokemon.getMove(1));
 			break;
 		case 3:
-			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(2));
+			battle.turnPlan(playerPokemon.getMove(2));
 			break;
 
 		case 4:
-			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(3));
+			battle.turnPlan(playerPokemon.getMove(3));
 			break;
 		}
 
+		// Exectues whole turn
 		battle.turnExecution("First");
 		battle.turnExecution("Second");
 		nextBattleResponse();
 		nextBattleMenu(myStage, "battleResponses");
-		
 
 	}
 
-	public void nextBattleResponse() {
+	public boolean nextBattleResponse() {
+
+		Boolean lastResponse = false;
 
 		if (responseCounter < battle.responseAmount()) {
 			lblBattleResponse.setText(battle.battleResponses(responseCounter));
@@ -637,7 +698,10 @@ public class Boot extends Application {
 		} else {
 			responseCounter = 0;
 			battle.clearResponses();
+			lastResponse = true;
 		}
+
+		return lastResponse;
 
 	}
 
@@ -737,6 +801,21 @@ public class Boot extends Application {
 
 		return color;
 	}
+	
+	public void updateProgressBar(String bar) {
+		switch (bar) {
+		
+		case "player":
+			playerHpBar.setProgress(playerPokemon.getCurrentHP()/playerPokemon.getTotalHP());
+			break;
+		case "opponent":
+			opponentHpBar.setProgress(opponentPokemon.getCurrentHP()/opponentPokemon.getTotalHP());
+			break;
+		case "xp":
+			
+			break;
+		}
+	}
 
 	public void wildEncounter(Stage myStage) {
 
@@ -745,14 +824,20 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			Pokemon opponent = new Pokemon("Torchic", 1);
+			opponentPokemon = new Pokemon("Torchic", 1);
+			
+			playerPokemon = player.getPokemon(0);
+			playerHpBar.setProgress(0.5);
 
-			battle = new Battle(player.getPokemon(0), opponent, false);
+			battle = new Battle(playerPokemon, opponentPokemon, false);
+			
 			// Sets the sprites for the pokemon
-			currentBattlePoke = 0;
-			playerPokeSprite.setImage(player.getPokemon(0).getBackSprite());
-			opponentPokeSprite.setImage(opponent.getFrontSprite());
+			playerPokeSprite.setImage(playerPokemon.getBackSprite());
+			opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 
+			updateProgressBar("player");
+			updateProgressBar("opponent");
+			
 			// Sets the Battle Scene
 			battleMenu = "battleResponses";
 			nextBattleResponse();
