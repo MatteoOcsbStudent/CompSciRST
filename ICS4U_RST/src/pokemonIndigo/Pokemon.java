@@ -24,7 +24,7 @@ public class Pokemon {
 	int speed;
 	int totalHP;
 
-	String status;
+	String status = "Null";
 	String name;
 
 	Image spriteFront;
@@ -323,5 +323,9 @@ public class Pokemon {
 
 	public Move getMove(int index) {
 		return currentMoves.get(index);
+	}
+	
+	public int getMovePoolSize() {
+		return currentMoves.size();
 	}
 }

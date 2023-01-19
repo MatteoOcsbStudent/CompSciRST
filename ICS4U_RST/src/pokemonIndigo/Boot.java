@@ -3,14 +3,17 @@ package pokemonIndigo;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -21,10 +24,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import simpleIO.Console;
 
 public class Boot extends Application {
 
@@ -33,18 +33,22 @@ public class Boot extends Application {
 	private final int CAMERAWIDTH = 10;
 
 	// size of pokemon sprites
-	private final int pokeSpriteDimension = 150;
+	private final int pokeSpriteDimension = 148;
+
+	// Scene height and width
+	private final int sceneHeight = 384;
+	private final int sceneWidth = 640;
 
 	// which battle button is being selected
 	private int battleButtonIndex = 0;
 
 	// font sizes
 	static final int LARGE_FONT = 25;
-	static final int MEDIUM_FONT = 18;
+	static final int MEDIUM_FONT = 20;
 	static final int SMALL_FONT = 12;
 
 	// Padding & Insets
-	static final int GAP = 1;
+	static final int GAP = 5;
 
 	// Player sprite location on gridpane
 	private int playerStackX;
@@ -53,22 +57,27 @@ public class Boot extends Application {
 	Label lblLoadingScreen;
 	static final int LOADINGFONT = 30;
 
+	private int currentBattlePoke;
+
 	// Locking movement
 	private boolean movementLock = false;
 
 	// Direction of movement
 	private String direction;
 
-	// Records what menu is being used
-	private String menu = "default";
+	// Tracks which battle menu is used
+	private String battleMenu;
 
 	// The map name used for transitions
 	private String currentMapName;
 
+	// Player sprite stackpane
 	StackPane playerStack = new StackPane();
 
+	// Scenes
 	Scene loading, scene, battleScene;
 
+	// Battle images
 	ImageView opponentPokeSprite, playerPokeSprite;
 	BackgroundImage backgroundImage;
 
@@ -79,20 +88,31 @@ public class Boot extends Application {
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
 	// Battle labels/buttons
-	Label lblfightButton;
+	Label lblFightButton;
 	Label lblPokemonButton;
 	Label lblCatchButton;
 	Label lblRunButton;
+	Label lblBattleResponse;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
 
+	// main gridpane
 	GridPane root;
 
+	// Tilegrid reference
 	TileGrid map;
+
+	// player instantiation
+	Player player = new Player();
+
+	// Battle reference
+	Battle battle;
 
 	@Override
 	public void start(Stage myStage) throws Exception {
+
+		player.addPokemon(new Pokemon("Torchic", 36));
 
 		// Temp hardcoded map loading
 		map = new TileGrid("Orilon Town", 1);
@@ -101,78 +121,98 @@ public class Boot extends Application {
 		playerStackY = 11;
 		direction = "Up";
 
-		Pokemon playerPoke = new Pokemon("Yanma", 52);
-		Pokemon opponent = new Pokemon("Yanma", 52);
-
 		// Declaring gridpane
 		root = new GridPane();
+
+		// Stack player sprite onto tile
+		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerUp);
+		root.add(playerStack, playerStackX, playerStackY);
+		scene = new Scene(root);
+
+		// call board display
+		displayBoard(root);
+
 		StackPane loadingPane = new StackPane();
 
 		lblLoadingScreen = new Label();
 		lblLoadingScreen.setTextFill(Color.WHITE);
 		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
-		loadingPane.getChildren().addAll(new Rectangle(640, 384, Color.BLACK), lblLoadingScreen);
+		loadingPane.getChildren().addAll(new Rectangle(sceneWidth, sceneHeight, Color.BLACK), lblLoadingScreen);
 
-		// call board display
-		displayBoard(root);
-
-		// Stack player sprite onto tile
-		playerStack = new StackPane(map.getTile(map.getPlayerY(), map.getPlayerX()), playerUp);
-		root.add(playerStack, playerStackX, playerStackY);
-
-		scene = new Scene(root);
-		loading = new Scene(loadingPane, 640, 384);
+		loading = new Scene(loadingPane, sceneWidth, sceneHeight);
 
 		/**
 		 * Battle Scene
 		 */
 
 		GridPane battleRoot = new GridPane();
-		battleScene = new Scene(battleRoot, 640, 384);
+		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
 		battleRoot.setGridLinesVisible(false);
 
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
 
-		playerPokeSprite = new ImageView(playerPoke.getBackSprite());
+		// Player's pokemon image
+		playerPokeSprite = new ImageView();
 		playerPokeSprite.setFitHeight(pokeSpriteDimension);
 		playerPokeSprite.setFitWidth(pokeSpriteDimension);
-		battleRoot.add(playerPokeSprite, 4, 10, 10, 1);
+		battleRoot.add(playerPokeSprite, 0, 2, 1, 2);
 
-		opponentPokeSprite = new ImageView(opponent.getFrontSprite());
+		// Opponent pokemon image
+		opponentPokeSprite = new ImageView();
 		opponentPokeSprite.setFitHeight(pokeSpriteDimension);
 		opponentPokeSprite.setFitWidth(pokeSpriteDimension);
-		battleRoot.add(opponentPokeSprite, 45, 5, 10, 1);
+		battleRoot.add(opponentPokeSprite, 6, 0, 1, 2);
 
+		// Background image
 		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT,
 				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
 		battleRoot.setBackground(new Background(backgroundImage));
 
-		lblfightButton = new Label("     Fight     ");
-		lblfightButton.setFont(Font.font(LARGE_FONT));
-		lblfightButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblfightButton, 0, 20, 15, 1);
-		GridPane.setHalignment(lblfightButton, HPos.CENTER);
+		// Fight button
+		lblFightButton = new Label("Fight");
+		lblFightButton.setFont(Font.font(LARGE_FONT));
+		lblFightButton.setTextFill(Color.BLACK);
+		battleRoot.add(lblFightButton, 0, 4, 1, 1);
+		lblFightButton.setVisible(false);
+		lblFightButton.setPrefWidth(148);
+		lblFightButton.setAlignment(Pos.CENTER);
 
-		lblPokemonButton = new Label("     Pokemon     ");
+		// Pokemon button
+		lblPokemonButton = new Label("Pokemon");
 		lblPokemonButton.setFont(Font.font(LARGE_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblPokemonButton, 15, 20, 15, 1);
-		GridPane.setHalignment(lblPokemonButton, HPos.CENTER);
+		battleRoot.add(lblPokemonButton, 2, 4, 1, 1);
+		lblPokemonButton.setVisible(false);
+		lblPokemonButton.setPrefWidth(148);
+		lblPokemonButton.setAlignment(Pos.CENTER);
 
-		lblCatchButton = new Label("     Catch     ");
+		// Catch button
+		lblCatchButton = new Label("Catch");
 		lblCatchButton.setFont(Font.font(LARGE_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblCatchButton, 30, 20, 15, 1);
-		GridPane.setHalignment(lblCatchButton, HPos.CENTER);
+		battleRoot.add(lblCatchButton, 4, 4, 1, 1);
+		lblCatchButton.setVisible(false);
+		lblCatchButton.setPrefWidth(148);
+		lblCatchButton.setAlignment(Pos.CENTER);
 
-		lblRunButton = new Label("     Run     ");
+		// Run button
+		lblRunButton = new Label("Run");
 		lblRunButton.setFont(Font.font(LARGE_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblRunButton, 45, 20, 15, 1);
-		GridPane.setHalignment(lblRunButton, HPos.CENTER);
+		battleRoot.add(lblRunButton, 6, 4, 1, 1);
+		lblRunButton.setVisible(false);
+		lblRunButton.setPrefWidth(148);
+		lblRunButton.setAlignment(Pos.CENTER);
+
+		// in battle response label
+		lblBattleResponse = new Label();
+		lblBattleResponse.setFont(Font.font(LARGE_FONT));
+		lblBattleResponse.setTextFill(Color.BLACK);
+		battleRoot.add(lblBattleResponse, 0, 4, 6, 1);
+		lblBattleResponse.setPrefWidth(888);
 
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -185,112 +225,143 @@ public class Boot extends Application {
 					switch (event.getCode()) {
 					case W:
 
-						if (menu.equals("Battle")) {
-							//W doesn't do anything in battle menu
-						} else {
+						// Directional sprite
+						playerSprite = playerUp;
 
-							// Directional sprite
-							playerSprite = playerUp;
+						// Defines direction
+						direction = "Up";
+						if (map.getPlayerY() == 0) {
+							nextMap(myStage);
+						} else
+						// Makes sure you're not flying over trees and houses
+						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
 
-							// Defines direction
-							direction = "Up";
-							if (map.getPlayerY() == 0) {
-								nextMap(myStage);
-							} else
-							// Makes sure you're not flying over trees and houses
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
-
-								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-									wildEncounter(myStage);
-								}
-								// Moves player's tilegrid location and stackpane location
-								map.setPlayerY(-1);
-								playerStackY--;
-
-								// Displays new board
-								displayBoard(root);
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
 							}
+							// Moves player's tilegrid location and stackpane location
+							map.setPlayerY(-1);
+							playerStackY--;
+
+							// Displays new board
+							displayBoard(root);
 						}
 
 						break;
 
 					case A:
 
-						// Moves through highlighted buttons in a battle instead of movement
-						if (menu.equals("Battle")) {
-							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
-								battleButtonIndex = 4;
-								buttonUpdate();
-							} else {
-								battleButtonIndex--;
-								buttonUpdate();
+						playerSprite = playerLeft;
+						direction = "Left";
+						if (map.getPlayerX() == 0) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
 							}
-						} else {
-							playerSprite = playerLeft;
-							direction = "Left";
-							if (map.getPlayerX() == 0) {
-								nextMap(myStage);
-							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
-								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-									wildEncounter(myStage);
-								}
-								map.setPlayerX(-1);
-								playerStackX--;
-								displayBoard(root);
-							}
+							map.setPlayerX(-1);
+							playerStackX--;
+							displayBoard(root);
 						}
+
 						break;
 
 					case S:
 
-						if (menu.equals("Battle")) {
-							Console.print("Test");
-						} else {
-							playerSprite = playerDown;
-							direction = "Down";
-							if (map.getPlayerY() == map.getMapHeight() - 1) {
-								nextMap(myStage);
-							} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
-								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-									wildEncounter(myStage);
-								}
-								map.setPlayerY(1);
-								playerStackY++;
-								displayBoard(root);
+						playerSprite = playerDown;
+						direction = "Down";
+						if (map.getPlayerY() == map.getMapHeight() - 1) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
 							}
+							map.setPlayerY(1);
+							playerStackY++;
+							displayBoard(root);
 						}
+
 						break;
 
 					case D:
 
-						if (menu.equals("Battle")) {
-							if (battleButtonIndex == 4 || battleButtonIndex == 0) {
-								battleButtonIndex = 1;
-								buttonUpdate();
-							} else {
-								battleButtonIndex++;
-								buttonUpdate();
+						playerSprite = playerRight;
+						direction = "Right";
+						if (map.getPlayerX() == map.getMapWidth() - 1) {
+							nextMap(myStage);
+						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
+							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+								wildEncounter(myStage);
 							}
-						} else {
-							playerSprite = playerRight;
-							direction = "Right";
-							if (map.getPlayerX() == map.getMapWidth() - 1) {
-								nextMap(myStage);
-							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
-								if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
-									wildEncounter(myStage);
-								}
-								map.setPlayerX(1);
-								playerStackX++;
-								displayBoard(root);
-							}
+							map.setPlayerX(1);
+							playerStackX++;
+							displayBoard(root);
 						}
+
 						break;
 
 					default:
 						break;
 
 					}
+				}
+			}
+		});
+
+		// Controls for battle scene
+		battleScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+
+				switch (event.getCode()) {
+
+				case A:
+
+					// Scrolling through buttons right
+					if (battleButtonIndex == 1 || battleButtonIndex == 0) {
+						battleButtonIndex = 4;
+						buttonUpdate();
+					} else {
+						battleButtonIndex--;
+						buttonUpdate();
+					}
+
+					break;
+
+				case D:
+
+					// Scrolling through buttons left
+					if (battleButtonIndex == 4 || battleButtonIndex == 0) {
+						battleButtonIndex = 1;
+						buttonUpdate();
+					} else {
+						battleButtonIndex++;
+						buttonUpdate();
+					}
+
+					break;
+
+				// 'Select' key. different functions based on menu
+				case C:
+					switch (battleMenu) {
+
+					case "Moves":
+						useMove(myStage);
+						break;
+					
+					case "General":
+						nextBattleMenu(myStage);
+						break;
+
+					default:
+						break;
+					}
+
+					break;
+
+				default:
+					break;
+
 				}
 			}
 		});
@@ -337,46 +408,534 @@ public class Boot extends Application {
 
 	public void buttonUpdate() {
 
-		switch (menu) {
-		case "Battle":
+		Background blue = new Background(new BackgroundFill(Color.LIGHTBLUE, null, null));
+		Background white = new Background(new BackgroundFill(Color.WHITE, null, null));
+		switch (battleButtonIndex) {
 
-			if (battleButtonIndex == 1) {
-				lblfightButton.setTextFill(Color.BLUE);	
+		// Highlights fight button
+		case 1:
+			lblFightButton.setBackground(blue);
+			lblRunButton.setBackground(white);
+			lblPokemonButton.setBackground(white);
+			break;
+
+		// highlights pokemon button
+		case 2:
+			lblPokemonButton.setBackground(blue);
+			lblFightButton.setBackground(white);
+			lblCatchButton.setBackground(white);
+			break;
+
+		// highlights catch button
+		case 3:
+			lblCatchButton.setBackground(blue);
+			lblRunButton.setBackground(white);
+			lblPokemonButton.setBackground(white);
+			break;
+
+		// highlights run button
+		case 4:
+			lblRunButton.setBackground(blue);
+			lblFightButton.setBackground(white);
+			lblCatchButton.setBackground(white);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	public void nextBattleMenu(Stage myStage) {
+
+		// Different function based on current menu
+		switch (battleMenu) {
+
+		// Moves menu goes back to general
+		case "Moves":
+
+			battleMenu = "General";
+
+			// Buttons changed back
+			lblFightButton.setText("Fight");
+			lblCatchButton.setText("Catch");
+			lblPokemonButton.setText("Pokemon");
+			lblRunButton.setText("Run");
+
+			// Setting visibility
+			lblBattleResponse.setVisible(false);
+			lblRunButton.setVisible(true);
+			lblFightButton.setVisible(true);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+
+			break;
+			
+		case "no controls":
+
+			battleMenu = "General";
+
+			// Buttons changed back
+			lblFightButton.setText("Fight");
+			lblCatchButton.setText("Catch");
+			lblPokemonButton.setText("Pokemon");
+			lblRunButton.setText("Run");
+
+			// Setting visibility
+			lblBattleResponse.setVisible(false);
+			lblRunButton.setVisible(true);
+			lblFightButton.setVisible(true);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+
+			break;
+
+		// General depends on higlighted button
+		case "General":
+
+			switch (battleButtonIndex) {
+
+			// Fight button
+			case 1:
+
+				// Battle menu set to moves
+				battleMenu = "Moves";
+
+				// Setting label to move name and setting color to the one corresponding of it's
+				// type
+				lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
+				lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
+
+				if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 1) {
+					lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
+					lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
+				} else {
+					lblPokemonButton.setText("");
+				}
+
+				if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 2) {
+					lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
+					lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
+				} else {
+					lblCatchButton.setText("");
+				}
+
+				if (player.getPokemon(currentBattlePoke).getMovePoolSize() > 3) {
+					lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
+					lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
+				} else {
+					lblRunButton.setText("");
+				}
+
+			case 2:
+
+				break;
+
+			case 3:
+				
+				lblRunButton.setVisible(false);
+				lblFightButton.setVisible(false);
+				lblCatchButton.setVisible(false);
+				lblPokemonButton.setVisible(false);
+
+				lblBattleResponse.setVisible(true);
+				lblBattleResponse.setText(battle.catchPokemon());
+
+				break;
+
+			case 4:
+
+				//Sets button nonvisible
+				lblRunButton.setVisible(false);
+				lblFightButton.setVisible(false);
+				lblCatchButton.setVisible(false);
+				lblPokemonButton.setVisible(false);
+				lblBattleResponse.setVisible(true);
+				
+				int timerCounter = 2000;
+
+				//If you got away, back to main scene
+				if (battle.flee() == true) {
+					lblBattleResponse.setText("You got away safely!");
+
+					Timer myTimer = new Timer();
+					myTimer.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							Platform.runLater(() -> myStage.setScene(scene));
+						}
+					}, timerCounter);
+					
+					timerCounter+=2000;
+
+				//Otherwise, battle continues, opponent takes turn 
+				} else {
+					lblBattleResponse.setText("You couldn't get away!");
+					battle.turnExecution("Opponent only");
+					
+					Timer myTimer = new Timer();
+					myTimer.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							Platform.runLater(() -> lblBattleResponse.setText(battle.toString("move")));
+						}
+					}, timerCounter);
+					timerCounter+=2000;
+					
+					
+					Timer continueBattle = new Timer();
+					continueBattle.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							Platform.runLater(() -> nextBattleMenu(myStage));
+						}
+					}, timerCounter);
+					timerCounter+=2000;
+				}
+
+				break;
+
+			default:
+				break;
 			}
 
-			if (battleButtonIndex == 2) {
-				lblPokemonButton.setTextFill(Color.BLUE);
-			}
+			break;
+		}
+	}
 
-			if (battleButtonIndex == 3) {
-				lblCatchButton.setTextFill(Color.BLUE);
-			}
+	public void useMove(Stage myStage) {
 
-			if (battleButtonIndex == 4) {
-				lblRunButton.setTextFill(Color.BLUE);
-			}
+		switch (battleButtonIndex) {
+
+		case 1:
+			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(0));
+			break;
+
+		case 2:
+			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(1));
+			break;
+		case 3:
+			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(2));
+			break;
+
+		case 4:
+			battle.turnPlan(player.getPokemon(currentBattlePoke).getMove(3));
+			break;
+		}
+
+		battleMenu = "no controls";
+		battle.turnExecution("First");
+		lblRunButton.setVisible(false);
+		lblFightButton.setVisible(false);
+		lblCatchButton.setVisible(false);
+		lblPokemonButton.setVisible(false);
+
+		int timerCounter = 2000;
+		
+		if (battle.toString("statusStart") != null) {
+
+			lblBattleResponse.setText(battle.toString("statusStart"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("statusBattle") != null) {
+
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("statusBattle"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("move") != null) {
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("move"));
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("effectiveness") != null) {
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("effectiveness"));
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("statusApply") != null) {
+
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("statusApply"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("faint") != null) {
+
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("faint"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		battle.turnExecution("Second");
+
+		if (battle.toString("statusStart") != null) {
+
+			lblBattleResponse.setText(battle.toString("statusStart"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
 
 		}
+
+		if (battle.toString("statusBattle") != null) {
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("statusBattle"));
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("move") != null) {
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("move"));
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("effectiveness") != null) {
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("effectiveness"));
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("statusApply") != null) {
+
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("statusApply"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		if (battle.toString("faint") != null) {
+
+			lblBattleResponse.setVisible(true);
+			lblBattleResponse.setText(battle.toString("faint"));
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+				}
+			}, timerCounter);
+			timerCounter+=2000;
+		}
+
+		//nextBattleMenu(myStage); broken????
+
+	}
+
+	public Color typeColor(Move move) {
+
+		Color color = Color.BLACK;
+
+		switch (move.getType()) {
+
+		case ("Fire"):
+
+			color = Color.RED;
+			break;
+
+		case ("Grass"):
+
+			color = Color.GREEN;
+			break;
+
+		case ("Water"):
+
+			color = Color.DARKBLUE;
+			break;
+
+		case ("Fighting"):
+
+			color = Color.ORANGE;
+			break;
+
+		case ("Ground"):
+
+			color = Color.DARKGOLDENROD;
+			break;
+
+		case ("Rock"):
+
+			color = Color.SADDLEBROWN;
+			break;
+
+		case ("Flying"):
+
+			color = Color.SKYBLUE;
+			break;
+
+		case ("Bug"):
+
+			color = Color.OLIVEDRAB;
+			break;
+
+		case ("Psychic"):
+
+			color = Color.MAGENTA;
+			break;
+
+		case ("Normal"):
+
+			color = Color.SILVER;
+			break;
+
+		case ("Electric"):
+
+			color = Color.YELLOW;
+			break;
+
+		case ("Dark"):
+
+			color = Color.BLACK;
+			break;
+
+		case ("Dragon"):
+
+			color = Color.MIDNIGHTBLUE;
+			break;
+
+		case ("Ice"):
+
+			color = Color.AQUAMARINE;
+			break;
+
+		case ("Ghost"):
+
+			color = Color.INDIGO;
+			break;
+
+		case ("Poison"):
+
+			color = Color.BLUEVIOLET;
+			break;
+
+		case ("Steel"):
+
+			color = Color.DIMGRAY;
+			break;
+		default:
+			break;
+		}
+
+		return color;
 	}
 
 	public void wildEncounter(Stage myStage) {
 
-		// 20% chance of wild encounter happening
-		if (Math.random() * 100 < 20) {
+		// 10% chance of wild encounter happening
+		if (Math.random() * 100 < 10) {
 
 			// Sets pokemon
-			Pokemon playerPoke = new Pokemon("Torchic", 20);
-			Pokemon opponent = new Pokemon("Totodile", (playerPoke.getLevel() - 2));
 
+			Pokemon opponent = new Pokemon("Torchic", 1);
+
+			battle = new Battle(player.getPokemon(0), opponent, false);
 			// Sets the sprites for the pokemon
-			playerPokeSprite.setImage(playerPoke.getBackSprite());
+			currentBattlePoke = 0;
+			playerPokeSprite.setImage(player.getPokemon(0).getBackSprite());
 			opponentPokeSprite.setImage(opponent.getFrontSprite());
 
-			// Battle Logic goes Here
-
 			// Sets the Battle Scene
-			menu = "Battle";
+			battleMenu = "General";
+			lblBattleResponse.setText(battle.toString("encounter"));
 			myStage.setScene(battleScene);
+
+			Timer myTimer = new Timer();
+			myTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+
+					Platform.runLater(() -> lblBattleResponse.setVisible(false));
+					Platform.runLater(() -> lblFightButton.setVisible(true));
+					Platform.runLater(() -> lblPokemonButton.setVisible(true));
+					Platform.runLater(() -> lblCatchButton.setVisible(true));
+					Platform.runLater(() -> lblRunButton.setVisible(true));
+				}
+			}, 2500);
+
 		}
 	}
 

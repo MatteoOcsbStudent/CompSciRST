@@ -4,10 +4,12 @@ public class Battle {
 
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
+	
+	Move opponentMove;
 
 	Pokemon firstToMove;
 	Pokemon secondToMove;
-	
+
 	Move fasterMove;
 	Move slowerMove;
 
@@ -28,22 +30,78 @@ public class Battle {
 	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
 		opponentPokemon = p2;
-		
 		isTrainerBattle = trainer;
-		if (isTrainerBattle == true) {
+
+		if (isTrainerBattle == false) {
 			encounter = "A wild " + opponentPokemon.getName() + " has appeared!";
 		}
-		
+
 		if (isTrainerBattle == true) {
 			encounter = "Opponent sent out " + opponentPokemon.getName() + "!";
 		}
-		
+
 	}
 
-	public void turnPlan(Move playerMove, Move opponentMove) {
-		
+	public void turnPlan(Move playerMove) {
+
+		int opponentMoveIndex = 0;
+		double random = Math.random();
+
+		//Randomizing opponent's movechoice
+		switch (opponentPokemon.getMovePoolSize()) {
+
+		case 1:
+			opponentMoveIndex = 0;
+			break;
+		case 2:
+			if (random < 0.5) {
+				opponentMoveIndex = 0;
+			}
+
+			if (random >= 0.5) {
+				opponentMoveIndex = 1;
+			}
+			break;
+		case 3:
+			if (random <= 0.33) {
+				opponentMoveIndex = 0;
+			}
+
+			if (random > 0.33 && random <= 0.66) {
+				opponentMoveIndex = 1;
+			}
+
+			if (random > 0.66) {
+				opponentMoveIndex = 2;
+			}
+			break;
+		case 4:
+
+			if (random <= 0.25) {
+				opponentMoveIndex = 0;
+			}
+
+			if (0.25 < random && random <= 0.5) {
+				opponentMoveIndex = 1;
+			}
+			if (0.5 < random && random < 0.75) {
+				opponentMoveIndex = 2;
+			}
+
+			if (0.75 < random && random <= 1) {
+				opponentMoveIndex = 3;
+			}
+			break;
+
+		default:
+			opponentMoveIndex = 0;
+			break;
+		}
+
+		opponentMove = opponentPokemon.getMove(opponentMoveIndex);
+
 		// Calculating which pokemon moves first
-		//Stores the order which moves will be used
+		// Stores the order which moves will be used
 		// Priority Tie goes to speed
 		if (playerMove.isPriority() == true && opponentMove.isPriority() == true) {
 			if (playerPokemon.getSpeed() > opponentPokemon.getSpeed()) {
@@ -71,7 +129,7 @@ public class Battle {
 					slowerMove = playerMove;
 				}
 			}
-			//Priority
+			// Priority
 		} else if (playerMove.isPriority() == true) {
 			firstToMove = playerPokemon;
 			fasterMove = playerMove;
@@ -82,8 +140,8 @@ public class Battle {
 			fasterMove = opponentMove;
 			secondToMove = playerPokemon;
 			slowerMove = playerMove;
-			
-			//If no priority, goes to speed
+
+			// If no priority, goes to speed
 		} else if (playerPokemon.getSpeed() > opponentPokemon.getSpeed()) {
 			firstToMove = playerPokemon;
 			fasterMove = playerMove;
@@ -117,19 +175,24 @@ public class Battle {
 
 		statusAfflictionStart = null;
 		statusAfflictionBattle = null;
-		//Intializing variables based on which pokemon is attacking
+		// Intializing variables based on which pokemon is attacking
 		Pokemon attacking;
 		Pokemon defending;
 		Move usedMove;
-		
+
 		if (firstOrSecond.equals("First")) {
 			attacking = firstToMove;
 			defending = secondToMove;
 			usedMove = fasterMove;
-		} else {
+		} else if (firstOrSecond.equals("Second")){
 			attacking = secondToMove;
 			defending = firstToMove;
 			usedMove = slowerMove;
+		} else { 
+			turnPlan(playerPokemon.getMove(0));
+			attacking = opponentPokemon;
+			defending = playerPokemon;
+			usedMove = opponentMove;
 		}
 		// Status afflictions
 		switch (attacking.getStatus()) {
@@ -176,6 +239,10 @@ public class Battle {
 		case ("Null"):
 			damageCalc(attacking, defending, usedMove);
 			break;
+
+		default:
+			damageCalc(attacking, defending, usedMove);
+			break;
 		}
 
 	}
@@ -192,9 +259,10 @@ public class Battle {
 
 		move = null;
 		statusApplied = null;
+		faint = null;
 		double damage = 0;
 
-		if (Math.random() * 100 < usedMove.getAccuracy()) {
+		if (Math.random() * 100 <= usedMove.getAccuracy()) {
 			// Types of both pokemon
 			String[] attackingTypes = attacking.getTypes().split("-");
 			String[] defendingTypes = defending.getTypes().split("-");
@@ -247,18 +315,18 @@ public class Battle {
 	}
 
 	public int typeCompare(String type1, String type2) {
-	
+
+		effectiveness = null;
 		int amp = 1;
-		
-		
+
 		if (amp == 0.5) {
 			effectiveness = "It was not very effective...";
 		}
-		
+
 		if (amp == 2 || amp == 4) {
 			effectiveness = "It was super effective!";
 		}
-		
+
 		return 1;
 	}
 
@@ -268,7 +336,7 @@ public class Battle {
 		int catchRate;
 
 		// Catch catch a trainer's pokemon
-		if (isTrainerBattle = true) {
+		if (isTrainerBattle == true) {
 			result = "You can't catch another trainer's Pokemon! are you crazy?";
 
 			// Calculates catch rate
@@ -289,76 +357,76 @@ public class Battle {
 
 	public boolean flee() {
 
-		// 85% chance of fleeing
+		// 90% chance of fleeing
 		boolean success = false;
 
-		if (Math.random() < 0.85) {
+		if (Math.random() < 0) {
 			success = true;
 		}
 
 		return success;
 	}
-	
+
 	public void switchPokemon(Pokemon newPokemon) {
-		
+
 		playerPokemon = newPokemon;
 		switchPokemon = "You have sent out " + playerPokemon.getName();
 	}
-	
+
 	public void switchPokemon() {
-		
+
 		Pokemon temp = opponentPokemon;
-		
-		//TODO - opponentPokemon = arraylist.get(tempindex+1)
+
+		// TODO - opponentPokemon = arraylist.get(tempindex+1)
 	}
-	
+
 	public String toString(String choice) {
 		String response = null;
-		
-		if (choice.equals("encounter")) {
+
+		if (choice == "encounter") {
 			response = encounter;
 		}
-		
-		if(choice.equals("statusStart")) {
+
+		if (choice == "statusStart") {
 			response = statusAfflictionStart;
 		}
-		
-		if(choice.equals("statusBattle")) {
+
+		if (choice == "statusBattle") {
 			response = statusAfflictionBattle;
 		}
-		
-		if(choice.equals("move")) {
-			response = move; 
+
+		if (choice == "move") {
+			response = move;
 		}
-		
-		if (choice.equals("effectiveness")) {
+
+		if (choice == "effectiveness") {
 			response = effectiveness;
 		}
-		
-		if (choice.equals("statusApply")) {
+
+		if (choice == "statusApply") {
 			response = statusApplied;
 		}
-		
-		if(choice.equals("faint")) {
+
+		if (choice == "faint") {
 			response = faint;
 		}
-		
-		if(choice.equals("catch")) {
+
+		if (choice == "catch") {
 			response = caught;
 		}
-		
-		if(choice.equals("flee")) {
+
+		if (choice == "flee") {
 			response = caught;
 		}
-		
-		if(choice.equals("switch")) {
+
+		if (choice == "switch") {
 			response = switchPokemon;
 		}
-		
-		if(choice.equals("nextPokemon")) {
+
+		if (choice == "nextPokemon") {
 			response = nextPokemon;
 		}
-		
+
 		return response;
 	}
 
