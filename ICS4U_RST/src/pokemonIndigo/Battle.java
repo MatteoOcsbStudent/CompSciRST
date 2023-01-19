@@ -1,9 +1,14 @@
 package pokemonIndigo;
 
+import java.util.ArrayList;
+
 public class Battle {
 
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
+	
+	boolean opponentFainted;
+	boolean playerFainted;
 	
 	Move opponentMove;
 
@@ -15,17 +20,7 @@ public class Battle {
 
 	boolean isTrainerBattle = false;
 
-	String nextPokemon = null;
-	String switchPokemon = null;
-	String encounter = null;
-	String statusAfflictionStart = null;
-	String statusAfflictionBattle = null;
-	String statusApplied = null;
-	String effectiveness = null;
-	String move = null;
-	String caught = null;
-	String faint = null;
-	String flee = null;
+	ArrayList <String> battleResponses  = new ArrayList <String>();
 
 	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
@@ -33,11 +28,11 @@ public class Battle {
 		isTrainerBattle = trainer;
 
 		if (isTrainerBattle == false) {
-			encounter = "A wild " + opponentPokemon.getName() + " has appeared!";
+			battleResponses.add("A wild " + opponentPokemon.getName() + " has appeared!");
 		}
 
 		if (isTrainerBattle == true) {
-			encounter = "Opponent sent out " + opponentPokemon.getName() + "!";
+			battleResponses.add("Opponent sent out " + opponentPokemon.getName() + "!");
 		}
 
 	}
@@ -173,8 +168,6 @@ public class Battle {
 
 	public void turnExecution(String firstOrSecond) {
 
-		statusAfflictionStart = null;
-		statusAfflictionBattle = null;
 		// Intializing variables based on which pokemon is attacking
 		Pokemon attacking;
 		Pokemon defending;
@@ -189,17 +182,18 @@ public class Battle {
 			defending = firstToMove;
 			usedMove = slowerMove;
 		} else { 
-			turnPlan(playerPokemon.getMove(0));
 			attacking = opponentPokemon;
 			defending = playerPokemon;
 			usedMove = opponentMove;
 		}
+		
+		if (playerPokemon.equals(attacking) && playerFainted == false || opponentPokemon.equals(attacking) && opponentFainted == false) {
 		// Status afflictions
 		switch (attacking.getStatus()) {
 
 		// Pokemon takes burn damage at the start of the turn
 		case ("Burn"):
-			statusAfflictionStart = attacking.getName() + " has been hurt by it's burn";
+			battleResponses.add(attacking.getName() + " has been hurt by it's burn");
 			attacking.hpChange((int) attacking.getTotalHP() / 16);
 			damageCalc(attacking, defending, usedMove);
 			break;
@@ -208,29 +202,29 @@ public class Battle {
 			if (Math.random() < 0.5) {
 				damageCalc(attacking, defending, usedMove);
 			} else {
-				statusAfflictionBattle = attacking.getName() + " missed in confusion!";
+				battleResponses.add(attacking.getName() + " missed in confusion!");
 			}
 			break;
 		// 30% chance of being fully paralyzed
 		case ("Paralyze"):
 			if (Math.random() < 0.3) {
-				statusAfflictionBattle = attacking.getName() + " is fully paralyzed!";
+				battleResponses.add(attacking.getName() + " is fully paralyzed!");
 			} else {
 				damageCalc(attacking, defending, usedMove);
 			}
 			break;
 		// can't move, 33% chance to break out of sleep
 		case ("Sleep"):
-			statusAfflictionBattle = attacking.getName() + " is sleeping";
+			battleResponses.add(attacking.getName() + " is sleeping");
 			if (Math.random() < 0.33) {
-				statusAfflictionBattle = attacking.getName() + " woke up!";
+				battleResponses.add(attacking.getName() + " woke up!");
 				damageCalc(attacking, defending, usedMove);
 				attacking.setStatus("Null");
 			}
 			break;
 		// poison, takes 1/12 total hp
 		case ("Poison"):
-			statusAfflictionStart = attacking.getName() + " took damage from posion";
+			battleResponses.add(attacking.getName() + " took damage from posion");
 			attacking.hpChange((int) attacking.getTotalHP() / 12);
 			damageCalc(attacking, defending, usedMove);
 			break;
@@ -244,6 +238,8 @@ public class Battle {
 			damageCalc(attacking, defending, usedMove);
 			break;
 		}
+		
+		}
 
 	}
 
@@ -256,10 +252,7 @@ public class Battle {
 	}
 
 	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
-
-		move = null;
-		statusApplied = null;
-		faint = null;
+		
 		double damage = 0;
 
 		if (Math.random() * 100 <= usedMove.getAccuracy()) {
@@ -290,41 +283,45 @@ public class Battle {
 				// Healing
 				if (usedMove.getStatus() == "Heal") {
 					attacking.hpChange((int) -damage / usedMove.getStatusRate());
-					statusApplied = attacking.getName() + " has healed themselves";
+					battleResponses.add(attacking.getName() + " has healed themselves");
 				}
 
 				// Applying status
 				else if ((Math.random() * 100) <= usedMove.getStatusRate()) {
 					defending.setStatus(usedMove.getStatus());
-					statusApplied = defending.getName() + " has been afflicted with " + usedMove.getStatus();
+					battleResponses.add(defending.getName() + " has been afflicted with " + usedMove.getStatus());
 				}
 			}
 
-			move = attacking.getName() + " used " + usedMove.getName() + "!";
+			battleResponses.add(attacking.getName() + " used " + usedMove.getName() + "!");
 
 		} else {
-			move = attacking.getName() + " missed!";
+			battleResponses.add(attacking.getName() + " missed!");
 		}
 
 		// Applies damage
 		defending.hpChange((int) damage);
 		if (defending.currentHP < 0) {
-			faint = defending.getName() + " has fainted";
+			battleResponses.add(defending.getName() + " has fainted");
+			if(defending.equals(opponentPokemon)) {
+				opponentFainted = true;
+			} else if (defending.equals(playerPokemon)) {
+				playerFainted = true;
+			}
 		}
 
 	}
 
 	public int typeCompare(String type1, String type2) {
 
-		effectiveness = null;
 		int amp = 1;
 
 		if (amp == 0.5) {
-			effectiveness = "It was not very effective...";
+			battleResponses.add("It was not very effective...");
 		}
 
 		if (amp == 2 || amp == 4) {
-			effectiveness = "It was super effective!";
+			battleResponses.add("It was super effective!");
 		}
 
 		return 1;
@@ -360,7 +357,7 @@ public class Battle {
 		// 90% chance of fleeing
 		boolean success = false;
 
-		if (Math.random() < 0) {
+		if (Math.random() < 1) {
 			success = true;
 		}
 
@@ -370,7 +367,7 @@ public class Battle {
 	public void switchPokemon(Pokemon newPokemon) {
 
 		playerPokemon = newPokemon;
-		switchPokemon = "You have sent out " + playerPokemon.getName();
+		battleResponses.add("You have sent out " + playerPokemon.getName());
 	}
 
 	public void switchPokemon() {
@@ -380,54 +377,18 @@ public class Battle {
 		// TODO - opponentPokemon = arraylist.get(tempindex+1)
 	}
 
-	public String toString(String choice) {
-		String response = null;
+	public String battleResponses(int index) {
+		
+		return battleResponses.get(index);
 
-		if (choice == "encounter") {
-			response = encounter;
-		}
-
-		if (choice == "statusStart") {
-			response = statusAfflictionStart;
-		}
-
-		if (choice == "statusBattle") {
-			response = statusAfflictionBattle;
-		}
-
-		if (choice == "move") {
-			response = move;
-		}
-
-		if (choice == "effectiveness") {
-			response = effectiveness;
-		}
-
-		if (choice == "statusApply") {
-			response = statusApplied;
-		}
-
-		if (choice == "faint") {
-			response = faint;
-		}
-
-		if (choice == "catch") {
-			response = caught;
-		}
-
-		if (choice == "flee") {
-			response = caught;
-		}
-
-		if (choice == "switch") {
-			response = switchPokemon;
-		}
-
-		if (choice == "nextPokemon") {
-			response = nextPokemon;
-		}
-
-		return response;
+	}
+	
+	public int responseAmount() {
+		return battleResponses.size();
+	}
+	
+	public void clearResponses() {
+		battleResponses.clear();
 	}
 
 }
