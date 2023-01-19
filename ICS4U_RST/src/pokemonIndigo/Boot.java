@@ -4,6 +4,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -24,6 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Boot extends Application {
 
@@ -208,7 +211,7 @@ public class Boot extends Application {
 						if (map.getPlayerX() == 0) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+							if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
 							map.setPlayerX(-1);
@@ -224,7 +227,7 @@ public class Boot extends Application {
 						if (map.getPlayerY() == map.getMapHeight() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+							if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
 							map.setPlayerY(1);
@@ -239,7 +242,7 @@ public class Boot extends Application {
 						if (map.getPlayerX() == map.getMapWidth() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
+							if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
 							map.setPlayerX(1);
@@ -286,14 +289,18 @@ public class Boot extends Application {
 		//Instantiates the new map
 		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
 		
-		//Displays the next map
-		displayBoard(root);
 		
-		//Sets the scene to the new map
-		myStage.setScene(scene);
 		
-		//removes the movement lock
-		movementLock = false;
+		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
+		    //Displays the next map
+		    displayBoard(root);
+		    //Sets the scene to the new map
+		    myStage.setScene(scene);
+		    //removes the movement lock
+		    movementLock = false;
+		}));
+
+		delay.play();
 	}
 	
 	public void wildEncounter(Stage myStage) {
