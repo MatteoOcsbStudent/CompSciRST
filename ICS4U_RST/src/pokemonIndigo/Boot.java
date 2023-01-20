@@ -306,7 +306,7 @@ public class Boot extends Application {
 	public void wildEncounter(Stage myStage) {
 		
 		//20% chance of wild encounter happening
-		if (Math.random() * 100 < 20) {
+		if (Math.random() * 100 < 1) {
 			
 			//Sets pokemon
 			Pokemon playerPoke = new Pokemon("Torchic", 20);

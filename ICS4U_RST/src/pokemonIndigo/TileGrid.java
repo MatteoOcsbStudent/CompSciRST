@@ -87,14 +87,15 @@ public class TileGrid {
 			currentMapName = "Orilon Town";
 			break;
 
-		case "routeTwo":
-			tileLayout = new File("");
+		case "Horizon city":
+			tileLayout = new File("data/maps/horizonCity.map");
+			backgroundImage = backgroundImageForest;
+			if (spawnpoint == 1) {
+				playerX = 24;
+				playerY = 21;
+			}
+			currentMapName = "Horizon City";
 			break;
-
-		case "___ city":
-			tileLayout = new File("");
-			break;
-
 		}
 
 		// Reads map textfile
@@ -334,13 +335,26 @@ public class TileGrid {
 				spawnpoint = 2;
 			} else if ((playerX >= 23 && playerX <= 25) && playerY == 0) {
 				exit = true;
-				nextMap = "Route One";
+				nextMap = "Horizon City";
 				playerSpawnX = 10;
 				playerSpawnY = 11;
 				spawnpoint = 1;
 			} else {
 				exit = false;
 			}
+			break;
+		
+		case "Horizon City":
+			if ((playerX >= 22 && playerX <= 25) && playerY == 21) {
+				exit = true;
+				nextMap = "Route One";
+				playerSpawnX = 10;
+				playerSpawnY = 11;
+				spawnpoint = 2;
+			} else {
+				exit = false;
+			}
+			break;
 
 		}
 		return exit;
