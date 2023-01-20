@@ -28,7 +28,7 @@ FlashCannon
 HammerArm
 60
 1
-Haunter
+Golurk
 89
 124
 80

@@ -9,6 +9,10 @@ public class Player {
 	private ArrayList <Pokemon> team = new ArrayList<Pokemon>();
 	private String name;
 
+	public Player () {
+		
+	}
+	
 	public Player(String playerName) {
 		name = playerName;
 	}
