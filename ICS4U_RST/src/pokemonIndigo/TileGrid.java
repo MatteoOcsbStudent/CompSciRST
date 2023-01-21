@@ -42,7 +42,6 @@ public class TileGrid {
 	private Image backgroundImage;
 
 	public TileGrid() {
-
 	}
 
 	public TileGrid(String mapName, int spawnpoint) {
@@ -101,8 +100,9 @@ public class TileGrid {
 			
 		case "Pokemon Center":
 			tileLayout = new File("data/maps/pokemonCenter.map");
-			playerX = 6;
-			playerY = 10;
+			playerX = 10;
+			playerY = 12;
+			currentMapName = "Pokemon Center";
 		}
 
 		// Reads map textfile
@@ -167,6 +167,10 @@ public class TileGrid {
 
 					case 'H':
 						map[y][x] = new Tile("WallBack");
+						break;
+					
+					case 'U':
+						map[y][x] = new Tile("BlackTile");
 						break;
 
 					// Pokemon Center
@@ -370,10 +374,10 @@ public class TileGrid {
 				// Sets the specific spawn entrance
 				spawnpoint = 1;
 
-			} else if (playerX == 21 && playerY == 6) {
+			} else if (playerY == 7) {
 				exit = true;
 				
-				nextMap = "PokemonCenter";
+				nextMap = "Pokemon Center";
 				
 				playerSpawnX = 10;
 				playerSpawnY = 11;
@@ -434,7 +438,7 @@ public class TileGrid {
 			break;
 
 		case "Pokemon Center":
-			if ((playerX == 7 || playerX == 8) && playerY == 14) {
+			if ((playerX == 10 || playerX == 11) && playerY == 12) {
 				
 				exit = true;
 				
