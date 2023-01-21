@@ -198,12 +198,6 @@ public class Battle {
 			// Status afflictions
 			switch (attacking.getStatus()) {
 
-			// Pokemon takes burn damage at the start of the turn
-			case ("Burn"):
-				battleResponses.add(attacking.getName() + " has been hurt by it's burn");
-				attacking.hpChange((int) attacking.getTotalHP() / 16);
-				damageCalc(attacking, defending, usedMove);
-				break;
 			// 50% chance of missing the move
 			case ("Confusion"):
 				if (Math.random() < 0.5) {
@@ -228,12 +222,6 @@ public class Battle {
 					damageCalc(attacking, defending, usedMove);
 					attacking.setStatus("Null");
 				}
-				break;
-			// poison, takes 1/12 total hp
-			case ("Poison"):
-				battleResponses.add(attacking.getName() + " took damage from posion");
-				attacking.hpChange((int) attacking.getTotalHP() / 12);
-				damageCalc(attacking, defending, usedMove);
 				break;
 
 			// No status, moves normally
@@ -298,6 +286,23 @@ public class Battle {
 			battleResponses.add(attacking.getName() + " missed!");
 		}
 
+		
+		switch(attacking.getStatus()) {
+		
+		//Takes 1/12 max hp damage at the end of the turn
+		case ("Poison"):
+			battleResponses.add(attacking.getName() + " took damage from posion");
+			attacking.hpChange((int) attacking.getTotalHP() / 12);
+			
+			break;
+		
+		//Takes 1/16 max hp at the end of the turn
+		case ("Burn"):
+			battleResponses.add(attacking.getName() + " has been hurt by it's burn");
+			attacking.hpChange((int) attacking.getTotalHP() / 16);
+			break;		
+		}
+		
 		// Applies damage
 		defending.hpChange((int) damage);
 		if (defending.currentHP < 0) {

@@ -107,6 +107,8 @@ public class Boot extends Application {
 	Label lblPlayerBar;
 	Label lblOpponentHp;
 	Label lblOpponentBar;
+	Label lblCToContinue;
+	Label lblXToBack;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
@@ -135,7 +137,7 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-		player.addPokemon(new Pokemon("Torchic", 36));
+		player.addPokemon(new Pokemon("Torchic", 7));
 
 		// Temp hardcoded map loading
 		map = new TileGrid("Orilon Town", 1);
@@ -276,6 +278,20 @@ public class Boot extends Application {
 		battleRoot.add(lblBattleResponse, 0, 13, 6, 1);
 		lblBattleResponse.setPrefWidth(888);
 
+		// C to continue instruction
+		lblCToContinue = new Label("'C' to continue ->");
+		lblCToContinue.setFont(Font.font(SMALL_FONT));
+		lblCToContinue.setTextFill(Color.BLACK);
+		battleRoot.add(lblCToContinue, 6, 14, 1, 1);
+		lblCToContinue.setAlignment(Pos.CENTER_RIGHT);
+
+		lblXToBack = new Label("<- 'X' to go back");
+		lblXToBack.setFont(Font.font(SMALL_FONT));
+		lblXToBack.setTextFill(Color.BLACK);
+		battleRoot.add(lblXToBack, 0, 14, 1, 1);
+		lblXToBack.setAlignment(Pos.CENTER_LEFT);
+		lblXToBack.setVisible(false);
+
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
@@ -292,16 +308,17 @@ public class Boot extends Application {
 
 						// Defines direction
 						direction = "Up";
-						if (map.getPlayerY() == 0 || map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkDoor() == true) {
+						if (map.getPlayerY() == 0
+								|| map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkDoor() == true) {
 							nextMap(myStage);
-						} else 
+						} else
 						// Makes sure you're not flying over trees and houses
 						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
-							
+
 							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
-							
+
 							// Moves player's tilegrid location and stackpane location
 							map.setPlayerY(-1);
 							playerStackY--;
@@ -320,11 +337,11 @@ public class Boot extends Application {
 						if (map.getPlayerX() == 0) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
-							
+
 							if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
-							
+
 							map.setPlayerX(-1);
 							playerStackX--;
 							displayBoard(root);
@@ -339,11 +356,11 @@ public class Boot extends Application {
 						if (map.getPlayerY() == map.getMapHeight() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
-							
+
 							if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
-							} 
-							
+							}
+
 							map.setPlayerY(1);
 							playerStackY++;
 							displayBoard(root);
@@ -358,15 +375,15 @@ public class Boot extends Application {
 						if (map.getPlayerX() == map.getMapWidth() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
-							
+
 							if (map.getTile(map.getPlayerY(), map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
-							
+
 							map.setPlayerX(1);
 							playerStackX++;
 							displayBoard(root);
-							
+
 						}
 
 						break;
@@ -389,8 +406,10 @@ public class Boot extends Application {
 				case A:
 
 					if (movementLock == false) {
-						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
-							// Scrolling through buttons right
+						//Scrolling through buttons right
+						
+						if (battleMenu.equals("General")) {
+							
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = 4;
 								buttonUpdate();
@@ -398,14 +417,23 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
+						} else if (battleMenu.equals("Moves")) {
+							
+							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
+								battleButtonIndex = playerPokemon.getMovePoolSize();
+								buttonUpdate();
+							} else {
+								battleButtonIndex--;
+								buttonUpdate();
+							}
+							
 						}
 					}
 					break;
 
 				case D:
 					if (movementLock == false) {
-						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
-							// Scrolling through buttons left
+						if (battleMenu.equals("General")) {
 							if (battleButtonIndex == 4 || battleButtonIndex == 0) {
 								battleButtonIndex = 1;
 								buttonUpdate();
@@ -413,7 +441,16 @@ public class Boot extends Application {
 								battleButtonIndex++;
 								buttonUpdate();
 							}
+						} else if (battleMenu.equals("Moves")) {
+							if (battleButtonIndex == playerPokemon.getMovePoolSize() || battleButtonIndex == 0) {
+								battleButtonIndex = 1;
+								buttonUpdate();
+							} else {
+								battleButtonIndex++;
+								buttonUpdate();
+							}
 						}
+
 					}
 					break;
 
@@ -437,7 +474,7 @@ public class Boot extends Application {
 							nextBattleMenu(myStage, "PokemonMenu");
 							break;
 						case 3:
-							nextBattleMenu(myStage, "Flee");
+							nextBattleMenu(myStage, "Catch");
 							break;
 						case 4:
 							nextBattleMenu(myStage, "Run");
@@ -455,10 +492,13 @@ public class Boot extends Application {
 						if (lblBattleResponse.getText().contains("appeared!")) {
 							nextBattleMenu(myStage, "General");
 							movementLock = false;
-						} else {
-							if (nextBattleResponse() == true) {
-								nextBattleMenu(myStage, "General");
-							}
+
+						} else if (lblBattleResponse.getText().equals("You got away safely!")) {
+
+						} else if (lblBattleResponse.getText().contains("caught!")) {
+
+						} else if (nextBattleResponse() == true) {
+							nextBattleMenu(myStage, "General");
 						}
 
 						break;
@@ -519,7 +559,7 @@ public class Boot extends Application {
 
 			// Instantiates the new map
 			map = new TileGrid(map.getNextMap(), map.getNextSpawn());
-			
+
 			// Displays the next map
 			displayBoard(root);
 
@@ -599,6 +639,7 @@ public class Boot extends Application {
 
 			// Setting visibility
 			lblBattleResponse.setVisible(false);
+			lblXToBack.setVisible(false);
 			lblRunButton.setVisible(true);
 			lblFightButton.setVisible(true);
 			lblCatchButton.setVisible(true);
@@ -617,6 +658,7 @@ public class Boot extends Application {
 			lblFightButton.setVisible(false);
 			lblCatchButton.setVisible(false);
 			lblPokemonButton.setVisible(false);
+			lblXToBack.setVisible(false);
 
 			break;
 
@@ -626,8 +668,12 @@ public class Boot extends Application {
 			// Battle menu set to moves
 			battleMenu = "Moves";
 
+			// Shows x to go back instruction
+			lblXToBack.setVisible(true);
+
 			// Setting label to move name and setting color to the one corresponding of it's
 			// type
+			// Sets text to blank when pokemon doesn't have that many moves
 			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
 			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
 
@@ -662,13 +708,26 @@ public class Boot extends Application {
 			battleMenu = "battleResponses";
 			nextBattleMenu(myStage, "battleResponses");
 
+			// displays response
 			lblBattleResponse.setText(battle.catchPokemon());
 
 			Timeline delayCatch = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
 				myStage.setScene(scene);
 			}));
 
-			delayCatch.play();
+			// If caught, adds to player array
+			if (lblBattleResponse.getText().contains("has been caught!")) {
+				player.addPokemon(opponentPokemon);
+				delayCatch.play();
+
+				// if trainer battle, opponent does not take turn on catch attempt
+			} else if (lblBattleResponse.getText()
+					.equals("You can't catch another trainer's Pokemon! are you crazy?")) {
+
+				// otherwise, wild pokemon takes turn
+			} else {
+				battle.turnExecution("Opponent only");
+			}
 
 			break;
 
@@ -739,11 +798,13 @@ public class Boot extends Application {
 
 		Boolean lastResponse = false;
 
+		// Cycles through responses
 		if (responseCounter < battle.responseAmount()) {
 			lblBattleResponse.setText(battle.battleResponses(responseCounter));
-			
+
 			responseCounter++;
 
+			// resets responses, updates health bars, returns true
 		} else {
 			responseCounter = 0;
 			updateProgressBar("player");
@@ -759,6 +820,8 @@ public class Boot extends Application {
 	public Color typeColor(Move move) {
 
 		Color color = Color.BLACK;
+
+		// Chooses color based on move's type
 
 		switch (move.getType()) {
 
@@ -862,12 +925,16 @@ public class Boot extends Application {
 		switch (bar) {
 
 		case "player":
-			playerHpBar.setProgress((double)playerPokemon.getCurrentHP() / playerPokemon.getTotalHP());
+
+			// Updates progress bar and progress bar labels for player
+			playerHpBar.setProgress((double) playerPokemon.getCurrentHP() / playerPokemon.getTotalHP());
 			lblPlayerBar.setText((playerPokemon.getName() + " L." + playerPokemon.getLevel()).toUpperCase());
 			lblPlayerHp.setText(playerPokemon.getCurrentHP() + "/" + playerPokemon.getTotalHP() + "HP");
 			break;
 		case "opponent":
-			opponentHpBar.setProgress((double)opponentPokemon.getCurrentHP() / opponentPokemon.getTotalHP());
+
+			// Updates progress bar and progress bar labels for opponent
+			opponentHpBar.setProgress((double) opponentPokemon.getCurrentHP() / opponentPokemon.getTotalHP());
 			lblOpponentBar.setText((opponentPokemon.getName() + " L." + opponentPokemon.getLevel()).toUpperCase());
 			lblOpponentHp.setText(opponentPokemon.getCurrentHP() + "/" + opponentPokemon.getTotalHP() + "HP");
 			break;
@@ -884,7 +951,7 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Torchic", 31);
+			opponentPokemon = new Pokemon("Torchic", 5);
 			playerPokemon = player.getPokemon(0);
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
