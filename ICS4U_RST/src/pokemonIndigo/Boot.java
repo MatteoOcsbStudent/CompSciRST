@@ -460,7 +460,7 @@ public class Boot extends Application {
 		movementLock = true;
 
 		// Checks to see if the player is on an exit tile
-		map.checkExit(currentMapName, map.getPlayerX(), map.getPlayerY());
+		map.checkExit(currentMapName);
 
 		// Changes the currentMapName to the next map's
 		currentMapName = map.getNextMap();

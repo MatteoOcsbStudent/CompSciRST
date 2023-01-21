@@ -7,23 +7,23 @@ Fairy
 11
 Splash
 1
-WaterGun
+Water Gun
 4
-BubbleBeam
+Bubble Beam
 8
 Bounce
 15
-AquaTail
+Aqua Tail
 19
-PlayRough
+Play Rough
 25
-HydroPump
+Hydro Pump
 36
-BodySlam
+Body Slam
 48
 Waterfall
 54
-DoubleEdge
+Double-Edge
 64
 Superpower
 72

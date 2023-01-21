@@ -9,23 +9,23 @@ Scratch
 1
 Ember
 6
-QuickAttack
+Quick Attack
 8
-FlameCharge
+Flame Charge
 11
-DoubleKick
+Double Kick
 16
-AerialAce
+Aerial Ace
 19
 Slash
 25
-BlazeKick
+Blaze Kick
 36
-BrickBreak
+Brick Break
 41
-SuckerPunch
+Sucker Punch
 46
-FlareBlitz
+Flare Blitz
 50
 2
 Combusken

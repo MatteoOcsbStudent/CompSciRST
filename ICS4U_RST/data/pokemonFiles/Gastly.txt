@@ -11,21 +11,21 @@ Hypnosis
 4
 Payback
 14
-ShadowPunch
+Shadow Punch
 25
-NightShade
+Night Shade
 30
-SuckerPunch
+Sucker Punch
 37
-DarkPulse
+Dark Pulse
 42
-ShadowBall
+Shadow Ball
 48
-DreamEater
+Dream Eater
 52
-EnergyBall
+Energy Ball
 56
-IcePunch
+Ice Punch
 60
 2
 Haunter

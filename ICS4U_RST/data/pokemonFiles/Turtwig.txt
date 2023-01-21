@@ -9,27 +9,27 @@ Tackle
 1
 Leafage
 6
-Mudslap
+Mud Slap
 8
 Bite
 10
-RazorLeaf
+Razor Leaf
 14
-MegaDrain
+Mega Drain
 17
 Bulldoze
 20
-RockSmash
+Rock Smash
 23
 Crunch
 26
 Earthquake
 32
-IronTail
+Iron Tail
 34
-GigaDrain
+Giga Drain
 36
-DoubleEdge
+Double-Edge
 41
 2
 Grotle

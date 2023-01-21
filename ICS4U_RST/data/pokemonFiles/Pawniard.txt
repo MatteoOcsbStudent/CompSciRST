@@ -7,23 +7,23 @@ Steel
 11
 Scratch
 1
-FuryCutter
+Fury Cutter
 5
-MetalClaw
+Metal Claw
 10
 Assurance
 25
 Slash
 32
-NightSlash
+Night Slash
 40
-IronHead
+Iron Head
 48
-SuckerPunch
+Sucker Punch
 52
-StoneEdge
+Stone-Edge
 62
-ShadowClaw
+Shadow Claw
 68
 X-Scissor
 72
