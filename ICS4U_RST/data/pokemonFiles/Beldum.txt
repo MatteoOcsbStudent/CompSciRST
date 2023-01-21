@@ -9,21 +9,21 @@ Tackle
 1
 Confusion
 20
-MetalClaw
+Metal Claw
 21
-ZenHeadbutt
+Zen Headbutt
 27
-FlashCannon
+Flash Cannon
 35
-TakeDown
+Takedown
 37
 Earthquake
 42
-HammerArm
+Hammer Arm
 45
 Psychic
 52
-HyperBeam
+Hyper Beam
 63
 2
 Metang

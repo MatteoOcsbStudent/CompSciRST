@@ -7,23 +7,23 @@ Rock
 10
 Tackle
 1
-MetalClaw
+Metal Claw
 4
-RockTomb
+Rock Tomb
 8
 Headbutt
 16
-RockSlide
+Rock Slide
 24
-IronHead
+Iron Head
 28
-TakeDown
+Takedown
 40
-StoneEdge
+Stone-Edge
 48
-SteelCannon
+Steel Cannon
 52
-DoubleEdge
+Double Edge
 59
 2
 Lairon

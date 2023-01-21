@@ -5,27 +5,27 @@ Ghost
 50
 35
 11
-MudSlap
+Mud Slap
 1
 Astonish
 4
 Pound
 8
-ShadowPunch
+Shadow Punch
 12
-NightShade
+Night Shade
 20
-RockSlide
+Rock Slide
 24
-MegaPunch
+Mega Punch
 32
-ShadowBall
+Shadow Ball
 36
 Earthquake
 43
-FlashCannon
+Flash Cannon
 56
-HammerArm
+Hammer Arm
 60
 1
 Golurk

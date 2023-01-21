@@ -7,23 +7,23 @@ Flying
 10
 Tackle
 1
-QuickAttack
+Quick Attack
 6
-WingAttack
+Wing Attack
 8
-FlameCharge
+Flame Charge
 11
-DoubleKick
+Double Kick
 16
-AerialAce
+Aerial Ace
 19
 Whirlwind
 25
-TakeDown
+Takedown
 36
-AirSlash
+Air Slash
 41
-BraveBird
+Brave Bird
 46
 2
 Staravia

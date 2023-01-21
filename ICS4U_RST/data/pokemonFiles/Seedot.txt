@@ -11,21 +11,21 @@ Absorb
 4
 Rollout
 12
-MegaDrain
+Mega Drain
 18
 Payback
 24
-RazorLeaf
+Razor Leaf
 32
-RockSlide
+Rock Slide
 36
-SuckerPunch
+Sucker Punch
 48
-GigaDrain
+Giga Drain
 54
-LeafTornado
+Leaf Tornado
 64
-FocusBlast
+Focus Blast
 72
 2
 Nuzleaf

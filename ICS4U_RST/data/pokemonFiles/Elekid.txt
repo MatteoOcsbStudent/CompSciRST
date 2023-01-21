@@ -5,25 +5,25 @@ Null
 55
 95
 11
-QuickAttack
+Quick Attack
 1
-ThunderShock
+Thunder Shock
 4
 Charge
 8
-ThunderWave
+Thunder Wave
 25
-ThunderPunch
+Thunder Punch
 30
-LowKick
+Low Kick
 37
-ThunderBolt
+Thunder Bolt
 46
 Psychic
 54
-WildCharge
+Wild Charge
 58
-HyperBeam
+Hyper Beam
 65
 Earthquake
 72
