@@ -2,14 +2,16 @@ package pokemonIndigo;
 
 import java.util.ArrayList;
 
+
+
 public class Battle {
 
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
-	
+
 	boolean opponentFainted;
 	boolean playerFainted;
-	
+
 	Move opponentMove;
 
 	Pokemon firstToMove;
@@ -19,8 +21,10 @@ public class Battle {
 	Move slowerMove;
 
 	boolean isTrainerBattle = false;
+	
+	String currentTurn;
 
-	ArrayList <String> battleResponses  = new ArrayList <String>();
+	ArrayList<String> battleResponses = new ArrayList<String>();
 
 	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
 		playerPokemon = p1;
@@ -42,7 +46,7 @@ public class Battle {
 		int opponentMoveIndex = 0;
 		double random = Math.random();
 
-		//Randomizing opponent's movechoice
+		// Randomizing opponent's movechoice
 		switch (opponentPokemon.getMovePoolSize()) {
 
 		case 1:
@@ -174,91 +178,88 @@ public class Battle {
 		Move usedMove;
 
 		if (firstOrSecond.equals("First")) {
+			currentTurn = "First";
 			attacking = firstToMove;
 			defending = secondToMove;
 			usedMove = fasterMove;
-		} else if (firstOrSecond.equals("Second")){
+		} else if (firstOrSecond.equals("Second")) {
+			currentTurn = "Second";
 			attacking = secondToMove;
 			defending = firstToMove;
 			usedMove = slowerMove;
-		} else { 
+		} else {
 			attacking = opponentPokemon;
 			defending = playerPokemon;
 			usedMove = opponentMove;
 		}
-		
-		if (playerPokemon.equals(attacking) && playerFainted == false || opponentPokemon.equals(attacking) && opponentFainted == false) {
-		// Status afflictions
-		switch (attacking.getStatus()) {
 
-		// Pokemon takes burn damage at the start of the turn
-		case ("Burn"):
-			battleResponses.add(attacking.getName() + " has been hurt by it's burn");
-			attacking.hpChange((int) attacking.getTotalHP() / 16);
-			damageCalc(attacking, defending, usedMove);
-			break;
-		// 50% chance of missing the move
-		case ("Confusion"):
-			if (Math.random() < 0.5) {
-				damageCalc(attacking, defending, usedMove);
-			} else {
-				battleResponses.add(attacking.getName() + " missed in confusion!");
-			}
-			break;
-		// 30% chance of being fully paralyzed
-		case ("Paralyze"):
-			if (Math.random() < 0.3) {
-				battleResponses.add(attacking.getName() + " is fully paralyzed!");
-			} else {
-				damageCalc(attacking, defending, usedMove);
-			}
-			break;
-		// can't move, 33% chance to break out of sleep
-		case ("Sleep"):
-			battleResponses.add(attacking.getName() + " is sleeping");
-			if (Math.random() < 0.33) {
-				battleResponses.add(attacking.getName() + " woke up!");
-				damageCalc(attacking, defending, usedMove);
-				attacking.setStatus("Null");
-			}
-			break;
-		// poison, takes 1/12 total hp
-		case ("Poison"):
-			battleResponses.add(attacking.getName() + " took damage from posion");
-			attacking.hpChange((int) attacking.getTotalHP() / 12);
-			damageCalc(attacking, defending, usedMove);
-			break;
+		if (playerPokemon.equals(attacking) && playerFainted == false
+				|| opponentPokemon.equals(attacking) && opponentFainted == false) {
+			// Status afflictions
+			switch (attacking.getStatus()) {
 
-		// No status, moves normally
-		case ("Null"):
-			damageCalc(attacking, defending, usedMove);
-			break;
+			// Pokemon takes burn damage at the start of the turn
+			case ("Burn"):
+				battleResponses.add(attacking.getName() + " has been hurt by it's burn");
+				attacking.hpChange((int) attacking.getTotalHP() / 16);
+				damageCalc(attacking, defending, usedMove);
+				break;
+			// 50% chance of missing the move
+			case ("Confusion"):
+				if (Math.random() < 0.5) {
+					damageCalc(attacking, defending, usedMove);
+				} else {
+					battleResponses.add(attacking.getName() + " missed in confusion!");
+				}
+				break;
+			// 30% chance of being fully paralyzed
+			case ("Paralyze"):
+				if (Math.random() < 0.3) {
+					battleResponses.add(attacking.getName() + " is fully paralyzed!");
+				} else {
+					damageCalc(attacking, defending, usedMove);
+				}
+				break;
+			// can't move, 33% chance to break out of sleep
+			case ("Sleep"):
+				battleResponses.add(attacking.getName() + " is sleeping");
+				if (Math.random() < 0.33) {
+					battleResponses.add(attacking.getName() + " woke up!");
+					damageCalc(attacking, defending, usedMove);
+					attacking.setStatus("Null");
+				}
+				break;
+			// poison, takes 1/12 total hp
+			case ("Poison"):
+				battleResponses.add(attacking.getName() + " took damage from posion");
+				attacking.hpChange((int) attacking.getTotalHP() / 12);
+				damageCalc(attacking, defending, usedMove);
+				break;
 
-		default:
-			damageCalc(attacking, defending, usedMove);
-			break;
+			// No status, moves normally
+			case ("Null"):
+				damageCalc(attacking, defending, usedMove);
+				break;
+
+			default:
+				damageCalc(attacking, defending, usedMove);
+				break;
+			}
+
 		}
-		
-		}
 
-	}
-
-	public Pokemon getFirstToMove() {
-		return firstToMove;
-	}
-
-	public Pokemon getSecondToMove() {
-		return secondToMove;
 	}
 
 	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
-		
+
 		double damage = 0;
 
 		if (Math.random() * 100 <= usedMove.getAccuracy()) {
-			// Types of both pokemon
+			
+			battleResponses.add(attacking.getName() + " used " + usedMove.getName() + "!");
+			
+			// Types of attacking pokemon
 			String[] attackingTypes = attacking.getTypes().split("-");
-			String[] defendingTypes = defending.getTypes().split("-");
 
 			// Portion of damage equation
 			double temp = ((2 * attacking.getLevel()) / 5.0 + 2) * usedMove.getDamage()
@@ -273,8 +274,8 @@ public class Battle {
 			}
 
 			// Last part of damage equation
-			damage = ((temp / 50) + 2) * stab * typeCompare(usedMove.getType(), defendingTypes[0])
-					* typeCompare(usedMove.getType(), defendingTypes[1]);
+			damage = ((temp / 50) + 2) * stab * typeCompare(usedMove.getType(), defending);
+
 			Math.round(damage);
 
 			// Status moves
@@ -293,8 +294,6 @@ public class Battle {
 				}
 			}
 
-			battleResponses.add(attacking.getName() + " used " + usedMove.getName() + "!");
-
 		} else {
 			battleResponses.add(attacking.getName() + " missed!");
 		}
@@ -302,8 +301,9 @@ public class Battle {
 		// Applies damage
 		defending.hpChange((int) damage);
 		if (defending.currentHP < 0) {
+			defending.setCurrentHp(0);
 			battleResponses.add(defending.getName() + " has fainted");
-			if(defending.equals(opponentPokemon)) {
+			if (defending.equals(opponentPokemon)) {
 				opponentFainted = true;
 			} else if (defending.equals(playerPokemon)) {
 				playerFainted = true;
@@ -312,19 +312,652 @@ public class Battle {
 
 	}
 
-	public int typeCompare(String type1, String type2) {
+	public double typeCompare(String type1, Pokemon defending) {
 
-		int amp = 1;
+		double amp = 1;
+		String[] defendingTypes = defending.getTypes().split("-");
 
-		if (amp == 0.5) {
+		for (int i = 0; i < defendingTypes.length; i++) {
+
+			if (defendingTypes[i] != "Null") {
+				switch (type1) {
+
+				case ("Fire"):
+
+					switch (defendingTypes[i]) {
+
+					case "Fire":
+						amp *= 0.5;
+						break;
+
+					case "Water":
+						amp *= 0.5;
+						break;
+
+					case "Rock":
+						amp *= 0.5;
+						break;
+
+					case "Dragon":
+						amp *= 0.5;
+						break;
+
+					case "Grass":
+						amp *= 2;
+						break;
+
+					case "Ice":
+						amp *= 2;
+						break;
+
+					case "Bug":
+						amp *= 2;
+						break;
+
+					case "Steel":
+						amp *= 2;
+						break;
+					}
+					break;
+
+				case ("Grass"):
+
+					switch (defendingTypes[i]) {
+
+					case "Fire":
+						amp *= 0.5;
+						break;
+
+					case "Grass":
+						amp *= 0.5;
+						break;
+
+					case "Poison":
+						amp *= 0.5;
+						break;
+
+					case "Flying":
+						amp *= 0.5;
+						break;
+
+					case "Bug":
+						amp *= 0.5;
+						break;
+
+					case "Dragon":
+						amp *= 0.5;
+						break;
+
+					case "Steel":
+						amp *= 0.5;
+						break;
+
+					case "Water":
+						amp *= 2;
+						break;
+
+					case "Ground":
+						amp *= 2;
+						break;
+
+					case "Rock":
+						amp *= 2;
+						break;
+
+					}
+					break;
+
+				case ("Water"):
+
+					switch (defendingTypes[i]) {
+
+					case "Water":
+						amp *= 0.5;
+						break;
+
+					case "Grass":
+						amp *= 0.5;
+						break;
+					
+					case "Dragon":
+						amp *= 0.5;
+						break;
+						
+					case "Fire":
+						amp *= 2;
+						break;
+						
+					case "Ground":
+						amp *= 2;
+						break;
+						
+					case "Rock":
+						amp *= 2;
+						break;
+
+					}
+
+					break;
+
+				case ("Fighting"):
+					
+					switch (defendingTypes[i]) {
+					
+					case "Poison":
+						amp *= 0.5;
+						break;
+						
+					case "Flying":
+						amp *= 0.5;
+						break;
+					
+					case "Psychic":
+						amp *= 0.5;
+						break;
+						
+					case "Bug":
+						amp *= 0.5;
+						break;
+						
+					case "Fairy":
+						amp *= 0.5;
+						break;
+						
+					case "Normal":
+						amp *= 2;
+						break;
+						
+					case "Ice":
+						amp *= 2;
+						break;
+						
+					case "Rock":
+						amp *= 2;
+						break;
+						
+					case "Dark":
+						amp *= 2;
+						break;
+						
+					case "Steel":
+						amp *= 2;
+						break;
+						
+					case "Ghost":
+						amp *= 0;
+						break;
+			
+					}
+					
+					break;
+
+				case ("Ground"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Grass":
+						amp *= 0.5;
+						break;
+						
+					case "Bug":
+						amp *= 0.5;
+						break;
+					
+					case "Fire":
+						amp *= 2;
+						break;
+						
+					case "Electric":
+						amp *= 2;
+						break;
+						
+					case "Poison":
+						amp *= 2;
+						break;
+						
+					case "Rock":
+						amp *= 2;
+						break;
+						
+					case "Steel":
+						amp *= 2;
+						break;
+						
+					case "Flying":
+						amp *= 0;
+						break;
+					
+					}
+					
+					break;
+
+				case ("Rock"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Fighting":
+						amp *= 0.5;
+						break;
+						
+					case "Ground":
+						amp *= 0.5;
+						break;
+					
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Fire":
+						amp *= 2;
+						break;
+						
+					case "Ice":
+						amp *= 2;
+						break;
+						
+					case "Flying":
+						amp *= 2;
+						break;
+						
+					case "Bug":
+						amp *= 2;
+						break;	
+					
+					}
+					
+					break;
+
+				case ("Flying"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Electric":
+						amp *= 0.5;
+						break;
+						
+					case "Rock":
+						amp *= 0.5;
+						break;
+					
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Grass":
+						amp *= 2;
+						break;
+						
+					case "Fighting":
+						amp *= 2;
+						break;
+						
+					case "Bug":
+						amp *= 2;
+						break;					
+									
+					}
+					
+					break;
+
+				case ("Bug"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Fire":
+						amp *= 0.5;
+						break;
+						
+					case "Fighting":
+						amp *= 0.5;
+						break;
+					
+					case "Poison":
+						amp *= 0.5;
+						break;
+						
+					case "Flying":
+						amp *= 0.5;
+						break;
+						
+					case "Ghost":
+						amp *= 0.5;
+						break;
+						
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Fairy":
+						amp *= 0.5;
+						break;
+						
+					case "Grass":
+						amp *= 2;
+						break;
+						
+					case "Psychic":
+						amp *= 2;
+						break;
+						
+					case "Dark":
+						amp *= 2;
+						break;
+					
+					
+					}
+					
+					break;
+
+				case ("Psychic"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Psychic":
+						amp *= 0.5;
+						break;
+						
+					case "Steel":
+						amp *= 0.5;
+						break;
+					
+					case "Fighting":
+						amp *= 2;
+						break;
+						
+					case "Posion":
+						amp *= 2;
+						break;
+						
+					case "Dark":
+						amp *= 0;
+						break;
+						
+						
+					}
+					
+					break;
+
+				case ("Normal"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Rock":
+						amp *= 0.5;
+						break;
+						
+					case "Steel":
+						amp *= 0.5;
+						break;
+					
+					case "Ghost":
+						amp *= 0;
+						break;
+				
+					}
+					
+					break;
+
+				case ("Electric"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Grass":
+						amp *= 0.5;
+						break;
+						
+					case "Electric":
+						amp *= 0.5;
+						break;
+					
+					case "Dragon":
+						amp *= 0.5;
+						break;
+						
+					case "Water":
+						amp *= 2;
+						break;
+						
+					case "Flying":
+						amp *= 0.5;
+						break;
+						
+					case "Ground":
+						amp *= 0;
+						break;
+					
+					}
+					
+					break;
+
+				case ("Dark"):
+					
+					switch (defendingTypes[i]) {
+					
+					case "Fighting":
+						amp *= 0.5;
+						break;
+						
+					case "Dark":
+						amp *= 0.5;
+						break;
+					
+					case "Fariy":
+						amp *= 0.5;
+						break;
+						
+					case "Psychic":
+						amp *= 2;
+						break;
+						
+					case "Ghost":
+						amp *= 2;
+						break;
+					
+					}
+					
+					break;
+
+				case ("Dragon"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Dragon":
+						amp *= 2;
+						break;
+					
+					case "Fairy":
+						amp *= 0;
+						break;
+						
+					}
+					
+					break;
+
+				case ("Ice"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Fire":
+						amp *= 0.5;
+						break;
+						
+					case "Water":
+						amp *= 0.5;
+						break;
+					
+					case "Ice":
+						amp *= 0.5;
+						break;
+						
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Grass":
+						amp *= 2;
+						break;
+						
+					case "Ground":
+						amp *= 2;
+						break;
+						
+					case "Flying":
+						amp *= 2;
+						break;
+						
+					case "Dragon":
+						amp *= 2;
+						break;					
+					
+					}
+					
+					break;
+
+				case ("Ghost"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Dark":
+						amp *= 0.5;
+						break;
+						
+					case "Psychic":
+						amp *= 2;
+						break;
+					
+					case "Ghost":
+						amp *= 2;
+						break;
+						
+					case "Normal":
+						amp *= 0;
+						break;
+									
+					}
+					
+					break;
+
+				case ("Poison"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Poison":
+						amp *= 0.5;
+						break;
+						
+					case "Ground":
+						amp *= 0.5;
+						break;
+					
+					case "Rock":
+						amp *= 0.5;
+						break;
+						
+					case "Ghost":
+						amp *= 0.5;
+						break;
+						
+					case "Grass":
+						amp *= 2;
+						break;
+						
+					case "Fairy":
+						amp *= 2;
+						break;
+						
+					case "Steel":
+						amp *= 0;
+						break;
+						
+					}
+					
+					break;
+
+				case ("Steel"):
+
+					switch (defendingTypes[i]) {
+					
+					case "Fire":
+						amp *= 0.5;
+						break;
+						
+					case "Water":
+						amp *= 0.5;
+						break;
+					
+					case "Electric":
+						amp *= 0.5;
+						break;
+						
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Ice":
+						amp *= 2;
+						break;
+						
+					case "Rock":
+						amp *= 2;
+						break;
+						
+					case "Fairy":
+						amp *= 2;
+						break;				
+					
+					}
+					
+					break;
+					
+				case ("Fairy"):
+					
+					switch (defendingTypes[i]) {
+					
+					case "Fire":
+						amp *= 0.5;
+						break;
+						
+					case "Poison":
+						amp *= 0.5;
+						break;
+					
+					case "Steel":
+						amp *= 0.5;
+						break;
+						
+					case "Fighting":
+						amp *= 2;
+						break;
+						
+					case "Ghost":
+						amp *= 2;
+						break;
+								
+					}
+					
+				default:
+					break;
+				}
+			}
+
+		}
+		if (amp == 0) {
+			battleResponses.add("It had no effect...");
+		}
+		
+		else if (amp == 0.5) {
 			battleResponses.add("It was not very effective...");
 		}
 
-		if (amp == 2 || amp == 4) {
+		else if (amp == 2 || amp == 4) {
 			battleResponses.add("It was super effective!");
 		}
 
-		return 1;
+		return amp;
 	}
 
 	public String catchPokemon() {
@@ -378,7 +1011,7 @@ public class Battle {
 	}
 
 	public String battleResponses(int index) {
-		
+
 		return battleResponses.get(index);
 
 	}
@@ -386,9 +1019,22 @@ public class Battle {
 	public int responseAmount() {
 		return battleResponses.size();
 	}
-	
+
 	public void clearResponses() {
 		battleResponses.clear();
+	}
+	
+
+	public Pokemon getFirstToMove() {
+		return firstToMove;
+	}
+
+	public Pokemon getSecondToMove() {
+		return secondToMove;
+	}
+	
+	public String getCurrentTurn() {
+		return currentTurn;
 	}
 
 }

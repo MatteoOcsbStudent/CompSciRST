@@ -103,6 +103,10 @@ public class Boot extends Application {
 	Label lblCatchButton;
 	Label lblRunButton;
 	Label lblBattleResponse;
+	Label lblPlayerHp;
+	Label lblPlayerBar;
+	Label lblOpponentHp;
+	Label lblOpponentBar;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
@@ -166,7 +170,7 @@ public class Boot extends Application {
 
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-		battleRoot.setGridLinesVisible(false);
+		battleRoot.setGridLinesVisible(true);
 
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
@@ -176,13 +180,25 @@ public class Boot extends Application {
 		playerPokeSprite = new ImageView();
 		playerPokeSprite.setFitHeight(POKESPRITEDIMENSION);
 		playerPokeSprite.setFitWidth(POKESPRITEDIMENSION);
-		battleRoot.add(playerPokeSprite, 0, 2, 1, 2);
+		battleRoot.add(playerPokeSprite, 0, 6, 2, 6);
 
 		// playerHpBar
 		playerHpBar = new ProgressBar();
 		playerHpBar.setPrefWidth(POKESPRITEDIMENSION);
 		playerHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
-		battleRoot.add(playerHpBar, 6, 2, 1, 2);
+		battleRoot.add(playerHpBar, 4, 8, 2, 1);
+
+		lblPlayerBar = new Label();
+		lblPlayerBar.setTextFill(Color.BLACK);
+		lblPlayerBar.setFont(Font.font(SMALL_FONT));
+		battleRoot.add(lblPlayerBar, 4, 7, 1, 1);
+		lblPlayerBar.setAlignment(Pos.BOTTOM_CENTER);
+
+		lblPlayerHp = new Label();
+		lblPlayerHp.setTextFill(Color.BLACK);
+		lblPlayerHp.setFont(Font.font(SMALL_FONT));
+		battleRoot.add(lblPlayerHp, 4, 9, 1, 1);
+		lblPlayerHp.setAlignment(Pos.TOP_CENTER);
 
 		// xpBar
 		xpBar = new ProgressBar();
@@ -191,13 +207,25 @@ public class Boot extends Application {
 		opponentPokeSprite = new ImageView();
 		opponentPokeSprite.setFitHeight(POKESPRITEDIMENSION);
 		opponentPokeSprite.setFitWidth(POKESPRITEDIMENSION);
-		battleRoot.add(opponentPokeSprite, 6, 0, 1, 2);
+		battleRoot.add(opponentPokeSprite, 6, 0, 2, 6);
 
 		// opponentHpBar
 		opponentHpBar = new ProgressBar();
 		opponentHpBar.setPrefWidth(POKESPRITEDIMENSION);
 		opponentHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
-		battleRoot.add(opponentHpBar, 0, 0, 1, 2);
+		battleRoot.add(opponentHpBar, 2, 3, 2, 1);
+
+		lblOpponentBar = new Label();
+		lblOpponentBar.setTextFill(Color.BLACK);
+		lblOpponentBar.setFont(Font.font(SMALL_FONT));
+		battleRoot.add(lblOpponentBar, 2, 2, 1, 1);
+		lblOpponentBar.setAlignment(Pos.BOTTOM_CENTER);
+
+		lblOpponentHp = new Label();
+		lblOpponentHp.setTextFill(Color.BLACK);
+		lblOpponentHp.setFont(Font.font(SMALL_FONT));
+		battleRoot.add(lblOpponentHp, 2, 4, 1, 1);
+		lblOpponentHp.setAlignment(Pos.TOP_CENTER);
 
 		// Background image
 		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT,
@@ -209,7 +237,7 @@ public class Boot extends Application {
 		lblFightButton = new Label("Fight");
 		lblFightButton.setFont(Font.font(LARGE_FONT));
 		lblFightButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblFightButton, 0, 4, 1, 1);
+		battleRoot.add(lblFightButton, 0, 13, 1, 1);
 		lblFightButton.setVisible(false);
 		lblFightButton.setPrefWidth(148);
 		lblFightButton.setAlignment(Pos.CENTER);
@@ -218,7 +246,7 @@ public class Boot extends Application {
 		lblPokemonButton = new Label("Pokemon");
 		lblPokemonButton.setFont(Font.font(LARGE_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblPokemonButton, 2, 4, 1, 1);
+		battleRoot.add(lblPokemonButton, 2, 13, 1, 1);
 		lblPokemonButton.setVisible(false);
 		lblPokemonButton.setPrefWidth(148);
 		lblPokemonButton.setAlignment(Pos.CENTER);
@@ -227,7 +255,7 @@ public class Boot extends Application {
 		lblCatchButton = new Label("Catch");
 		lblCatchButton.setFont(Font.font(LARGE_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblCatchButton, 4, 4, 1, 1);
+		battleRoot.add(lblCatchButton, 4, 13, 1, 1);
 		lblCatchButton.setVisible(false);
 		lblCatchButton.setPrefWidth(148);
 		lblCatchButton.setAlignment(Pos.CENTER);
@@ -236,7 +264,7 @@ public class Boot extends Application {
 		lblRunButton = new Label("Run");
 		lblRunButton.setFont(Font.font(LARGE_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
-		battleRoot.add(lblRunButton, 6, 4, 1, 1);
+		battleRoot.add(lblRunButton, 6, 13, 1, 1);
 		lblRunButton.setVisible(false);
 		lblRunButton.setPrefWidth(148);
 		lblRunButton.setAlignment(Pos.CENTER);
@@ -245,7 +273,7 @@ public class Boot extends Application {
 		lblBattleResponse = new Label();
 		lblBattleResponse.setFont(Font.font(LARGE_FONT));
 		lblBattleResponse.setTextFill(Color.BLACK);
-		battleRoot.add(lblBattleResponse, 0, 4, 6, 1);
+		battleRoot.add(lblBattleResponse, 0, 13, 6, 1);
 		lblBattleResponse.setPrefWidth(888);
 
 		// Moving player WASD
@@ -266,19 +294,21 @@ public class Boot extends Application {
 						direction = "Up";
 						if (map.getPlayerY() == 0) {
 							nextMap(myStage);
-						} else
+						} else 
 						// Makes sure you're not flying over trees and houses
 						if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBarrier() != true) {
-
+							
 							if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
+							
 							// Moves player's tilegrid location and stackpane location
 							map.setPlayerY(-1);
 							playerStackY--;
 
 							// Displays new board
 							displayBoard(root);
+
 						}
 
 						break;
@@ -290,9 +320,11 @@ public class Boot extends Application {
 						if (map.getPlayerX() == 0) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBarrier() != true) {
+							
 							if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
+							
 							map.setPlayerX(-1);
 							playerStackX--;
 							displayBoard(root);
@@ -307,9 +339,11 @@ public class Boot extends Application {
 						if (map.getPlayerY() == map.getMapHeight() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBarrier() != true) {
+							
 							if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
-							}
+							} 
+							
 							map.setPlayerY(1);
 							playerStackY++;
 							displayBoard(root);
@@ -324,12 +358,15 @@ public class Boot extends Application {
 						if (map.getPlayerX() == map.getMapWidth() - 1) {
 							nextMap(myStage);
 						} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBarrier() != true) {
-							if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkEncounter() == true) {
+							
+							if (map.getTile(map.getPlayerY(), map.getPlayerX()).checkEncounter() == true) {
 								wildEncounter(myStage);
 							}
+							
 							map.setPlayerX(1);
 							playerStackX++;
 							displayBoard(root);
+							
 						}
 
 						break;
@@ -347,11 +384,11 @@ public class Boot extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 
-				if (movementLock == false) {
-					switch (event.getCode()) {
+				switch (event.getCode()) {
 
-					case A:
+				case A:
 
+					if (movementLock == false) {
 						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
 							// Scrolling through buttons right
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
@@ -362,10 +399,11 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 						}
-						break;
+					}
+					break;
 
-					case D:
-
+				case D:
+					if (movementLock == false) {
 						if (battleMenu.equals("General") || battleMenu.equals("Moves")) {
 							// Scrolling through buttons left
 							if (battleButtonIndex == 4 || battleButtonIndex == 0) {
@@ -376,75 +414,77 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 						}
+					}
+					break;
+
+				// 'Select' key. different functions based on menu
+				case C:
+					switch (battleMenu) {
+
+					// Uses move
+					case "Moves":
+						useMove(myStage);
 						break;
 
-					// 'Select' key. different functions based on menu
-					case C:
-						switch (battleMenu) {
+					// Changes next menu based on selected button
+					case "General":
 
-						// Uses move
-						case "Moves":
-							useMove(myStage);
+						switch (battleButtonIndex) {
+						case 1:
+							nextBattleMenu(myStage, "Moves");
 							break;
-
-						// Changes next menu based on selected button
-						case "General":
-
-							switch (battleButtonIndex) {
-							case 1:
-								nextBattleMenu(myStage, "Moves");
-								break;
-							case 2:
-								nextBattleMenu(myStage, "PokemonMenu");
-								break;
-							case 3:
-								nextBattleMenu(myStage, "Flee");
-								break;
-							case 4:
-								nextBattleMenu(myStage, "Run");
-								break;
-							default:
-								break;
-
-							}
-
+						case 2:
+							nextBattleMenu(myStage, "PokemonMenu");
 							break;
-
-						// Cycles through battle responses
-						case "battleResponses":
-
-							if (lblBattleResponse.getText().contains("appeared!")) {
-								nextBattleMenu(myStage, "General");
-							} else {
-								if (nextBattleResponse() == true) {
-									nextBattleMenu(myStage, "General");
-								}
-							}
-
+						case 3:
+							nextBattleMenu(myStage, "Flee");
 							break;
-
+						case 4:
+							nextBattleMenu(myStage, "Run");
+							break;
 						default:
 							break;
+
 						}
 
 						break;
 
-					case X:
+					// Cycles through battle responses
+					case "battleResponses":
 
-						switch (battleMenu) {
-
-						// Goes back to general battle menu
-						case "Moves":
+						if (lblBattleResponse.getText().contains("appeared!")) {
 							nextBattleMenu(myStage, "General");
-							break;
-
+							movementLock = false;
+						} else {
+							if (nextBattleResponse() == true) {
+								nextBattleMenu(myStage, "General");
+							}
 						}
+
+						break;
 
 					default:
 						break;
+					}
+
+					break;
+
+				case X:
+
+					switch (battleMenu) {
+
+					// Goes back to general battle menu
+					case "Moves":
+						nextBattleMenu(myStage, "General");
+						break;
 
 					}
+
+				default:
+					break;
+
 				}
+
 			}
 		});
 
@@ -477,17 +517,17 @@ public class Boot extends Application {
 
 		// Instantiates the new map
 		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
-		
+
 		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
-		    
-        //Displays the next map
-		    displayBoard(root);
-		   
-       //Sets the scene to the new map
-		    myStage.setScene(scene);
-		    
-        //removes the movement lock
-		   movementLock = false;
+
+			// Displays the next map
+			displayBoard(root);
+
+			// Sets the scene to the new map
+			myStage.setScene(scene);
+
+			// removes the movement lock
+			movementLock = false;
 		}));
 
 		delay.play();
@@ -707,9 +747,13 @@ public class Boot extends Application {
 
 		if (responseCounter < battle.responseAmount()) {
 			lblBattleResponse.setText(battle.battleResponses(responseCounter));
+			
 			responseCounter++;
+
 		} else {
 			responseCounter = 0;
+			updateProgressBar("player");
+			updateProgressBar("opponent");
 			battle.clearResponses();
 			lastResponse = true;
 		}
@@ -808,24 +852,33 @@ public class Boot extends Application {
 
 			color = Color.DIMGRAY;
 			break;
+
+		case ("Fairy"):
+
+			color = Color.HOTPINK;
+			break;
 		default:
 			break;
 		}
 
 		return color;
 	}
-	
+
 	public void updateProgressBar(String bar) {
 		switch (bar) {
-		
+
 		case "player":
-			playerHpBar.setProgress(playerPokemon.getCurrentHP()/playerPokemon.getTotalHP());
+			playerHpBar.setProgress((double)playerPokemon.getCurrentHP() / playerPokemon.getTotalHP());
+			lblPlayerBar.setText((playerPokemon.getName() + " L." + playerPokemon.getLevel()).toUpperCase());
+			lblPlayerHp.setText(playerPokemon.getCurrentHP() + "/" + playerPokemon.getTotalHP() + "HP");
 			break;
 		case "opponent":
-			opponentHpBar.setProgress(opponentPokemon.getCurrentHP()/opponentPokemon.getTotalHP());
+			opponentHpBar.setProgress((double)opponentPokemon.getCurrentHP() / opponentPokemon.getTotalHP());
+			lblOpponentBar.setText((opponentPokemon.getName() + " L." + opponentPokemon.getLevel()).toUpperCase());
+			lblOpponentHp.setText(opponentPokemon.getCurrentHP() + "/" + opponentPokemon.getTotalHP() + "HP");
 			break;
 		case "xp":
-			
+
 			break;
 		}
 	}
@@ -837,23 +890,21 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Torchic", 1);
-			
+			opponentPokemon = new Pokemon("Torchic", 31);
 			playerPokemon = player.getPokemon(0);
-			playerHpBar.setProgress(0.5);
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
-			
+
 			// Sets the sprites for the pokemon
 			playerPokeSprite.setImage(playerPokemon.getBackSprite());
 			opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 
 			updateProgressBar("player");
 			updateProgressBar("opponent");
-			
-			// Sets the Battle Scene
+
 			battleMenu = "battleResponses";
 			nextBattleResponse();
+
 			myStage.setScene(battleScene);
 
 		}
