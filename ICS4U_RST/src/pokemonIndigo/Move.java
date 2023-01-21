@@ -35,7 +35,7 @@ public class Move {
 			if (priorityString.equals("True")) {
 				priority = true;
 			} else { 
-				priority = true;
+				priority = false;
 			}
 			
 			moveFile.close();
