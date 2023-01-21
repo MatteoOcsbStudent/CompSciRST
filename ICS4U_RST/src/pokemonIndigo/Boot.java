@@ -114,7 +114,7 @@ public class Boot extends Application {
 	TileGrid map;
 
 	// player instantiation
-	Player player = new Player("test");
+	Player player = new Player();
 
 	// Battle reference
 	Battle battle;
