@@ -35,13 +35,12 @@ public class TileGrid {
 
 	// Exit tile boolean
 	private boolean exit = false;
-	
-	//Background Images
+
+	// Background Images
 	private Image backgroundImageForest = new Image("images/BattleBackgrounds/Forest.png", 640, 348, false, false);
 	private Image backgroundImageGym = new Image("images/BattleBackgrounds/Gym.png", 640, 348, false, false);
 	private Image backgroundImage;
-	
-	
+
 	public TileGrid() {
 
 	}
@@ -57,10 +56,10 @@ public class TileGrid {
 
 			// Calls the map file
 			tileLayout = new File("data/maps/routeOne.map");
-			
-			//Sets Background image
+
+			// Sets Background image
 			backgroundImage = backgroundImageForest;
-			
+
 			// Sets the spawnpoint
 			if (spawnpoint == 1) {
 				playerX = 14;
@@ -83,11 +82,14 @@ public class TileGrid {
 			} else if (spawnpoint == 2) {
 				playerX = 12;
 				playerY = 0;
+			} else if (spawnpoint == 3) {
+				playerX = 21;
+				playerY = 6;
 			}
 			currentMapName = "Orilon Town";
 			break;
 
-		case "Horizon city":
+		case "Horizon City":
 			tileLayout = new File("data/maps/horizonCity.map");
 			backgroundImage = backgroundImageForest;
 			if (spawnpoint == 1) {
@@ -96,6 +98,11 @@ public class TileGrid {
 			}
 			currentMapName = "Horizon City";
 			break;
+			
+		case "Pokemon Center":
+			tileLayout = new File("data/maps/pokemonCenter.map");
+			playerX = 6;
+			playerY = 10;
 		}
 
 		// Reads map textfile
@@ -114,7 +121,6 @@ public class TileGrid {
 			for (int y = 0; y < mapHeight; y++) {
 				String temp = mapStream.readLine();
 
-	
 				// Reads each character in the row, declaring corresponding tile at the index
 				for (int x = 0; x < temp.length(); x++) {
 					char tileType = temp.charAt(x);
@@ -138,13 +144,29 @@ public class TileGrid {
 					// TallGrass Tile
 					case 'W':
 						map[y][x] = new Tile("TallGrass");
-						
-						
+
 						break;
 
 					// Normal Grass Tile
 					case 'G':
 						map[y][x] = new Tile("Grass");
+						break;
+
+					// Floor
+					case 'F':
+						map[y][x] = new Tile("InsideFloor");
+						break;
+
+					case 'L':
+						map[y][x] = new Tile("WallLeft");
+						break;
+
+					case 'R':
+						map[y][x] = new Tile("WallRight");
+						break;
+
+					case 'H':
+						map[y][x] = new Tile("WallBack");
 						break;
 
 					// Pokemon Center
@@ -220,29 +242,56 @@ public class TileGrid {
 					case 'Y':
 						for (int position = 0; position < 5; position++) {
 							map[y][x] = new Tile("Gym", (position + 1));
+							x++;
 						}
 						x -= 5;
 
 						for (int position = 5; position < 10; position++) {
 							map[y + 1][x] = new Tile("Gym", (position + 1));
+							x++;
 						}
 						x -= 5;
 
 						for (int position = 10; position < 15; position++) {
 							map[y + 2][x] = new Tile("Gym", (position + 1));
+							x++;
 						}
 						x -= 5;
 
 						for (int position = 15; position < 20; position++) {
 							map[y + 3][x] = new Tile("Gym", (position + 1));
+							x++;
 						}
 						x -= 5;
 
 						for (int position = 20; position < 25; position++) {
 							map[y + 4][x] = new Tile("Gym", (position + 1));
+							x++;
 						}
 						x--;
 						break;
+
+					case 'A':
+						for (int position = 0; position < 2; position++) {
+							map[y][x] = new Tile("Table", (position + 1));
+							x++;
+						}
+						x -= 2;
+						for (int position = 2; position < 4; position++) {
+							map[y + 1][x] = new Tile("Table", (position + 1));
+							x++;
+						}
+						x--;
+						break;
+
+					case 'M':
+						for (int position = 0; position < 2; position++) {
+							map[y][x] = new Tile("Doormat", (position + 1));
+							x++;
+						}
+						x--;
+						break;
+
 					}
 
 				}
@@ -298,64 +347,119 @@ public class TileGrid {
 		playerY += movement;
 	}
 
-	//Checks for an exit tile
-	public boolean checkExit(String mapName, int row, int col) {
+	// Checks for an exit tile
+	public boolean checkExit(String mapName) {
 
 		switch (mapName) {
 
 		case "Orilon Town":
-			
-			//Checks for the hardcoded values for exit tiles
-			if ((row >= 10 && row <= 15) && (col == 0)) {
-				
-				//Sets the exit tile as true
+
+			// Checks for the hardcoded values for exit tiles
+			if ((playerX >= 10 && playerX <= 15) && (playerY == 0)) {
+
+				// Sets the exit tile as true
+				exit = true;
+
+				// Sets the next map's name
+				nextMap = "Route One";
+
+				// Sets the new player spawn
+				playerSpawnX = 10;
+				playerSpawnY = 11;
+
+				// Sets the specific spawn entrance
+				spawnpoint = 1;
+
+			} else if (playerX == 21 && playerY == 6) {
 				exit = true;
 				
-				//Sets the next map's name
-				nextMap = "Route One";
+				nextMap = "PokemonCenter";
 				
-				//Sets the new player spawn
 				playerSpawnX = 10;
 				playerSpawnY = 11;
 				
-				//Sets the specific spawn entrance
 				spawnpoint = 1;
-				
-			} else {
+			
+		} else {
 				exit = false;
 			}
 			break;
-			
+
 		case "Route One":
+		
 			if ((playerX >= 9 && playerX <= 19) && (playerY == 50)) {
+				
 				exit = true;
+				
 				nextMap = "Orilon Town";
+				
 				playerSpawnX = 10;
 				playerSpawnY = 0;
+				
 				spawnpoint = 2;
-			} else if ((playerX >= 23 && playerX <= 25) && playerY == 0) {
+				
+			} else if ((playerX >= 22 && playerX <= 25) && playerY == 0) {
+				
 				exit = true;
+				
 				nextMap = "Horizon City";
+				
 				playerSpawnX = 10;
 				playerSpawnY = 11;
+				
 				spawnpoint = 1;
+			
 			} else {
+				
 				exit = false;
+			
 			}
 			break;
-		
+
 		case "Horizon City":
+			
 			if ((playerX >= 22 && playerX <= 25) && playerY == 21) {
+				
 				exit = true;
+				
 				nextMap = "Route One";
+				
 				playerSpawnX = 10;
-				playerSpawnY = 11;
+				playerSpawnY = 0;
+				
 				spawnpoint = 2;
 			} else {
 				exit = false;
 			}
 			break;
 
+		case "Pokemon Center":
+			if ((playerX == 7 || playerX == 8) && playerY == 14) {
+				
+				exit = true;
+				
+				if (spawnpoint == 1) {
+					
+					nextMap = "Orilon City";
+					
+					playerSpawnX = 10;					
+					playerSpawnY = 11;
+					
+					spawnpoint = 3;
+
+				} else if (spawnpoint == 2) {
+					nextMap = "Horizon City";
+					playerSpawnX = 10;
+					playerSpawnY = 11;
+					spawnpoint = 2;
+				
+				} else {
+					
+					exit = false;
+				
+				}
+				break;
+			}
 		}
 		return exit;
 	}
@@ -364,7 +468,7 @@ public class TileGrid {
 		currentMapName = nextMap;
 		return nextMap;
 	}
-	
+
 	public Image getBackgroundImage() {
 		return backgroundImage;
 	}
