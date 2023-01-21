@@ -515,11 +515,11 @@ public class Boot extends Application {
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
 
-		// Instantiates the new map
-		map = new TileGrid(map.getNextMap(), map.getNextSpawn());
-
 		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
 
+			// Instantiates the new map
+			map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+			
 			// Displays the next map
 			displayBoard(root);
 
@@ -531,12 +531,6 @@ public class Boot extends Application {
 		}));
 
 		delay.play();
-
-		// Displays the next map
-		displayBoard(root);
-
-		// Sets the scene to the new map
-		myStage.setScene(scene);
 
 		// removes the movement lock
 		movementLock = false;
