@@ -138,8 +138,8 @@ public class Boot extends Application {
 		player.addPokemon(new Pokemon("Torchic", 36));
 
 		// Temp hardcoded map loading
-		map = new TileGrid("Orilon Town", 1);
-		currentMapName = "Orilon Town";
+		map = new TileGrid("Horizon City", 1);
+		currentMapName = "Horizon City";
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
