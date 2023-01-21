@@ -17,9 +17,12 @@ public class Tile extends ImageView {
 	private final Image imgWALLRIGHT = new Image(getClass().getResource("/images/PokemonCenterInside/WallRight.png").toString());
 	private final Image imgWALLLEFT = new Image(getClass().getResource("/images/PokemonCenterInside/WallLeft.png").toString());
 	private final Image imgWALLBACK = new Image(getClass().getResource("/images/PokemonCenterInside/WallBack.png").toString());
+	private final Image imgBLACKTILE = new Image(getClass().getResource("/images/PokemonCenterInside/BlackTile.png").toString());
 	
 	//Barrier boolean
 	private boolean barrier = false;
+	
+	private boolean door = false;
 	
 	private boolean wildEncounter = false;
 	
@@ -73,6 +76,24 @@ public class Tile extends ImageView {
 		case "InsideFloorWhite":
 			this.setImage(imgINSIDEFLOORWHITE);
 			break;
+		case "WallRight":
+			this.setImage(imgWALLRIGHT);
+			barrier = true;
+			break;
+			
+		case "WallLeft":
+			this.setImage(imgWALLLEFT);
+			barrier = true;
+			break;
+			
+		case "WallBack":
+			this.setImage(imgWALLBACK);
+			barrier = true;
+			break;
+		
+		case "BlackTile":
+			this.setImage(imgBLACKTILE);
+			break;
 		}
 	}
 
@@ -94,6 +115,8 @@ public class Tile extends ImageView {
 			// Setting the building as a barrier other than the door
 			if (position != 5) {
 				barrier = true;
+			} else if (position == 5) {
+				door = true;
 			}
 			break;
 
@@ -118,6 +141,8 @@ public class Tile extends ImageView {
 					getClass().getResource("/images/Gym/Gym" + position + ".png").toString()));
 			if (position >= 0 && position <= 20) {
 				barrier = true;
+			} else if (position == 23) {
+				door = true;
 			}
 			break;
 		case "Doormat":
@@ -128,24 +153,16 @@ public class Tile extends ImageView {
 			this.setImage(new Image(getClass().getResource("/images/PokemonCenterInside/Table" + position + ".png").toString()));;
 			barrier = true;
 			break;
-		
-		case "WallRight":
-			this.setImage(imgWALLRIGHT);
-			break;
-			
-		case "WallLeft":
-			this.setImage(imgWALLLEFT);
-			break;
-			
-		case "WallBack":
-			this.setImage(imgWALLBACK);
-			break;
 		}
 	}
 
 	//Checks for barrier
 	public Boolean checkBarrier() {
 		return barrier;
+	}
+	
+	public Boolean checkDoor() {
+		return door;
 	}
 	
 	public Boolean checkEncounter() {

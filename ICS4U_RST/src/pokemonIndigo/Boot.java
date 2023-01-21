@@ -292,7 +292,7 @@ public class Boot extends Application {
 
 						// Defines direction
 						direction = "Up";
-						if (map.getPlayerY() == 0) {
+						if (map.getPlayerY() == 0 || map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkDoor() == true) {
 							nextMap(myStage);
 						} else 
 						// Makes sure you're not flying over trees and houses
