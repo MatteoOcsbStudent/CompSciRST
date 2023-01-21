@@ -328,4 +328,8 @@ public class Pokemon {
 	public int getMovePoolSize() {
 		return currentMoves.size();
 	}
+	
+	public void setCurrentHp(int hp) {
+		currentHP = hp;
+	}
 }
