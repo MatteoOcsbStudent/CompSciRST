@@ -84,7 +84,7 @@ public class TileGrid {
 				playerX = 12;
 				playerY = 0;
 			} else if (spawnpoint == 3) {
-				playerX = 21;
+				playerX = 20;
 				playerY = 7;
 			}
 			currentMapName = "Orilon Town";
