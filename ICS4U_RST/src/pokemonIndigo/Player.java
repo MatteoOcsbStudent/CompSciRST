@@ -47,9 +47,6 @@ public class Player {
 		team.remove(index);
 	}
 	
-	public int getTeamSize() {
-		return team.size();
-	}
 }
 
 	
