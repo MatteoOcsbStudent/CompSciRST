@@ -11,6 +11,7 @@ public class Battle {
 
 	boolean opponentFainted;
 	boolean playerFainted;
+	boolean goingToEvolve;
 
 	Move opponentMove;
 
@@ -43,6 +44,8 @@ public class Battle {
 
 	public void turnPlan(Move playerMove) {
 
+		goingToEvolve = false;
+		
 		int opponentMoveIndex = 0;
 		double random = Math.random();
 
@@ -305,13 +308,59 @@ public class Battle {
 		
 		// Applies damage
 		defending.hpChange((int) damage);
+		
+		//Determines if defending pokemon fainted
 		if (defending.currentHP < 0) {
+			
+			//Sets to zero for health bar purposes
 			defending.setCurrentHp(0);
+			
+			//Informs user it was fainted
 			battleResponses.add(defending.getName() + " has fainted");
+			
+			//If opponent fainted, gain exp
 			if (defending.equals(opponentPokemon)) {
 				opponentFainted = true;
+				int expGain = (int)(((64 * opponentPokemon.getLevel()) / 7) * 8);
+				battleResponses.add(attacking.getName() + " gained " + expGain + " exp");
+			
+				//Level up as many times as necessary for exp gain
+				do {
+					attacking.levelUp();
+					battleResponses.add(attacking.getName() + " leveled up!");
+					
+					//If evolution level is hit, evolve pokemon and inform user
+					if (attacking.getNextEvolution() != -1) {
+						
+						goingToEvolve = true;
+						String previousEvolution = attacking.getName();
+						attacking.evolve(attacking.getNextEvolution());
+						
+						battleResponses.add(previousEvolution + " has evolved into " + attacking.getName() + "!");
+					}
+					
+					//checks if move can be learned
+					if (attacking.getNextMoveLearn() != "") {
+						
+						//If less than 4 moves, automatically learn new one
+						if (attacking.getMovePoolSize() < 4) {
+							battleResponses.add(attacking.getName() + " has learned " + attacking.getNextMoveLearn());
+							attacking.changeMoveSet(attacking.getNextMoveLearn());
+						
+						//Otherwise, ask user if they would like to learn the new move
+						} else {
+							battleResponses.add(attacking.getName() + " is trying to learn " + attacking.getNextMoveLearn());
+							battleResponses.add("Would you like to forget an old move?");
+						}
+					}
+					
+				} while (attacking.getExp() >= attacking.getNextLevelUp());
+				
+				
 			} else if (defending.equals(playerPokemon)) {
 				playerFainted = true;
+				
+				
 			}
 		}
 
@@ -1041,5 +1090,21 @@ public class Battle {
 	public String getCurrentTurn() {
 		return currentTurn;
 	}
-
+	
+	public boolean isTrainerBattle() {
+		return isTrainerBattle;
+	}
+	
+	public boolean isOpponentFainted() {
+		return opponentFainted;
+	}
+	
+	public boolean isPlayerFainted() {
+		return playerFainted;
+	}
+	
+	public boolean isGoingToEvolve() {
+		return goingToEvolve;
+	}
+	
 }

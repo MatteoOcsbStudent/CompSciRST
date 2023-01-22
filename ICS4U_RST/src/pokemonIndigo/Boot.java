@@ -74,6 +74,8 @@ public class Boot extends Application {
 	// Locking movement
 	private boolean movementLock = false;
 
+	private boolean endBattle;
+
 	// Direction of movement
 	private String direction;
 
@@ -271,9 +273,12 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-		// Hardcoded start point for New Game
+		player.addPokemon(new Pokemon("Torchic", 15));
+		
+    // Hardcoded start point for New Game
 		map = new TileGrid("Orilon Town", 1);
 		currentMapName = "Orilon Town";
+
 		direction = "Up";
 
 		// Declaring gridpane
@@ -289,21 +294,23 @@ public class Boot extends Application {
 
 		StackPane loadingPane = new StackPane();
 
+		//Loading screen text
 		lblLoadingScreen = new Label();
 		lblLoadingScreen.setTextFill(Color.WHITE);
 		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
 		loadingPane.getChildren().addAll(new Rectangle(sceneWidth, sceneHeight, Color.BLACK), lblLoadingScreen);
 
+		//Loading screen 
 		loading = new Scene(loadingPane, sceneWidth, sceneHeight);
 
 		/**
 		 * Battle Scene
 		 */
 
+		//Battle UI gridpane and scene
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-		battleRoot.setGridLinesVisible(true);
-
+    
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -320,12 +327,14 @@ public class Boot extends Application {
 		playerHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
 		battleRoot.add(playerHpBar, 4, 8, 2, 1);
 
+		//label for player pokemons name and level
 		lblPlayerBar = new Label();
 		lblPlayerBar.setTextFill(Color.BLACK);
 		lblPlayerBar.setFont(Font.font(SMALL_FONT));
 		battleRoot.add(lblPlayerBar, 4, 7, 1, 1);
 		lblPlayerBar.setAlignment(Pos.BOTTOM_CENTER);
 
+		//label for player pokemons hp
 		lblPlayerHp = new Label();
 		lblPlayerHp.setTextFill(Color.BLACK);
 		lblPlayerHp.setFont(Font.font(SMALL_FONT));
@@ -347,19 +356,21 @@ public class Boot extends Application {
 		opponentHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
 		battleRoot.add(opponentHpBar, 2, 3, 2, 1);
 
+		//Label for opponent pokemons name and level
 		lblOpponentBar = new Label();
 		lblOpponentBar.setTextFill(Color.BLACK);
 		lblOpponentBar.setFont(Font.font(SMALL_FONT));
 		battleRoot.add(lblOpponentBar, 2, 2, 1, 1);
 		lblOpponentBar.setAlignment(Pos.BOTTOM_CENTER);
 
+		//Label for opponent pokemons hp
 		lblOpponentHp = new Label();
 		lblOpponentHp.setTextFill(Color.BLACK);
 		lblOpponentHp.setFont(Font.font(SMALL_FONT));
 		battleRoot.add(lblOpponentHp, 2, 4, 1, 1);
 		lblOpponentHp.setAlignment(Pos.TOP_CENTER);
 
-		// Background image
+		// Background image for battle
 		backgroundImage = new BackgroundImage(map.getBackgroundImage(), BackgroundRepeat.REPEAT,
 				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
@@ -367,7 +378,7 @@ public class Boot extends Application {
 
 		// Fight button
 		lblFightButton = new Label("Fight");
-		lblFightButton.setFont(Font.font(LARGE_FONT));
+		lblFightButton.setFont(Font.font(MEDIUM_FONT));
 		lblFightButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblFightButton, 0, 13, 1, 1);
 		lblFightButton.setVisible(false);
@@ -376,7 +387,7 @@ public class Boot extends Application {
 
 		// Pokemon button
 		lblPokemonButton = new Label("Pokemon");
-		lblPokemonButton.setFont(Font.font(LARGE_FONT));
+		lblPokemonButton.setFont(Font.font(MEDIUM_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblPokemonButton, 2, 13, 1, 1);
 		lblPokemonButton.setVisible(false);
@@ -385,7 +396,7 @@ public class Boot extends Application {
 
 		// Catch button
 		lblCatchButton = new Label("Catch");
-		lblCatchButton.setFont(Font.font(LARGE_FONT));
+		lblCatchButton.setFont(Font.font(MEDIUM_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblCatchButton, 4, 13, 1, 1);
 		lblCatchButton.setVisible(false);
@@ -394,7 +405,7 @@ public class Boot extends Application {
 
 		// Run button
 		lblRunButton = new Label("Run");
-		lblRunButton.setFont(Font.font(LARGE_FONT));
+		lblRunButton.setFont(Font.font(MEDIUM_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblRunButton, 6, 13, 1, 1);
 		lblRunButton.setVisible(false);
@@ -403,7 +414,7 @@ public class Boot extends Application {
 
 		// in battle response label
 		lblBattleResponse = new Label();
-		lblBattleResponse.setFont(Font.font(LARGE_FONT));
+		lblBattleResponse.setFont(Font.font(MEDIUM_FONT));
 		lblBattleResponse.setTextFill(Color.BLACK);
 		battleRoot.add(lblBattleResponse, 0, 13, 6, 1);
 		lblBattleResponse.setPrefWidth(888);
@@ -415,6 +426,7 @@ public class Boot extends Application {
 		battleRoot.add(lblCToContinue, 6, 14, 1, 1);
 		lblCToContinue.setAlignment(Pos.CENTER_RIGHT);
 
+		// X to go back instruction
 		lblXToBack = new Label("<- 'X' to go back");
 		lblXToBack.setFont(Font.font(SMALL_FONT));
 		lblXToBack.setTextFill(Color.BLACK);
@@ -594,8 +606,10 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
-						} else if (battleMenu.equals("Moves")) {
 
+							//Only scrolls through as many buttons as there are moves
+						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
+              
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = playerPokemon.getMovePoolSize();
 								buttonUpdate();
@@ -604,6 +618,15 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 
+							//Only scrolls through two options, yes and no
+						} else if (battleMenu.equals("MoveLearning")) {
+							if (battleButtonIndex == 1 || battleButtonIndex == 2) {
+								battleButtonIndex = 3;
+								buttonUpdate();
+							} else {
+								battleButtonIndex = 2;
+								buttonUpdate();
+							}
 						}
 					}
 					break;
@@ -618,12 +641,20 @@ public class Boot extends Application {
 								battleButtonIndex++;
 								buttonUpdate();
 							}
-						} else if (battleMenu.equals("Moves")) {
+						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
 							if (battleButtonIndex == playerPokemon.getMovePoolSize() || battleButtonIndex == 0) {
 								battleButtonIndex = 1;
 								buttonUpdate();
 							} else {
 								battleButtonIndex++;
+								buttonUpdate();
+							}
+						} else if (battleMenu.equals("MoveLearning")) {
+							if (battleButtonIndex == 3 || battleButtonIndex == 4) {
+								battleButtonIndex = 2;
+								buttonUpdate();
+							} else {
+								battleButtonIndex = 3;
 								buttonUpdate();
 							}
 						}
@@ -666,20 +697,125 @@ public class Boot extends Application {
 					// Cycles through battle responses
 					case "battleResponses":
 
+						//Start of battle
 						if (lblBattleResponse.getText().contains("appeared!")) {
 							nextBattleMenu(myStage, "General");
 							movementLock = false;
 
+						//Do nothing if got away safely
 						} else if (lblBattleResponse.getText().equals("You got away safely!")) {
 
+						//Do nothing if caught pokemon
 						} else if (lblBattleResponse.getText().contains("caught!")) {
 
+						//Shows yes and no options if prompted to learn a new move
+						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
+
+							nextBattleMenu(myStage, "MoveLearning");
+						
+						//shows moves to replace
+						} else if (lblBattleResponse.getText().equals("Please select a move to replace")) {
+
+							nextBattleMenu(myStage, "MovesToReplace");
+						
+						//Searches for available pokemon to send out
+						} else if (lblBattleResponse.getText().equals(playerPokemon.getName() + " has fainted")){
+							
+							int nonFaintedPokemon = player.getTeamSize();
+							for (int i = 0; i < player.getTeamSize(); i++) {
+								if (player.getPokemon(i).getCurrentHP() == 0) {
+									nonFaintedPokemon--;
+								}
+							}
+							
+							//If available, prompts user to select a new pokemon
+							if (nonFaintedPokemon > 0) {
+								lblBattleResponse.setText("Please choose another pokemon to send out");
+							
+							//Otherwise, informs user they have no other pokemon
+							} else {
+								lblBattleResponse.setText("You have no other Pokemon able to fight...");
+							}
+						
+						//If no other pokemon, tell user they blacked out, end battle
+						} else if (lblBattleResponse.getText().equals("You have no other Pokemon able to fight...")) {
+							lblBattleResponse.setText("... you blacked out!");
+							endBattle = true;
+							
+						//If blacked out, sends back to pokemon center and heals all pokemon
+						} else if (lblBattleResponse.getText().equals("... you blacked out")) {
+							//TODO - black out logic, sends back to pokemon center, heals all pokemon.
+						
+						//If no more responses
 						} else if (nextBattleResponse() == true) {
-							nextBattleMenu(myStage, "General");
+
+							//If battle is to be ended, sets scene to main scene. resets endbattle
+							if (endBattle == true) {
+								myStage.setScene(scene);
+								endBattle = false;
+							
+							//Otherwise, goes back to main battle menu
+							} else {
+								nextBattleMenu(myStage, "General");
+							}
 						}
 
 						break;
 
+					//Move learning menu
+					case "MoveLearning":
+
+						//Yes button, prompts for move to replace
+						if (battleButtonIndex == 2) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText("Please select a move to replace");
+						
+						//No button, informs user pokemon did not learn the move
+						} else if (battleButtonIndex == 3) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText(
+									playerPokemon.getName() + " did not learn " + playerPokemon.getNextMoveLearn());
+						}
+
+						break;
+
+					case "MovesToReplace":
+
+						//Moves to be replaced with a new move
+						//Informs user of their selection, changes pokemons moveset respective to selection
+						switch (battleButtonIndex) {
+						case 1:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(0).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 0);
+							break;
+						case 2:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(1).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 1);
+							break;
+						case 3:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(2).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 2);
+							break;
+						case 4:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(3).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 3);
+							break;
+						default:
+							break;
+						}
+						break;
 					default:
 						break;
 					}
@@ -695,7 +831,14 @@ public class Boot extends Application {
 						nextBattleMenu(myStage, "General");
 						break;
 
+					// Goes back to prompt to forgetting an old move
+					case "MovesToReplace":
+						lblBattleResponse.setText("Would you like to forget an old move?");
+						nextBattleMenu(myStage, "battleResponses");
+						break;
 					}
+
+					break;
 
 				default:
 					break;
@@ -854,6 +997,7 @@ public class Boot extends Application {
 			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
 			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
 
+			//Displays all moves available to be displayed
 			if (playerPokemon.getMovePoolSize() > 1) {
 				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
 				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
@@ -875,6 +1019,8 @@ public class Boot extends Application {
 				lblRunButton.setText("");
 			}
 
+			break;
+
 		case "PokemonMenu":
 
 			break;
@@ -888,16 +1034,18 @@ public class Boot extends Application {
 			// displays response
 			lblBattleResponse.setText(battle.catchPokemon());
 
+			//Delay if needed when caught pokemon
 			Timeline delayCatch = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
 				myStage.setScene(scene);
 			}));
 
-			// If caught, adds to player array
+			// If caught, adds to player array, back to main scene
 			if (lblBattleResponse.getText().contains("has been caught!")) {
 				player.addPokemon(opponentPokemon);
 				delayCatch.play();
 
 				// if trainer battle, opponent does not take turn on catch attempt
+				// informs user you cannot catch another trainers pokemon
 			} else if (lblBattleResponse.getText()
 					.equals("You can't catch another trainer's Pokemon! are you crazy?")) {
 
@@ -936,6 +1084,66 @@ public class Boot extends Application {
 
 			break;
 
+		case "MoveLearning":
+
+			//sets battlemenu
+			battleMenu = "MoveLearning";
+
+			//Sets button text and visibility
+			lblCatchButton.setText("No");
+			lblPokemonButton.setText("Yes");
+			lblCatchButton.setTextFill(Color.BLACK);
+			lblPokemonButton.setTextFill(Color.BLACK);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+			lblRunButton.setVisible(false);
+			lblFightButton.setVisible(false);
+			lblXToBack.setVisible(false);
+			lblBattleResponse.setVisible(false);
+
+			break;
+
+		case "MovesToReplace":
+
+			// Battle menu set to moves
+			battleMenu = "MovesToReplace";
+
+			// Shows x to go back instruction
+			lblXToBack.setVisible(true);
+			lblBattleResponse.setVisible(false);
+			lblRunButton.setVisible(true);
+			lblFightButton.setVisible(true);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+
+			// Setting label to move name and setting color to the one corresponding of it's
+			// type
+			// Sets text to blank when pokemon doesn't have that many moves
+			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
+			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
+
+			if (playerPokemon.getMovePoolSize() > 1) {
+				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
+				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
+			} else {
+				lblPokemonButton.setText("");
+			}
+
+			if (playerPokemon.getMovePoolSize() > 2) {
+				lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
+				lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
+			} else {
+				lblCatchButton.setText("");
+			}
+
+			if (playerPokemon.getMovePoolSize() > 3) {
+				lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
+				lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
+			} else {
+				lblRunButton.setText("");
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -966,6 +1174,8 @@ public class Boot extends Application {
 		// Exectues whole turn
 		battle.turnExecution("First");
 		battle.turnExecution("Second");
+		
+		//Calls battle response, sets battle menu to responses
 		nextBattleResponse();
 		nextBattleMenu(myStage, "battleResponses");
 
@@ -979,9 +1189,38 @@ public class Boot extends Application {
 		if (responseCounter < battle.responseAmount()) {
 			lblBattleResponse.setText(battle.battleResponses(responseCounter));
 
+			// Updates hp bars if pokemon was fainted
+			if (battle.battleResponses(responseCounter).contains("fainted")) {
+					if (battle.isOpponentFainted() == true) {
+						updateProgressBar("opponent");
+						
+						//If wild encounter, endbattle
+						if (battle.isTrainerBattle == false) {
+							endBattle = true;
+						}
+					} else if (battle.isPlayerFainted() == true){
+							updateProgressBar("player");
+					}
+			}
+			
+			//Updates progress bar if pokemon levels up
+			if (battle.battleResponses(responseCounter).contains("leveled up")) {
+				if (battle.isGoingToEvolve() == true) {
+					//waits to update progress bar if pokemon is going to evolve
+				} else {
+					updateProgressBar("player");
+				}
+			}
+			
+			// Updates sprite and hp bar if pokemon evolved
+			if (battle.battleResponses(responseCounter).contains("evolved")) {
+				playerPokeSprite.setImage(playerPokemon.getBackSprite());
+				updateProgressBar("player");
+			}
+
 			responseCounter++;
 
-			// resets responses, updates health bars, returns true
+		// resets responses, updates health bars, returns true
 		} else {
 			responseCounter = 0;
 			updateProgressBar("player");
@@ -1049,7 +1288,7 @@ public class Boot extends Application {
 
 		case ("Normal"):
 
-			color = Color.SILVER;
+			color = Color.GREY;
 			break;
 
 		case ("Electric"):
@@ -1102,7 +1341,6 @@ public class Boot extends Application {
 		switch (bar) {
 
 		case "player":
-
 			// Updates progress bar and progress bar labels for player
 			playerHpBar.setProgress((double) playerPokemon.getCurrentHP() / playerPokemon.getTotalHP());
 			lblPlayerBar.setText((playerPokemon.getName() + " L." + playerPokemon.getLevel()).toUpperCase());
@@ -1128,18 +1366,22 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Totodile", 2);
+			opponentPokemon = new Pokemon("Torchic", 13);
+
 			playerPokemon = player.getPokemon(0);
 
+			//Instantiates new battle, not trainer 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
 
 			// Sets the sprites for the pokemon
 			playerPokeSprite.setImage(playerPokemon.getBackSprite());
 			opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 
+			//Updates progress bar
 			updateProgressBar("player");
 			updateProgressBar("opponent");
 
+			//battlemenu to responses, calls next response
 			battleMenu = "battleResponses";
 			nextBattleResponse();
 
