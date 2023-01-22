@@ -148,12 +148,14 @@ public class Boot extends Application {
 			PrintWriter savePrinter = new PrintWriter(saveFile);
 
 			savePrinter.println(currentMapName);
+
 			savePrinter.println(map.getNextSpawn());
-			savePrinter.println(map.getPlayerX());
+
 			savePrinter.println(map.getPlayerY());
+			savePrinter.println(map.getPlayerX());
+
 			savePrinter.println(playerStackX);
 			savePrinter.println(playerStackY);
-			savePrinter.println(direction);
 
 			saveFile.close();
 
@@ -171,13 +173,15 @@ public class Boot extends Application {
 			BufferedReader loadStream = new BufferedReader(loadFile);
 
 			currentMapName = loadStream.readLine();
+			
 			map = new TileGrid(currentMapName, Integer.parseInt(loadStream.readLine()));
-			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
+			
 			map.setPlayerY(Integer.parseInt(loadStream.readLine()));
-			playerStackX = (Integer.parseInt(loadStream.readLine()));
+			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
+	
+			playerStackX = (Integer.parseInt(loadStream.readLine()) + 1);
 			playerStackY = (Integer.parseInt(loadStream.readLine()));
-			direction = loadStream.readLine();
-
+			
 			displayBoard(root);
 
 			loadFile.close();
@@ -201,11 +205,9 @@ public class Boot extends Application {
 
 		player.addPokemon(new Pokemon("Yanma", 60));
 
-		// Temp hardcoded map loading
+		// Hardcoded start point for New Game
 		map = new TileGrid("Orilon Town", 1);
 		currentMapName = "Orilon Town";
-		playerStackX = 10;
-		playerStackY = 11;
 		direction = "Up";
 
 		// Declaring gridpane
