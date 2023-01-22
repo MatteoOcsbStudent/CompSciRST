@@ -68,6 +68,8 @@ public class Boot extends Application {
 	// Locking movement
 	private boolean movementLock = false;
 
+	private boolean endBattle;
+
 	// Direction of movement
 	private String direction;
 
@@ -137,7 +139,7 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-		player.addPokemon(new Pokemon("Torchic", 7));
+		player.addPokemon(new Pokemon("Torchic", 15));
 
 		// Temp hardcoded map loading
 		map = new TileGrid("Orilon Town", 1);
@@ -172,7 +174,6 @@ public class Boot extends Application {
 
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-		battleRoot.setGridLinesVisible(true);
 
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
@@ -237,7 +238,7 @@ public class Boot extends Application {
 
 		// Fight button
 		lblFightButton = new Label("Fight");
-		lblFightButton.setFont(Font.font(LARGE_FONT));
+		lblFightButton.setFont(Font.font(MEDIUM_FONT));
 		lblFightButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblFightButton, 0, 13, 1, 1);
 		lblFightButton.setVisible(false);
@@ -246,7 +247,7 @@ public class Boot extends Application {
 
 		// Pokemon button
 		lblPokemonButton = new Label("Pokemon");
-		lblPokemonButton.setFont(Font.font(LARGE_FONT));
+		lblPokemonButton.setFont(Font.font(MEDIUM_FONT));
 		lblPokemonButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblPokemonButton, 2, 13, 1, 1);
 		lblPokemonButton.setVisible(false);
@@ -255,7 +256,7 @@ public class Boot extends Application {
 
 		// Catch button
 		lblCatchButton = new Label("Catch");
-		lblCatchButton.setFont(Font.font(LARGE_FONT));
+		lblCatchButton.setFont(Font.font(MEDIUM_FONT));
 		lblCatchButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblCatchButton, 4, 13, 1, 1);
 		lblCatchButton.setVisible(false);
@@ -264,7 +265,7 @@ public class Boot extends Application {
 
 		// Run button
 		lblRunButton = new Label("Run");
-		lblRunButton.setFont(Font.font(LARGE_FONT));
+		lblRunButton.setFont(Font.font(MEDIUM_FONT));
 		lblRunButton.setTextFill(Color.BLACK);
 		battleRoot.add(lblRunButton, 6, 13, 1, 1);
 		lblRunButton.setVisible(false);
@@ -406,10 +407,10 @@ public class Boot extends Application {
 				case A:
 
 					if (movementLock == false) {
-						//Scrolling through buttons right
-						
+						// Scrolling through buttons right
+
 						if (battleMenu.equals("General")) {
-							
+
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = 4;
 								buttonUpdate();
@@ -417,8 +418,8 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
-						} else if (battleMenu.equals("Moves")) {
-							
+						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
+
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = playerPokemon.getMovePoolSize();
 								buttonUpdate();
@@ -426,7 +427,15 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
-							
+
+						} else if (battleMenu.equals("MoveLearning")) {
+							if (battleButtonIndex == 1 || battleButtonIndex == 2) {
+								battleButtonIndex = 3;
+								buttonUpdate();
+							} else {
+								battleButtonIndex = 2;
+								buttonUpdate();
+							}
 						}
 					}
 					break;
@@ -441,12 +450,20 @@ public class Boot extends Application {
 								battleButtonIndex++;
 								buttonUpdate();
 							}
-						} else if (battleMenu.equals("Moves")) {
+						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
 							if (battleButtonIndex == playerPokemon.getMovePoolSize() || battleButtonIndex == 0) {
 								battleButtonIndex = 1;
 								buttonUpdate();
 							} else {
 								battleButtonIndex++;
+								buttonUpdate();
+							}
+						} else if (battleMenu.equals("MoveLearning")) {
+							if (battleButtonIndex == 3 || battleButtonIndex == 4) {
+								battleButtonIndex = 2;
+								buttonUpdate();
+							} else {
+								battleButtonIndex = 3;
 								buttonUpdate();
 							}
 						}
@@ -497,12 +514,76 @@ public class Boot extends Application {
 
 						} else if (lblBattleResponse.getText().contains("caught!")) {
 
+						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
+
+							nextBattleMenu(myStage, "MoveLearning");
+						} else if (lblBattleResponse.getText().equals("Please select a move to replace")) {
+
+							nextBattleMenu(myStage, "MovesToReplace");
 						} else if (nextBattleResponse() == true) {
-							nextBattleMenu(myStage, "General");
+
+							if (endBattle == true) {
+								myStage.setScene(scene);
+								endBattle = false;
+							} else {
+								nextBattleMenu(myStage, "General");
+							}
 						}
 
 						break;
 
+					case "MoveLearning":
+
+						if (battleButtonIndex == 2) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText("Please select a move to replace");
+						} else if (battleButtonIndex == 3) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText(
+									playerPokemon.getName() + "did not learn" + playerPokemon.getNextMoveLearn());
+						}
+
+						break;
+
+					case "MovesToReplace":
+
+						switch (battleButtonIndex) {
+						case 1:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setFont(Font.font(MEDIUM_FONT));
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(0).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 0);
+							break;
+						case 2:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setFont(Font.font(MEDIUM_FONT));
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(1).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 1);
+							break;
+						case 3:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setFont(Font.font(MEDIUM_FONT));
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(2).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 2);
+							break;
+						case 4:
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setFont(Font.font(MEDIUM_FONT));
+							lblBattleResponse
+									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(3).getName()
+											+ "... and learned " + playerPokemon.getNextMoveLearn());
+							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 3);
+							break;
+						default:
+							break;
+						}
+						break;
 					default:
 						break;
 					}
@@ -518,7 +599,13 @@ public class Boot extends Application {
 						nextBattleMenu(myStage, "General");
 						break;
 
+					case "MovesToReplace":
+						lblBattleResponse.setText("Would you like to forget an old move?");
+						nextBattleMenu(myStage, "battleResponses");
+						break;
 					}
+
+					break;
 
 				default:
 					break;
@@ -652,6 +739,7 @@ public class Boot extends Application {
 
 			battleMenu = "battleResponses";
 
+			lblBattleResponse.setFont(Font.font(LARGE_FONT));
 			// Setting visibility
 			lblBattleResponse.setVisible(true);
 			lblRunButton.setVisible(false);
@@ -697,6 +785,8 @@ public class Boot extends Application {
 			} else {
 				lblRunButton.setText("");
 			}
+
+			break;
 
 		case "PokemonMenu":
 
@@ -759,6 +849,64 @@ public class Boot extends Application {
 
 			break;
 
+		case "MoveLearning":
+
+			battleMenu = "MoveLearning";
+
+			lblCatchButton.setText("No");
+			lblPokemonButton.setText("Yes");
+			lblCatchButton.setTextFill(Color.BLACK);
+			lblPokemonButton.setTextFill(Color.BLACK);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+			lblRunButton.setVisible(false);
+			lblFightButton.setVisible(false);
+			lblXToBack.setVisible(false);
+			lblBattleResponse.setVisible(false);
+
+			break;
+
+		case "MovesToReplace":
+
+			// Battle menu set to moves
+			battleMenu = "MovesToReplace";
+
+			// Shows x to go back instruction
+			lblXToBack.setVisible(true);
+			lblBattleResponse.setVisible(false);
+			lblRunButton.setVisible(true);
+			lblFightButton.setVisible(true);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+
+			// Setting label to move name and setting color to the one corresponding of it's
+			// type
+			// Sets text to blank when pokemon doesn't have that many moves
+			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
+			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
+
+			if (playerPokemon.getMovePoolSize() > 1) {
+				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
+				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
+			} else {
+				lblPokemonButton.setText("");
+			}
+
+			if (playerPokemon.getMovePoolSize() > 2) {
+				lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
+				lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
+			} else {
+				lblCatchButton.setText("");
+			}
+
+			if (playerPokemon.getMovePoolSize() > 3) {
+				lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
+				lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
+			} else {
+				lblRunButton.setText("");
+			}
+			break;
+
 		default:
 			break;
 		}
@@ -801,6 +949,20 @@ public class Boot extends Application {
 		// Cycles through responses
 		if (responseCounter < battle.responseAmount()) {
 			lblBattleResponse.setText(battle.battleResponses(responseCounter));
+
+			// Updates hp bars if pokemon was fainted
+			if (battle.battleResponses(responseCounter).contains("fainted")
+					&& battle.battleResponses(responseCounter + 1).contains("exp")) {
+				updateProgressBar("opponent");
+				if (battle.isTrainerBattle == false) {
+					endBattle = true;
+				}
+			}
+			// Updates sprite and hp bar if pokemon evolved
+			if (battle.battleResponses(responseCounter).contains("evolved")) {
+				playerPokeSprite.setImage(playerPokemon.getBackSprite());
+				updateProgressBar("player");
+			}
 
 			responseCounter++;
 
@@ -925,7 +1087,6 @@ public class Boot extends Application {
 		switch (bar) {
 
 		case "player":
-
 			// Updates progress bar and progress bar labels for player
 			playerHpBar.setProgress((double) playerPokemon.getCurrentHP() / playerPokemon.getTotalHP());
 			lblPlayerBar.setText((playerPokemon.getName() + " L." + playerPokemon.getLevel()).toUpperCase());
@@ -951,7 +1112,7 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Torchic", 5);
+			opponentPokemon = new Pokemon("Torchic", 13);
 			playerPokemon = player.getPokemon(0);
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
