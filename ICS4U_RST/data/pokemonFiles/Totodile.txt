@@ -9,7 +9,7 @@ Scratch
 1
 Water Gun
 6
-Mud Slap
+Mud-Slap
 8
 Bite
 13

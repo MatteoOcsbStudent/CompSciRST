@@ -137,7 +137,7 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-		player.addPokemon(new Pokemon("Torchic", 7));
+		player.addPokemon(new Pokemon("Yanma", 60));
 
 		// Temp hardcoded map loading
 		map = new TileGrid("Horizon City", 1);
