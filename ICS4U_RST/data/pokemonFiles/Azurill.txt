@@ -17,11 +17,11 @@ Aqua Tail
 19
 Play Rough
 25
-Hydro Pump
+Waterfall
 36
 Body Slam
 48
-Waterfall
+Hydro Pump
 54
 Double-Edge
 64

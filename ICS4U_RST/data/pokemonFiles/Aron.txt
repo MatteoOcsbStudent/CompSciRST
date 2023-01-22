@@ -19,11 +19,11 @@ Iron Head
 28
 Takedown
 40
-Stone-Edge
+Stone Edge
 48
-Steel Cannon
+Flash Cannon
 52
-Double Edge
+Double-Edge
 59
 2
 Lairon

@@ -9,7 +9,7 @@ Tackle
 1
 Leafage
 6
-Mud Slap
+Mud-Slap
 8
 Bite
 10
@@ -19,7 +19,7 @@ Mega Drain
 17
 Bulldoze
 20
-Rock Smash
+Rock Slide
 23
 Crunch
 26
