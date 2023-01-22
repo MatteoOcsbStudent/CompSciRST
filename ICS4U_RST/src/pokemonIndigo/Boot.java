@@ -172,7 +172,7 @@ public class Boot extends Application {
 
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-		battleRoot.setGridLinesVisible(true);
+		battleRoot.setGridLinesVisible(false);
 
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
@@ -555,7 +555,7 @@ public class Boot extends Application {
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
 
-		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
+		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
 
 			// Instantiates the new map
 			map = new TileGrid(map.getNextMap(), map.getNextSpawn());
@@ -951,7 +951,7 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Torchic", 5);
+			opponentPokemon = new Pokemon("Totodile", 54);
 			playerPokemon = player.getPokemon(0);
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
