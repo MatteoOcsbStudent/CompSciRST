@@ -144,18 +144,55 @@ public class Boot extends Application {
 
 		FileWriter saveFile;
 		try {
+			
+			//Saved File
 			saveFile = new FileWriter("data/saveFile");
 			PrintWriter savePrinter = new PrintWriter(saveFile);
 
+			//Saves the map's name
 			savePrinter.println(currentMapName);
 
+			//Saves the Spawnpoint
 			savePrinter.println(map.getNextSpawn());
+			
+			//Saves player's direction
+			savePrinter.println(direction);
 
+			//Saves the X and Y of the player
 			savePrinter.println(map.getPlayerY());
 			savePrinter.println(map.getPlayerX());
 
+			//Saves the Playerstack's X and Y
 			savePrinter.println(playerStackX);
 			savePrinter.println(playerStackY);
+
+			//Saves the size of the player's team
+			savePrinter.println(player.getTeamSize());
+			
+			//Saving Pokemon
+			for (int i = 0; i < player.getTeamSize(); i++) {
+				
+				//Pokemon's Name
+				savePrinter.println(player.getPokemon(i).getFirstEvo());
+				
+				//Pokemon's Level
+				savePrinter.println(player.getPokemon(i).getLevel());
+				
+				//Pokemon's Current HP
+				savePrinter.println(player.getPokemon(i).getCurrentHP());
+				
+				//Pokemon's Status (If afflicted)
+				savePrinter.println(player.getPokemon(i).getStatus());
+				
+				//Size of Pokemon's move pool (1 to 4)
+				savePrinter.println(player.getPokemon(i).getMovePoolSize());
+				
+				//Loops through all the moves, saving them
+				for (int j = 0; j < player.getPokemon(i).getMovePoolSize(); j++) {
+					
+					savePrinter.println(player.getPokemon(i).getMove(j).getName());
+				}
+			}
 
 			saveFile.close();
 
@@ -172,15 +209,46 @@ public class Boot extends Application {
 			FileReader loadFile = new FileReader("data/saveFile");
 			BufferedReader loadStream = new BufferedReader(loadFile);
 
+			//Reads map name
 			currentMapName = loadStream.readLine();
-			
+
+			//Creates a new map based on the saved one
 			map = new TileGrid(currentMapName, Integer.parseInt(loadStream.readLine()));
 			
+			direction = loadStream.readLine();
+
+			//Sets the player's X and Y
 			map.setPlayerY(Integer.parseInt(loadStream.readLine()));
 			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
-	
-			playerStackX = (Integer.parseInt(loadStream.readLine()) + 1);
+
+			//Sets the playerStack's X and Y
+			playerStackX = (Integer.parseInt(loadStream.readLine()));
 			playerStackY = (Integer.parseInt(loadStream.readLine()));
+
+			//Checks the player's team size
+			int teamSize = Integer.parseInt(loadStream.readLine());
+			
+			//Loops through every pokemon based on the team's size
+			for (int i = 0; i < teamSize; i++) {
+				
+				//Adds a new pokemon using the name saved
+				player.addPokemon(new Pokemon(loadStream.readLine(), Integer.parseInt(loadStream.readLine())));
+				
+				//Sets the pokemon's current HP
+				player.getPokemon(i).setCurrentHP(Integer.parseInt(loadStream.readLine()));
+				
+				//Sets any status it is afflicted with
+				player.getPokemon(i).setStatus(loadStream.readLine());
+				
+				//Sets the movepool's size
+				int movePoolSize = Integer.parseInt(loadStream.readLine());
+				
+				for (int j = 0; j < movePoolSize; j++) {
+					
+					//Adds all the moves
+					player.getPokemon(i).changeMoveSet(new Move(loadStream.readLine()), j);
+				}
+			}
 			
 			displayBoard(root);
 
@@ -202,8 +270,6 @@ public class Boot extends Application {
 
 	@Override
 	public void start(Stage myStage) throws Exception {
-
-		player.addPokemon(new Pokemon("Yanma", 60));
 
 		// Hardcoded start point for New Game
 		map = new TileGrid("Orilon Town", 1);
@@ -1062,7 +1128,7 @@ public class Boot extends Application {
 
 			// Sets pokemon
 
-			opponentPokemon = new Pokemon("Totodile", 54);
+			opponentPokemon = new Pokemon("Totodile", 2);
 			playerPokemon = player.getPokemon(0);
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
@@ -1148,6 +1214,16 @@ public class Boot extends Application {
 			if (direction.equals("Down") && (map.getPlayerY() - 1) != (CAMERAHEIGHT - 1)) {
 				playerStackY--;
 			}
+		}
+		
+		// Top & Bottom & Left & Right
+		if ((botBarrier == true || topBarrier == true) && (leftBarrier == true || rightBarrier == true)) {
+		    if (direction.equals("Left") || direction.equals("Right")) {
+		        playerStackX++;
+		    }
+		    if (direction.equals("Right") || direction.equals("Left")) {
+		        playerStackX--;
+		    }
 		}
 
 		// Player sprite is in direct middle if no barriers are encountered
