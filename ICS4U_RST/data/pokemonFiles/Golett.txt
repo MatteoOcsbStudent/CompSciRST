@@ -1,7 +1,7 @@
 Ground
 Ghost
 59
-74
+55
 50
 35
 11
@@ -30,9 +30,9 @@ Hammer Arm
 1
 Golurk
 89
-124
+90
 80
 55
-43
+35
 Ground
 Ghost

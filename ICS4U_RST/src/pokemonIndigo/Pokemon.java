@@ -120,6 +120,10 @@ public class Pokemon {
 		// Levels up pokemon to instantiated level
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
+			
+			if(getNextEvolution() != -1) {
+				evolve(getNextEvolution());
+			}
 
 			// Checks for moves that can be learned
 			for (int c = 0; c < movePoolLevels.length; c++) {
@@ -360,6 +364,14 @@ public class Pokemon {
 		
 		Move newMove = new Move(newMoveName);
 		currentMoves.add(newMove);
+	}
+	
+	public void moveHeal(int heal) {
+		currentHP+=heal;
+		
+		if (currentHP > totalHP) {
+			currentHP = totalHP;
+		}
 	}
 
 	public Move getMove(int index) {
