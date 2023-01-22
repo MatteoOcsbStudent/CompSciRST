@@ -9,7 +9,7 @@ Tackle
 1
 Metal Claw
 4
-Rock Tomb
+Sand Tomb
 8
 Headbutt
 16
@@ -17,13 +17,13 @@ Rock Slide
 24
 Iron Head
 28
-Takedown
+Take Down
 40
-Stone-Edge
+Stone Edge
 48
-Steel Cannon
+Flash Cannon
 52
-Double Edge
+Double-Edge
 59
 2
 Lairon

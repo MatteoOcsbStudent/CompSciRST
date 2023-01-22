@@ -142,8 +142,8 @@ public class Boot extends Application {
 		player.addPokemon(new Pokemon("Torchic", 15));
 
 		// Temp hardcoded map loading
-		map = new TileGrid("Orilon Town", 1);
-		currentMapName = "Orilon Town";
+		map = new TileGrid("Horizon City", 1);
+		currentMapName = "Horizon City";
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
@@ -693,7 +693,7 @@ public class Boot extends Application {
 		playerStackX = map.getPlayerSpawnX();
 		playerStackY = map.getPlayerSpawnY();
 
-		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
+		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
 
 			// Instantiates the new map
 			map = new TileGrid(map.getNextMap(), map.getNextSpawn());
@@ -1183,7 +1183,6 @@ public class Boot extends Application {
 		if (Math.random() * 100 < 10) {
 
 			// Sets pokemon
-
 			opponentPokemon = new Pokemon("Torchic", 13);
 			playerPokemon = player.getPokemon(0);
 
