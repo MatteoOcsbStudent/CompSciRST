@@ -44,10 +44,12 @@ public class TileGrid {
 	public TileGrid() {
 	}
 
-	public TileGrid(String mapName, int spawnpoint) {
+	public TileGrid(String mapName, int newSpawnpoint) {
 
 		File tileLayout = null;
 
+		spawnpoint = newSpawnpoint;
+		
 		// Declares file and spawnpoint based on chosen map
 		switch (mapName) {
 
@@ -83,7 +85,7 @@ public class TileGrid {
 				playerY = 0;
 			} else if (spawnpoint == 3) {
 				playerX = 21;
-				playerY = 6;
+				playerY = 7;
 			}
 			currentMapName = "Orilon Town";
 			break;
@@ -94,6 +96,12 @@ public class TileGrid {
 			if (spawnpoint == 1) {
 				playerX = 24;
 				playerY = 21;
+			} else if (spawnpoint == 2) {
+				playerX = 5;
+				playerY = 13;
+			} else if (spawnpoint == 3) {
+				playerX = 24;
+				playerY = 8;
 			}
 			currentMapName = "Horizon City";
 			break;
@@ -103,6 +111,12 @@ public class TileGrid {
 			playerX = 10;
 			playerY = 12;
 			currentMapName = "Pokemon Center";
+			break;
+		
+		case "Gym":
+			tileLayout = new File("data/maps/gym.map");
+			playerX = 11;
+			playerY = 14;
 		}
 
 		// Reads map textfile
@@ -432,29 +446,47 @@ public class TileGrid {
 				playerSpawnY = 0;
 				
 				spawnpoint = 2;
+			} else if (playerY == 13) {
+				exit = true;
+				
+				nextMap = "Pokemon Center";
+				
+				playerSpawnY = 11;
+				playerSpawnX = 10;
+				
+				spawnpoint = 2;
+			} else if (playerY == 8) {
+				exit = true;
+				
+				nextMap = "Gym";
+				
+				playerSpawnY = 11;
+				playerSpawnX = 10;
 			} else {
 				exit = false;
 			}
 			break;
 
 		case "Pokemon Center":
-			if ((playerX == 10 || playerX == 11) && playerY == 12) {
+			if ((playerX == 9 || playerX == 10) && playerY == 12) {
 				
 				exit = true;
 				
 				if (spawnpoint == 1) {
 					
-					nextMap = "Orilon City";
+					nextMap = "Orilon Town";
 					
-					playerSpawnX = 10;					
-					playerSpawnY = 11;
+					playerSpawnX = 13;					
+					playerSpawnY = 7;
 					
 					spawnpoint = 3;
 
 				} else if (spawnpoint == 2) {
 					nextMap = "Horizon City";
-					playerSpawnX = 10;
-					playerSpawnY = 11;
+					
+					playerSpawnX = 5;
+					playerSpawnY = 7;
+					
 					spawnpoint = 2;
 				
 				} else {
@@ -464,6 +496,21 @@ public class TileGrid {
 				}
 				break;
 			}
+			
+		case "Gym":
+			if ((playerX == 10 || playerX == 11) && playerY == 14) {
+			
+				nextMap = "Horizon City";
+				
+				playerSpawnX = 10;
+				playerSpawnY = 7;
+				
+				spawnpoint = 3;
+			} else {
+				exit = false;
+			}
+			
+			break;
 		}
 		return exit;
 	}
