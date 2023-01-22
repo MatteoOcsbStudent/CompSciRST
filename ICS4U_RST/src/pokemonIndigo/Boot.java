@@ -248,7 +248,7 @@ public class Boot extends Application {
 				for (int j = 0; j < movePoolSize; j++) {
 					
 					//Adds all the moves
-					player.getPokemon(i).changeMoveSet(new Move(loadStream.readLine()), j);
+					player.getPokemon(i).changeMoveSet((loadStream.readLine()), j);
 				}
 			}
 			
