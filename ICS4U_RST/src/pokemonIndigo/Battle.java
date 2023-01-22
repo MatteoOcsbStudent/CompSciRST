@@ -11,6 +11,7 @@ public class Battle {
 
 	boolean opponentFainted;
 	boolean playerFainted;
+	boolean goingToEvolve;
 
 	Move opponentMove;
 
@@ -43,6 +44,8 @@ public class Battle {
 
 	public void turnPlan(Move playerMove) {
 
+		goingToEvolve = false;
+		
 		int opponentMoveIndex = 0;
 		double random = Math.random();
 
@@ -329,8 +332,10 @@ public class Battle {
 					//If evolution level is hit, evolve pokemon and inform user
 					if (attacking.getNextEvolution() != -1) {
 						
+						goingToEvolve = true;
 						String previousEvolution = attacking.getName();
 						attacking.evolve(attacking.getNextEvolution());
+						
 						battleResponses.add(previousEvolution + " has evolved into " + attacking.getName() + "!");
 					}
 					
@@ -354,6 +359,8 @@ public class Battle {
 				
 			} else if (defending.equals(playerPokemon)) {
 				playerFainted = true;
+				
+				
 			}
 		}
 
@@ -1086,6 +1093,18 @@ public class Battle {
 	
 	public boolean isTrainerBattle() {
 		return isTrainerBattle;
+	}
+	
+	public boolean isOpponentFainted() {
+		return opponentFainted;
+	}
+	
+	public boolean isPlayerFainted() {
+		return playerFainted;
+	}
+	
+	public boolean isGoingToEvolve() {
+		return goingToEvolve;
 	}
 	
 }
