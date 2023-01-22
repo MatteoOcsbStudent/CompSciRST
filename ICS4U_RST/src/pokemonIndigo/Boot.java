@@ -3,19 +3,23 @@ package pokemonIndigo;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -28,6 +32,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import simpleIO.Console;
 
 public class Boot extends Application {
 
@@ -49,6 +54,7 @@ public class Boot extends Application {
 	private int responseCounter = 0;
 
 	// font sizes
+	static final int TITLE_FONT = 50;
 	static final int LARGE_FONT = 25;
 	static final int MEDIUM_FONT = 20;
 	static final int SMALL_FONT = 12;
@@ -136,16 +142,143 @@ public class Boot extends Application {
 
 	ProgressBar xpBar;
 
+	public void save() {
+
+		FileWriter saveFile;
+		try {
+			
+			//Saved File
+			saveFile = new FileWriter("data/saveFile");
+			PrintWriter savePrinter = new PrintWriter(saveFile);
+
+			//Saves the map's name
+			savePrinter.println(currentMapName);
+
+			//Saves the Spawnpoint
+			savePrinter.println(map.getNextSpawn());
+			
+			//Saves player's direction
+			savePrinter.println(direction);
+
+			//Saves the X and Y of the player
+			savePrinter.println(map.getPlayerY());
+			savePrinter.println(map.getPlayerX());
+
+			//Saves the Playerstack's X and Y
+			savePrinter.println(playerStackX);
+			savePrinter.println(playerStackY);
+
+			//Saves the size of the player's team
+			savePrinter.println(player.getTeamSize());
+			
+			//Saving Pokemon
+			for (int i = 0; i < player.getTeamSize(); i++) {
+				
+				//Pokemon's Name
+				savePrinter.println(player.getPokemon(i).getFirstEvo());
+				
+				//Pokemon's Level
+				savePrinter.println(player.getPokemon(i).getLevel());
+				
+				//Pokemon's Current HP
+				savePrinter.println(player.getPokemon(i).getCurrentHP());
+				
+				//Pokemon's Status (If afflicted)
+				savePrinter.println(player.getPokemon(i).getStatus());
+				
+				//Size of Pokemon's move pool (1 to 4)
+				savePrinter.println(player.getPokemon(i).getMovePoolSize());
+				
+				//Loops through all the moves, saving them
+				for (int j = 0; j < player.getPokemon(i).getMovePoolSize(); j++) {
+					
+					savePrinter.println(player.getPokemon(i).getMove(j).getName());
+				}
+			}
+
+			saveFile.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void load(Stage myStage) {
+
+		try {
+
+			FileReader loadFile = new FileReader("data/saveFile");
+			BufferedReader loadStream = new BufferedReader(loadFile);
+
+			//Reads map name
+			currentMapName = loadStream.readLine();
+
+			//Creates a new map based on the saved one
+			map = new TileGrid(currentMapName, Integer.parseInt(loadStream.readLine()));
+			
+			direction = loadStream.readLine();
+
+			//Sets the player's X and Y
+			map.setPlayerY(Integer.parseInt(loadStream.readLine()));
+			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
+
+			//Sets the playerStack's X and Y
+			playerStackX = (Integer.parseInt(loadStream.readLine()));
+			playerStackY = (Integer.parseInt(loadStream.readLine()));
+
+			//Checks the player's team size
+			int teamSize = Integer.parseInt(loadStream.readLine());
+			
+			//Loops through every pokemon based on the team's size
+			for (int i = 0; i < teamSize; i++) {
+				
+				//Adds a new pokemon using the name saved
+				player.addPokemon(new Pokemon(loadStream.readLine(), Integer.parseInt(loadStream.readLine())));
+				
+				//Sets the pokemon's current HP
+				player.getPokemon(i).setCurrentHP(Integer.parseInt(loadStream.readLine()));
+				
+				//Sets any status it is afflicted with
+				player.getPokemon(i).setStatus(loadStream.readLine());
+				
+				//Sets the movepool's size
+				int movePoolSize = Integer.parseInt(loadStream.readLine());
+				
+				for (int j = 0; j < movePoolSize; j++) {
+					
+					//Adds all the moves
+					player.getPokemon(i).changeMoveSet(new Move(loadStream.readLine()), j);
+				}
+			}
+			
+			displayBoard(root);
+
+			loadFile.close();
+
+			myStage.setScene(scene);
+
+		} catch (FileNotFoundException e) {
+			Console.print("Save file not Found" + e.getMessage());
+		} catch (NumberFormatException e) {
+			Console.print("Number Format Exception" + e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	@Override
 	public void start(Stage myStage) throws Exception {
 
 		player.addPokemon(new Pokemon("Torchic", 15));
+		
+    // Hardcoded start point for New Game
+		map = new TileGrid("Orilon Town", 1);
+		currentMapName = "Orilon Town";
 
-		// Temp hardcoded map loading
-		map = new TileGrid("Horizon City", 1);
-		currentMapName = "Horizon City";
-		playerStackX = 10;
-		playerStackY = 11;
 		direction = "Up";
 
 		// Declaring gridpane
@@ -177,7 +310,7 @@ public class Boot extends Application {
 		//Battle UI gridpane and scene
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-
+    
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -301,6 +434,47 @@ public class Boot extends Application {
 		lblXToBack.setAlignment(Pos.CENTER_LEFT);
 		lblXToBack.setVisible(false);
 
+		/**
+		 * Main Menu Scene
+		 */
+
+		GridPane mainMenu = new GridPane();
+		Scene mainMenuScene = new Scene(mainMenu, sceneWidth, sceneHeight);
+		mainMenu.setGridLinesVisible(false);
+
+		mainMenu.setHgap(GAP);
+		mainMenu.setVgap(GAP);
+		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
+
+		// Title
+		ImageView title = new ImageView("images/MainMenu/PokemonTitle.png");
+		title.setFitWidth(500);
+		title.setFitHeight(40);
+		mainMenu.add(title, 13, 15, 100, 10);
+
+		// Main Menu Background
+		Image menuBackground = new Image("images/MainMenu/MenuBackground.png");
+
+		BackgroundImage mainMenuBackgroundImage = new BackgroundImage(menuBackground, BackgroundRepeat.REPEAT,
+				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+
+		mainMenu.setBackground(new Background(mainMenuBackgroundImage));
+
+		Button btnNewGame = new Button("New Game");
+		btnNewGame.setMinWidth(100);
+		btnNewGame.setOnAction(event -> myStage.setScene(scene));
+		mainMenu.add(btnNewGame, 54, 35);
+
+		Button btnLoad = new Button("Load");
+		btnLoad.setMinWidth(100);
+		btnLoad.setOnAction(event -> load(myStage));
+		mainMenu.add(btnLoad, 54, 40);
+
+		Button btnExit = new Button("Exit");
+		btnExit.setMinWidth(100);
+		btnExit.setOnAction(event -> System.exit(0));
+		mainMenu.add(btnExit, 54, 45);
+
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
@@ -329,7 +503,7 @@ public class Boot extends Application {
 							}
 
 							// Moves player's tilegrid location and stackpane location
-							map.setPlayerY(-1);
+							map.addPlayerY(-1);
 							playerStackY--;
 
 							// Displays new board
@@ -351,7 +525,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerX(-1);
+							map.addPlayerX(-1);
 							playerStackX--;
 							displayBoard(root);
 						}
@@ -370,7 +544,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerY(1);
+							map.addPlayerY(1);
 							playerStackY++;
 							displayBoard(root);
 						}
@@ -389,7 +563,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerX(1);
+							map.addPlayerX(1);
 							playerStackX++;
 							displayBoard(root);
 
@@ -397,6 +571,12 @@ public class Boot extends Application {
 
 						break;
 
+					case V:
+
+						save();
+						Console.print("Game Saved");
+
+						break;
 					default:
 						break;
 
@@ -426,9 +606,10 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
+
 							//Only scrolls through as many buttons as there are moves
 						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
-
+              
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = playerPokemon.getMovePoolSize();
 								buttonUpdate();
@@ -436,6 +617,7 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
+
 							//Only scrolls through two options, yes and no
 						} else if (battleMenu.equals("MoveLearning")) {
 							if (battleButtonIndex == 1 || battleButtonIndex == 2) {
@@ -667,7 +849,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(scene);
+		myStage.setScene(mainMenuScene);
 		myStage.show();
 
 	}
@@ -1183,7 +1365,9 @@ public class Boot extends Application {
 		if (Math.random() * 100 < 10) {
 
 			// Sets pokemon
+
 			opponentPokemon = new Pokemon("Torchic", 13);
+
 			playerPokemon = player.getPokemon(0);
 
 			//Instantiates new battle, not trainer 
@@ -1272,6 +1456,16 @@ public class Boot extends Application {
 			if (direction.equals("Down") && (map.getPlayerY() - 1) != (CAMERAHEIGHT - 1)) {
 				playerStackY--;
 			}
+		}
+		
+		// Top & Bottom & Left & Right
+		if ((botBarrier == true || topBarrier == true) && (leftBarrier == true || rightBarrier == true)) {
+		    if (direction.equals("Left") || direction.equals("Right")) {
+		        playerStackX++;
+		    }
+		    if (direction.equals("Right") || direction.equals("Left")) {
+		        playerStackX--;
+		    }
 		}
 
 		// Player sprite is in direct middle if no barriers are encountered

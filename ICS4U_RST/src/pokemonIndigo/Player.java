@@ -35,6 +35,10 @@ public class Player {
 		
 	}
 	
+	public int getTeamSize() {
+		return team.size();
+	}
+	
 	public String getName() {
 		return name;
 	}
