@@ -341,6 +341,14 @@ public class TileGrid {
 		return playerY;
 	}
 
+	public void setPlayerX(int newPlayerX) {
+		playerX = newPlayerX;
+	}
+	
+	public void setPlayerY(int newPlayerY) {
+		playerX = newPlayerY;
+	}
+	
 	public int getPlayerSpawnX() {
 		return playerSpawnX;
 	}
@@ -357,11 +365,11 @@ public class TileGrid {
 		return mapWidth;
 	}
 
-	public void setPlayerX(int movement) {
+	public void addPlayerX(int movement) {
 		playerX += movement;
 	}
 
-	public void setPlayerY(int movement) {
+	public void addPlayerY(int movement) {
 		playerY += movement;
 	}
 

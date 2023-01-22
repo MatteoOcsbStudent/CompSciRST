@@ -3,13 +3,15 @@ package pokemonIndigo;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
@@ -138,10 +140,62 @@ public class Boot extends Application {
 
 	ProgressBar xpBar;
 
-	public void stop() throws Exception {
-		System.exit(0);
+	public void save() {
+
+		FileWriter saveFile;
+		try {
+			saveFile = new FileWriter("data/saveFile");
+			PrintWriter savePrinter = new PrintWriter(saveFile);
+
+			savePrinter.println(currentMapName);
+			savePrinter.println(map.getNextSpawn());
+			savePrinter.println(map.getPlayerX());
+			savePrinter.println(map.getPlayerY());
+			savePrinter.println(playerStackX);
+			savePrinter.println(playerStackY);
+			savePrinter.println(direction);
+
+			saveFile.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
-	
+
+	public void load(Stage myStage) {
+
+		try {
+
+			FileReader loadFile = new FileReader("data/saveFile");
+			BufferedReader loadStream = new BufferedReader(loadFile);
+
+			currentMapName = loadStream.readLine();
+			map = new TileGrid(currentMapName, Integer.parseInt(loadStream.readLine()));
+			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
+			map.setPlayerY(Integer.parseInt(loadStream.readLine()));
+			playerStackX = (Integer.parseInt(loadStream.readLine()));
+			playerStackY = (Integer.parseInt(loadStream.readLine()));
+			direction = loadStream.readLine();
+
+			displayBoard(root);
+
+			loadFile.close();
+
+			myStage.setScene(scene);
+
+		} catch (FileNotFoundException e) {
+			Console.print("Save file not Found" + e.getMessage());
+		} catch (NumberFormatException e) {
+			Console.print("Number Format Exception" + e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	@Override
 	public void start(Stage myStage) throws Exception {
 
@@ -299,11 +353,11 @@ public class Boot extends Application {
 		battleRoot.add(lblXToBack, 0, 14, 1, 1);
 		lblXToBack.setAlignment(Pos.CENTER_LEFT);
 		lblXToBack.setVisible(false);
-		
+
 		/**
 		 * Main Menu Scene
 		 */
-		
+
 		GridPane mainMenu = new GridPane();
 		Scene mainMenuScene = new Scene(mainMenu, sceneWidth, sceneHeight);
 		mainMenu.setGridLinesVisible(false);
@@ -311,42 +365,36 @@ public class Boot extends Application {
 		mainMenu.setHgap(GAP);
 		mainMenu.setVgap(GAP);
 		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
-		
-		//Title
+
+		// Title
 		ImageView title = new ImageView("images/MainMenu/PokemonTitle.png");
 		title.setFitWidth(500);
 		title.setFitHeight(40);
 		mainMenu.add(title, 13, 15, 100, 10);
-		
-		//Main Menu Background
+
+		// Main Menu Background
 		Image menuBackground = new Image("images/MainMenu/MenuBackground.png");
-		
+
 		BackgroundImage mainMenuBackgroundImage = new BackgroundImage(menuBackground, BackgroundRepeat.REPEAT,
 				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
-		
+
 		mainMenu.setBackground(new Background(mainMenuBackgroundImage));
-		
+
 		Button btnNewGame = new Button("New Game");
 		btnNewGame.setMinWidth(100);
 		btnNewGame.setOnAction(event -> myStage.setScene(scene));
 		mainMenu.add(btnNewGame, 54, 35);
-		
+
 		Button btnLoad = new Button("Load");
 		btnLoad.setMinWidth(100);
+		btnLoad.setOnAction(event -> load(myStage));
 		mainMenu.add(btnLoad, 54, 40);
-		
+
 		Button btnExit = new Button("Exit");
 		btnExit.setMinWidth(100);
-		btnExit.setOnAction(event -> {
-			try {
-				stop();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+		btnExit.setOnAction(event -> System.exit(0));
 		mainMenu.add(btnExit, 54, 45);
-		
-		
+
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
@@ -375,7 +423,7 @@ public class Boot extends Application {
 							}
 
 							// Moves player's tilegrid location and stackpane location
-							map.setPlayerY(-1);
+							map.addPlayerY(-1);
 							playerStackY--;
 
 							// Displays new board
@@ -397,7 +445,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerX(-1);
+							map.addPlayerX(-1);
 							playerStackX--;
 							displayBoard(root);
 						}
@@ -416,7 +464,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerY(1);
+							map.addPlayerY(1);
 							playerStackY++;
 							displayBoard(root);
 						}
@@ -435,7 +483,7 @@ public class Boot extends Application {
 								wildEncounter(myStage);
 							}
 
-							map.setPlayerX(1);
+							map.addPlayerX(1);
 							playerStackX++;
 							displayBoard(root);
 
@@ -443,6 +491,12 @@ public class Boot extends Application {
 
 						break;
 
+					case V:
+
+						save();
+						Console.print("Game Saved");
+
+						break;
 					default:
 						break;
 
@@ -461,10 +515,10 @@ public class Boot extends Application {
 				case A:
 
 					if (movementLock == false) {
-						//Scrolling through buttons right
-						
+						// Scrolling through buttons right
+
 						if (battleMenu.equals("General")) {
-							
+
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = 4;
 								buttonUpdate();
@@ -473,7 +527,7 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 						} else if (battleMenu.equals("Moves")) {
-							
+
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = playerPokemon.getMovePoolSize();
 								buttonUpdate();
@@ -481,7 +535,7 @@ public class Boot extends Application {
 								battleButtonIndex--;
 								buttonUpdate();
 							}
-							
+
 						}
 					}
 					break;
