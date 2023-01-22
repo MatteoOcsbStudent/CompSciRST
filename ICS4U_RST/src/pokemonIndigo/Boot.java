@@ -14,8 +14,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -28,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import simpleIO.Console;
 
 public class Boot extends Application {
 
@@ -49,6 +52,7 @@ public class Boot extends Application {
 	private int responseCounter = 0;
 
 	// font sizes
+	static final int TITLE_FONT = 50;
 	static final int LARGE_FONT = 25;
 	static final int MEDIUM_FONT = 20;
 	static final int SMALL_FONT = 12;
@@ -134,14 +138,18 @@ public class Boot extends Application {
 
 	ProgressBar xpBar;
 
+	public void stop() throws Exception {
+		System.exit(0);
+	}
+	
 	@Override
 	public void start(Stage myStage) throws Exception {
 
 		player.addPokemon(new Pokemon("Yanma", 60));
 
 		// Temp hardcoded map loading
-		map = new TileGrid("Horizon City", 1);
-		currentMapName = "Horizon City";
+		map = new TileGrid("Orilon Town", 1);
+		currentMapName = "Orilon Town";
 		playerStackX = 10;
 		playerStackY = 11;
 		direction = "Up";
@@ -172,7 +180,7 @@ public class Boot extends Application {
 
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-		battleRoot.setGridLinesVisible(false);
+		battleRoot.setGridLinesVisible(true);
 
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
@@ -291,7 +299,54 @@ public class Boot extends Application {
 		battleRoot.add(lblXToBack, 0, 14, 1, 1);
 		lblXToBack.setAlignment(Pos.CENTER_LEFT);
 		lblXToBack.setVisible(false);
+		
+		/**
+		 * Main Menu Scene
+		 */
+		
+		GridPane mainMenu = new GridPane();
+		Scene mainMenuScene = new Scene(mainMenu, sceneWidth, sceneHeight);
+		mainMenu.setGridLinesVisible(false);
 
+		mainMenu.setHgap(GAP);
+		mainMenu.setVgap(GAP);
+		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
+		
+		//Title
+		ImageView title = new ImageView("images/MainMenu/PokemonTitle.png");
+		title.setFitWidth(500);
+		title.setFitHeight(40);
+		mainMenu.add(title, 13, 15, 100, 10);
+		
+		//Main Menu Background
+		Image menuBackground = new Image("images/MainMenu/MenuBackground.png");
+		
+		BackgroundImage mainMenuBackgroundImage = new BackgroundImage(menuBackground, BackgroundRepeat.REPEAT,
+				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+		
+		mainMenu.setBackground(new Background(mainMenuBackgroundImage));
+		
+		Button btnNewGame = new Button("New Game");
+		btnNewGame.setMinWidth(100);
+		btnNewGame.setOnAction(event -> myStage.setScene(scene));
+		mainMenu.add(btnNewGame, 54, 35);
+		
+		Button btnLoad = new Button("Load");
+		btnLoad.setMinWidth(100);
+		mainMenu.add(btnLoad, 54, 40);
+		
+		Button btnExit = new Button("Exit");
+		btnExit.setMinWidth(100);
+		btnExit.setOnAction(event -> {
+			try {
+				stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		mainMenu.add(btnExit, 54, 45);
+		
+		
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
@@ -529,7 +584,7 @@ public class Boot extends Application {
 		});
 
 		myStage.setTitle("Pokemon Indigo");
-		myStage.setScene(scene);
+		myStage.setScene(mainMenuScene);
 		myStage.show();
 
 	}
