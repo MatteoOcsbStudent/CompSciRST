@@ -1,7 +1,7 @@
 Grass
 Null
 55
-68
+56
 60
 31
 13
@@ -34,7 +34,7 @@ Double-Edge
 2
 Grotle
 75
-89
+72
 75
 36
 16
@@ -42,7 +42,7 @@ Grass
 Null
 Torterra
 95
-109
+92
 95
 56
 32

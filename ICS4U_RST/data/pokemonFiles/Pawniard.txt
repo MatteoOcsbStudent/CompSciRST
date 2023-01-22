@@ -1,8 +1,8 @@
 Dark
 Steel
 45
-85
-70
+63
+55
 60
 11
 Scratch
@@ -30,8 +30,8 @@ X-Scissor
 1
 Bisharp
 65
-125
-100
+93
+85
 70
 41
 Dark

@@ -38,7 +38,7 @@ Water
 Fairy
 Azumarill
 100
-60
+55
 80
 50
 36

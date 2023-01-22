@@ -28,6 +28,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import sortAlgorithim.Sort;
 
 public class Boot extends Application {
 
@@ -62,8 +63,6 @@ public class Boot extends Application {
 
 	Label lblLoadingScreen;
 	static final int LOADINGFONT = 30;
-
-	private int currentBattlePoke;
 
 	// Locking movement
 	private boolean movementLock = false;
@@ -139,7 +138,7 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-		player.addPokemon(new Pokemon("Torchic", 15));
+		player.addPokemon(new Pokemon("Torchic", 50));
 
 		// Temp hardcoded map loading
 		map = new TileGrid("Horizon City", 1);
@@ -812,27 +811,27 @@ public class Boot extends Application {
 			// Setting label to move name and setting color to the one corresponding of it's
 			// type
 			// Sets text to blank when pokemon doesn't have that many moves
-			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
-			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
+			lblFightButton.setText(playerPokemon.getMove(0).getName());
+			lblFightButton.setTextFill(typeColor(playerPokemon.getMove(0)));
 
 			//Displays all moves available to be displayed
 			if (playerPokemon.getMovePoolSize() > 1) {
-				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
-				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
+				lblPokemonButton.setText(playerPokemon.getMove(1).getName());
+				lblPokemonButton.setTextFill(typeColor(playerPokemon.getMove(1)));
 			} else {
 				lblPokemonButton.setText("");
 			}
 
 			if (playerPokemon.getMovePoolSize() > 2) {
-				lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
-				lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
+				lblCatchButton.setText(playerPokemon.getMove(2).getName());
+				lblCatchButton.setTextFill(typeColor(playerPokemon.getMove(2)));
 			} else {
 				lblCatchButton.setText("");
 			}
 
 			if (playerPokemon.getMovePoolSize() > 3) {
-				lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
-				lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
+				lblRunButton.setText(playerPokemon.getMove(3).getName());
+				lblRunButton.setTextFill(typeColor(playerPokemon.getMove(3)));
 			} else {
 				lblRunButton.setText("");
 			}
@@ -937,26 +936,26 @@ public class Boot extends Application {
 			// Setting label to move name and setting color to the one corresponding of it's
 			// type
 			// Sets text to blank when pokemon doesn't have that many moves
-			lblFightButton.setText(player.getPokemon(currentBattlePoke).getMove(0).getName());
-			lblFightButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(0)));
+			lblFightButton.setText(playerPokemon.getMove(0).getName());
+			lblFightButton.setTextFill(typeColor(playerPokemon.getMove(0)));
 
 			if (playerPokemon.getMovePoolSize() > 1) {
-				lblPokemonButton.setText(player.getPokemon(currentBattlePoke).getMove(1).getName());
-				lblPokemonButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(1)));
+				lblPokemonButton.setText(playerPokemon.getMove(1).getName());
+				lblPokemonButton.setTextFill(typeColor(playerPokemon.getMove(1)));
 			} else {
 				lblPokemonButton.setText("");
 			}
 
 			if (playerPokemon.getMovePoolSize() > 2) {
-				lblCatchButton.setText(player.getPokemon(currentBattlePoke).getMove(2).getName());
-				lblCatchButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(2)));
+				lblCatchButton.setText(playerPokemon.getMove(2).getName());
+				lblCatchButton.setTextFill(typeColor(playerPokemon.getMove(2)));
 			} else {
 				lblCatchButton.setText("");
 			}
 
 			if (playerPokemon.getMovePoolSize() > 3) {
-				lblRunButton.setText(player.getPokemon(currentBattlePoke).getMove(3).getName());
-				lblRunButton.setTextFill(typeColor(player.getPokemon(currentBattlePoke).getMove(3)));
+				lblRunButton.setText(playerPokemon.getMove(3).getName());
+				lblRunButton.setTextFill(typeColor(playerPokemon.getMove(3)));
 			} else {
 				lblRunButton.setText("");
 			}
@@ -1018,6 +1017,7 @@ public class Boot extends Application {
 						}
 					} else if (battle.isPlayerFainted() == true){
 							updateProgressBar("player");
+							updateProgressBar("opponent");
 					}
 			}
 			
@@ -1182,11 +1182,67 @@ public class Boot extends Application {
 		// 10% chance of wild encounter happening
 		if (Math.random() * 100 < 10) {
 
+			//Puts levels of all team members in an array
+			int [] teamLevels = new int [player.getTeamSize()];
+			
+			for(int i = 0; i < player.getTeamSize(); i++) {
+				teamLevels[i] = player.getPokemon(i).getLevel();
+			}
+			
+			//Sort in descending order
+			Sort.selectionSort(teamLevels, 2);
+			
+			int highestLevel = teamLevels[0];
+			
+			double randomLevelChange = Math.random();
+			
+			//40% chance of encounter being 5 or 4 levels down from your highest leveled pokemon
+			//20% chance of encounter being 3 level down from your highest level pokemon
+			
+			if (randomLevelChange < 0.40) {
+				highestLevel -= 3;
+			} else if (randomLevelChange >= 0.40 && randomLevelChange <= 0.80) {
+				highestLevel -=2;
+			} else {
+				highestLevel -=1;
+			}
+			
+			double randomEncounter = Math.random();
+			String encounter;
+			
+			//8.3% chance for every pokemon
+			
+			if (randomEncounter <= 0.083) {
+				encounter = "Aron";
+			} else if (randomEncounter > 0.083 && randomEncounter <= 0.166) {
+				encounter = "Azurill";
+			} else if (randomEncounter > 0.166 && randomEncounter <= 0.249) {
+				encounter = "Beldum";
+			} else if (randomEncounter > 0.249 && randomEncounter <= 0.332) {
+				encounter = "Elekid";
+			} else if (randomEncounter > 0.332 && randomEncounter <= 0.415) {
+				encounter = "Gastly";
+			} else if (randomEncounter > 0.415 && randomEncounter <= 0.498) {
+				encounter = "Gible";
+			} else if (randomEncounter > 0.498 && randomEncounter <= 0.581) {
+				encounter = "Golett";
+			} else if (randomEncounter > 0.581 && randomEncounter <= 0.664) {
+				encounter = "Pawniard";
+			} else if (randomEncounter > 0.664 && randomEncounter <= 0.747) {
+				encounter = "Seedot";
+			} else if (randomEncounter > 0.747 && randomEncounter <= 0.83) {
+				encounter = "Shinx";
+			} else if (randomEncounter > 0.83 && randomEncounter <= 0.913) {
+				encounter = "Yanma";
+			} else {
+				encounter = "Starly";
+			}
+			
 			// Sets pokemon
-			opponentPokemon = new Pokemon("Torchic", 13);
+			opponentPokemon = new Pokemon(encounter, highestLevel);
 			playerPokemon = player.getPokemon(0);
 
-			//Instantiates new battle, not trainer 
+			//Instantiates new battle, istrainer false
 			battle = new Battle(playerPokemon, opponentPokemon, false);
 
 			// Sets the sprites for the pokemon
