@@ -9,7 +9,7 @@ Tackle
 1
 Metal Claw
 4
-Rock Tomb
+Sand Tomb
 8
 Headbutt
 16
@@ -17,7 +17,7 @@ Rock Slide
 24
 Iron Head
 28
-Takedown
+Take Down
 40
 Stone Edge
 48
