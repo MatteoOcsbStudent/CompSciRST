@@ -65,9 +65,16 @@ public class TileGrid {
 			if (spawnpoint == 1) {
 				playerX = 14;
 				playerY = 50;
+				
+				//Setting the playerStack
+				playerSpawnX = 10;
+				playerSpawnY = 11;
 			} else if (spawnpoint == 2) {
 				playerX = 24;
 				playerY = 0;
+				
+				playerSpawnX = 10;
+				playerSpawnY = 0;
 			}
 
 			// Names the map accordingly
@@ -80,12 +87,21 @@ public class TileGrid {
 			if (spawnpoint == 1) {
 				playerX = 10;
 				playerY = 10;
+				
+				playerSpawnX = 10;
+				playerSpawnY = 6;
 			} else if (spawnpoint == 2) {
 				playerX = 12;
 				playerY = 0;
+				
+				playerSpawnX = 10;
+				playerSpawnY = 0;
 			} else if (spawnpoint == 3) {
 				playerX = 20;
 				playerY = 7;
+				
+				playerSpawnX = 13;					
+				playerSpawnY = 7;
 			}
 			currentMapName = "Orilon Town";
 			break;
@@ -341,6 +357,14 @@ public class TileGrid {
 		return playerY;
 	}
 
+	public void setPlayerX(int newPlayerX) {
+		playerX = newPlayerX;
+	}
+	
+	public void setPlayerY(int newPlayerY) {
+		playerY = newPlayerY;
+	}
+	
 	public int getPlayerSpawnX() {
 		return playerSpawnX;
 	}
@@ -357,11 +381,11 @@ public class TileGrid {
 		return mapWidth;
 	}
 
-	public void setPlayerX(int movement) {
+	public void addPlayerX(int movement) {
 		playerX += movement;
 	}
 
-	public void setPlayerY(int movement) {
+	public void addPlayerY(int movement) {
 		playerY += movement;
 	}
 

@@ -26,6 +26,7 @@ public class Pokemon {
 
 	String status = "Null";
 	String name;
+	String firstEvo;
 
 	Image spriteFront;
 	Image spriteBack;
@@ -45,10 +46,11 @@ public class Pokemon {
 		// Setting name
 		name = species;
 
+		firstEvo = species;
+
 		// Setting sprite based on pokemon name
 		spriteFront = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Front.png").toString());
 		spriteBack = new Image(getClass().getResource("/images/PokemonSprites/" + name + "Back.png").toString());
-		
 
 		// Pulling information from file based on pokemon's name
 		pokemonInfo = new File("data/pokemonFiles/" + name + ".txt");
@@ -115,8 +117,7 @@ public class Pokemon {
 			e.printStackTrace();
 		}
 
-		
-		//Levels up pokemon to instantiated level
+		// Levels up pokemon to instantiated level
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
 			
@@ -124,20 +125,22 @@ public class Pokemon {
 				evolve(getNextEvolution());
 			}
 
-			//Checks for moves that can be learned
+			// Checks for moves that can be learned
 			for (int c = 0; c < movePoolLevels.length; c++) {
-				
-				//Learns move at correct level 
+
+				// Learns move at correct level
 				if (level == movePoolLevels[c]) {
-					
-					//Learns move if theres space, max is 4
+
+					// Learns move if theres space, max is 4
 					if (currentMoves.size() < 4) {
+            
 						changeMoveSet((movePool[c]));
 					
 					//Checking for oldest move to replace if pokemon already has 4 moves
 					} else {
-						
-						//Populates an array with the index at which the moves a pokemon knows is in movePool
+
+						// Populates an array with the index at which the moves a pokemon knows is in
+						// movePool
 						int[] levelsLearned = new int[4];
 
 						for (int j = 0; j < 4; j++) {
@@ -147,14 +150,14 @@ public class Pokemon {
 								}
 							}
 						}
-						
-						//Sorts levelsLearned in ascending order
+
+						// Sorts levelsLearned in ascending order
 						Sort.selectionSort(levelsLearned, 1);
-						
-						//Defines the oldest move a pokemon knows from movePool
+
+						// Defines the oldest move a pokemon knows from movePool
 						int oldestMoveIndexMovePool = levelsLearned[0];
 
-						//Replaces the oldest move in currentMoves with the new move to be leanred
+						// Replaces the oldest move in currentMoves with the new move to be leanred
 						for (int b = 0; b < 4; b++) {
 
 							if (movePool[oldestMoveIndexMovePool].equals(currentMoves.get(b).getName())) {
@@ -210,13 +213,18 @@ public class Pokemon {
 	public String getStatus() {
 		return status;
 	}
-	
+
 	public void setStatus(String affliction) {
 		status = affliction;
 	}
 
 	public void gainExp(int expGain) {
 		exp += expGain;
+
+		if (exp >= nextLevelUp) {
+			levelUp();
+		}
+
 	}
 
 	public int getLevel() {
@@ -227,6 +235,10 @@ public class Pokemon {
 		return currentHP;
 	}
 
+	public void setCurrentHP(int newHP) {
+		currentHP = newHP;
+	}
+	
 	public int getExp() {
 		return exp;
 	}
@@ -276,6 +288,10 @@ public class Pokemon {
 		}
 		
 		return evolution;
+	}
+
+	public String getFirstEvo() {
+		return firstEvo;
 	}
 
 	public void evolve(int evolution) {
@@ -361,11 +377,11 @@ public class Pokemon {
 	public Move getMove(int index) {
 		return currentMoves.get(index);
 	}
-	
+
 	public int getMovePoolSize() {
 		return currentMoves.size();
 	}
-	
+
 	public void setCurrentHp(int hp) {
 		currentHP = hp;
 	}
