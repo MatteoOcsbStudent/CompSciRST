@@ -110,6 +110,10 @@ public class TileGrid {
 			tileLayout = new File("data/maps/pokemonCenter.map");
 			playerX = 10;
 			playerY = 12;
+			
+			playerSpawnX = 11;
+			playerSpawnY = 10;
+			
 			currentMapName = "Pokemon Center";
 			break;
 		
@@ -443,7 +447,7 @@ public class TileGrid {
 
 		case "Horizon City":
 			
-			if ((playerX >= 22 && playerX <= 25) && playerY == 21) {
+			if ((playerX >= 21 && playerX <= 24) && playerY == 21) {
 				
 				exit = true;
 				

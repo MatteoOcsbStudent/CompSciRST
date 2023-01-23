@@ -2,6 +2,8 @@ package pokemonIndigo;
 
 import java.util.ArrayList;
 
+import sortAlgorithim.Sort;
+
 public class Battle {
 
 	Pokemon playerPokemon;
@@ -310,7 +312,7 @@ public class Battle {
 		if (damage <= 1) {
 			damage = 1;
 		}
-		
+
 		// Applies damage
 		defending.hpChange((int) damage);
 
@@ -1045,15 +1047,15 @@ public class Battle {
 	public boolean flee() {
 
 		boolean success = false;
-		
-		//Can't flee a trainer battle
-	if (isTrainerBattle == false) {
-		// 90% chance of fleeing
-		
-		if (Math.random() < 1) {
-			success = true;
+
+		// Can't flee a trainer battle
+		if (isTrainerBattle == false) {
+			// 90% chance of fleeing
+
+			if (Math.random() < 1) {
+				success = true;
+			}
 		}
-	}
 		return success;
 	}
 
@@ -1062,11 +1064,14 @@ public class Battle {
 		playerPokemon = newPokemon;
 	}
 
-	public void switchPokemon() {
+	public void switchOpponentPokemon(Player player, String starterChoice) {
 
-		Pokemon temp = opponentPokemon;
+		if (isTrainerBattle == true) {
 
+			
+		}
 		// TODO - opponentPokemon = arraylist.get(tempindex+1)
+
 	}
 
 	public String battleResponses(int index) {
