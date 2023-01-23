@@ -19,6 +19,7 @@ public class Tile extends ImageView {
 	private final Image imgWALLBACK = new Image(getClass().getResource("/images/PokemonCenterInside/WallBack.png").toString());
 	private final Image imgBLACKTILE = new Image(getClass().getResource("/images/PokemonCenterInside/BlackTile.png").toString());
 	private final Image imgNURSEJOY = new Image(getClass().getResource("/images/OtherCharacters/NurseJoy.png").toString());
+	private final Image imgGYMLEADER = new Image(getClass().getResource("/images/OtherCharacters/GymLeaderJack.png").toString());
 	
 	//Barrier boolean, the player shouldnt be allowed to go through these tiles
 	private boolean barrier = false;
@@ -32,6 +33,9 @@ public class Tile extends ImageView {
 	//tiles that when interacted with, heal the team
 	private boolean heal = false;
 	
+	//tiles that when interacted with, start a battle
+	private boolean battle = false;
+	
 	// Size
 	private final int DIMENSION = 32;
 
@@ -39,6 +43,10 @@ public class Tile extends ImageView {
 
 	}
 
+	/**Overloaded Constructor
+	 * sets the image file for a specific tile, depending on the name given
+	 * @param tileType
+	 */
 	public Tile(String tileType) {
 
 		super();
@@ -106,9 +114,20 @@ public class Tile extends ImageView {
 			barrier = true;
 			heal = true;
 			break;
+			
+		case "GymLeader":
+			this.setImage(imgGYMLEADER);
+			barrier = true;
+			battle = true;
 		}
 	}
 
+	/**Overloaded Constructor
+	 * similar to the constructor above, this is for looped tiles that take more than one tile of space, like a building
+	 * requires position to loop the tile and call multiple different files
+	 * @param tileType
+	 * @param position
+	 */
 	public Tile(String tileType, int position) {
 
 		super();
@@ -168,21 +187,44 @@ public class Tile extends ImageView {
 		}
 	}
 
-	//Checks for barrier
+	/**Accessor Method
+	 * returns boolean stating whether or not the you can move onto the tile
+	 * @return barrier
+	 */
 	public Boolean checkBarrier() {
 		return barrier;
 	}
 	
+	/**Accessor Method
+	 * returns boolean stating whether or not the tile counts as an exit
+	 * @return door
+	 */
 	public Boolean checkDoor() {
 		return door;
 	}
 	
+	/**Accessor Method
+	 * returns a boolean stating whether or not the tile triggers an encounter
+	 * @return wildEncounter
+	 */
 	public Boolean checkEncounter() {
 		return wildEncounter;
 	}
 	
+	/**Accessor Method
+	 * returns a boolean stating whether or not the tile heals the player's team
+	 * @return heal
+	 */
 	public Boolean checkHeal() {
 		return heal;
+	}
+	
+	/**Accessor Method
+	 * returns a boolean stating whether or not the tile triggers a trainer battle
+	 * @return battle
+	 */
+	public Boolean checkBattle() {
+		return battle;
 	}
 
 }

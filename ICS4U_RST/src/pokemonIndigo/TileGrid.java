@@ -44,12 +44,20 @@ public class TileGrid {
 	public TileGrid() {
 	}
 
+	/**
+	 * Overloaded Constructor Declares the player's location based on the spawnpoint
+	 * given, and sets the currentMap's name accordingly. Creates the file to be
+	 * read and inserted as a new grid filled with tiles
+	 * 
+	 * @param mapName
+	 * @param newSpawnpoint
+	 */
 	public TileGrid(String mapName, int newSpawnpoint) {
 
 		File tileLayout = null;
 
 		spawnpoint = newSpawnpoint;
-		
+
 		// Declares file and spawnpoint based on chosen map
 		switch (mapName) {
 
@@ -105,18 +113,18 @@ public class TileGrid {
 			}
 			currentMapName = "Horizon City";
 			break;
-			
+
 		case "Pokemon Center":
 			tileLayout = new File("data/maps/pokemonCenter.map");
 			playerX = 10;
 			playerY = 12;
-			
+
 			playerSpawnX = 11;
 			playerSpawnY = 10;
-			
+
 			currentMapName = "Pokemon Center";
 			break;
-		
+
 		case "Gym":
 			tileLayout = new File("data/maps/gym.map");
 			backgroundImage = backgroundImageGym;
@@ -181,9 +189,13 @@ public class TileGrid {
 					case 'H':
 						map[y][x] = new Tile("WallBack");
 						break;
-					
+
 					case 'U':
 						map[y][x] = new Tile("BlackTile");
+						break;
+						
+					case 'J':
+						map[y][x] = new Tile("GymLeader");
 						break;
 
 					// Pokemon Center
@@ -308,9 +320,9 @@ public class TileGrid {
 						}
 						x--;
 						break;
-					
+
 					case 'N':
-						map[y][x] = new Tile ("NurseJoy");
+						map[y][x] = new Tile("NurseJoy");
 						break;
 
 					}
@@ -332,51 +344,152 @@ public class TileGrid {
 
 	}
 
+	/**
+	 * Accessor Method gets specific tile from row and column
+	 * 
+	 * @param row, col
+	 */
 	public Tile getTile(int row, int col) {
 		return map[row][col];
 	}
 
+	/**
+	 * Accessor Method returns the X value of the player
+	 * 
+	 * @return playerX
+	 */
 	public int getPlayerX() {
 		return playerX;
 	}
 
+	/**
+	 * Accessor Method returns the Y value of the player
+	 * 
+	 * @return playerY
+	 */
 	public int getPlayerY() {
 		return playerY;
 	}
 
-	public void setPlayerX(int newX) {
-		playerX = newX;
-	}
-	
-	public void setPlayerY(int newY) {
-		playerY = newY;
-	}
-	
+	/**
+	 * Accessor Method returns the X value of the player's Spawn (Specifically for
+	 * playerStack)
+	 * 
+	 * @return playerSpawnX
+	 */
 	public int getPlayerSpawnX() {
 		return playerSpawnX;
 	}
 
+	/**
+	 * Accessor Method returns the Y value of the player's Spawn (Specifically for
+	 * playerStack)
+	 * 
+	 * @return playerSpawnY
+	 */
 	public int getPlayerSpawnY() {
 		return playerSpawnY;
 	}
 
+	/**
+	 * Accessor Method returns the total height of the map
+	 * 
+	 * @return mapHeight
+	 */
 	public int getMapHeight() {
 		return mapHeight;
 	}
 
+	/**
+	 * Accessor Method returns the total width of the map
+	 * 
+	 * @return mapWidth
+	 */
 	public int getMapWidth() {
 		return mapWidth;
 	}
 
+	/**
+	 * Accessor Method returns the next map's name, and sets the new current map to
+	 * the next one
+	 * 
+	 * @return nextMap
+	 */
+	public String getNextMap() {
+		currentMapName = nextMap;
+		return nextMap;
+	}
+
+	/**
+	 * Accessor Method returns the background image for the battle of that map
+	 * 
+	 * @return backgroundImage
+	 */
+	public Image getBackgroundImage() {
+		return backgroundImage;
+	}
+
+	/**
+	 * Accessor Method returns the value of the next spawnpoint
+	 * 
+	 * @return spawnpoint
+	 */
+	public int getNextSpawn() {
+		return spawnpoint;
+	}
+
+	/**
+	 * Accessor Method returns the map's current name
+	 * 
+	 * @return currentMapName
+	 */
+	public String getName() {
+		return currentMapName;
+	}
+
+	/**
+	 * Mutator Method sets the X value of the player
+	 * 
+	 * @param newX
+	 */
+	public void setPlayerX(int newX) {
+		playerX = newX;
+	}
+
+	/**
+	 * Mutator Method sets the Y value of the player
+	 * 
+	 * @param newY
+	 */
+	public void setPlayerY(int newY) {
+		playerY = newY;
+	}
+
+	/**
+	 * Mutator Method adds to the value of playerX
+	 * 
+	 * @param movement
+	 */
 	public void addPlayerX(int movement) {
 		playerX += movement;
 	}
 
+	/**
+	 * Mutator Method adds to the value of playerY
+	 * 
+	 * @param movement
+	 */
 	public void addPlayerY(int movement) {
 		playerY += movement;
 	}
 
-	// Checks for an exit tile
+	/**
+	 * Accessor Method checks the value of exit by giving the specific name of the
+	 * current map
+	 * 
+	 * @param mapName
+	 * @return exit
+	 */
 	public boolean checkExit(String mapName) {
 
 		switch (mapName) {
@@ -401,76 +514,76 @@ public class TileGrid {
 
 			} else if (playerY == 7) {
 				exit = true;
-				
+
 				nextMap = "Pokemon Center";
-				
+
 				playerSpawnX = 10;
 				playerSpawnY = 11;
-				
+
 				spawnpoint = 1;
-			
-		} else {
+
+			} else {
 				exit = false;
 			}
 			break;
 
 		case "Route One":
-		
+
 			if ((playerX >= 9 && playerX <= 19) && (playerY == 50)) {
-				
+
 				exit = true;
-				
+
 				nextMap = "Orilon Town";
-				
+
 				playerSpawnX = 10;
 				playerSpawnY = 0;
-				
+
 				spawnpoint = 2;
-				
+
 			} else if ((playerX >= 22 && playerX <= 25) && playerY == 0) {
-				
+
 				exit = true;
-				
+
 				nextMap = "Horizon City";
-				
+
 				playerSpawnX = 10;
 				playerSpawnY = 11;
-				
+
 				spawnpoint = 1;
-			
+
 			} else {
-				
+
 				exit = false;
-			
+
 			}
 			break;
 
 		case "Horizon City":
-			
+
 			if ((playerX >= 21 && playerX <= 24) && playerY == 21) {
-				
+
 				exit = true;
-				
+
 				nextMap = "Route One";
-				
+
 				playerSpawnX = 10;
 				playerSpawnY = 0;
-				
+
 				spawnpoint = 2;
 			} else if (playerY == 13) {
 				exit = true;
-				
+
 				nextMap = "Pokemon Center";
-				
+
 				playerSpawnY = 11;
 				playerSpawnX = 10;
-				
+
 				spawnpoint = 2;
 			} else if (playerY == 8) {
 				exit = true;
-				
+
 				nextMap = "Gym";
-				
+
 				playerSpawnY = 11;
 				playerSpawnX = 10;
 			} else {
@@ -480,67 +593,51 @@ public class TileGrid {
 
 		case "Pokemon Center":
 			if ((playerX == 9 || playerX == 10) && playerY == 12) {
-				
+
 				exit = true;
-				
+
 				if (spawnpoint == 1) {
-					
+
 					nextMap = "Orilon Town";
-					
-					playerSpawnX = 13;					
+
+					playerSpawnX = 13;
 					playerSpawnY = 7;
-					
+
 					spawnpoint = 3;
 
 				} else if (spawnpoint == 2) {
 					nextMap = "Horizon City";
-					
+
 					playerSpawnX = 5;
 					playerSpawnY = 7;
-					
+
 					spawnpoint = 2;
-				
+
 				} else {
-					
+
 					exit = false;
-				
+
 				}
 			}
-			
+
 			break;
 		case "Gym":
 			if ((playerX == 10 || playerX == 11) && playerY == 14) {
 				exit = true;
-				
+
 				nextMap = "Horizon City";
-				
+
 				playerSpawnX = 10;
 				playerSpawnY = 7;
-				
+
 				spawnpoint = 3;
 			} else {
 				exit = false;
 			}
-			
+
 			break;
 		}
 		return exit;
 	}
 
-	public String getNextMap() {
-		currentMapName = nextMap;
-		return nextMap;
-	}
-
-	public Image getBackgroundImage() {
-		return backgroundImage;
-	}
-
-	public int getNextSpawn() {
-		return spawnpoint;
-	}
-
-	public String getName() {
-		return currentMapName;
-	}
 }
