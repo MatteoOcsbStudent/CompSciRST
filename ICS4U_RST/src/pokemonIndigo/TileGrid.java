@@ -115,6 +115,7 @@ public class TileGrid {
 		
 		case "Gym":
 			tileLayout = new File("data/maps/gym.map");
+			backgroundImage = backgroundImageGym;
 			playerX = 11;
 			playerY = 14;
 		}
@@ -141,32 +142,26 @@ public class TileGrid {
 
 					switch (tileType) {
 
-					// If its a null tile
 					case '-':
 						break;
 
-					// Tree Tile
 					case 'T':
 						map[y][x] = new Tile("Tree");
 						break;
 
-					// Dirt Tile
 					case 'D':
 						map[y][x] = new Tile("Dirt");
 						break;
 
-					// TallGrass Tile
 					case 'W':
 						map[y][x] = new Tile("TallGrass");
 
 						break;
 
-					// Normal Grass Tile
 					case 'G':
 						map[y][x] = new Tile("Grass");
 						break;
 
-					// Floor
 					case 'F':
 						map[y][x] = new Tile("InsideFloor");
 						break;
@@ -308,6 +303,10 @@ public class TileGrid {
 							x++;
 						}
 						x--;
+						break;
+					
+					case 'N':
+						map[y][x] = new Tile ("NurseJoy");
 						break;
 
 					}
@@ -502,12 +501,13 @@ public class TileGrid {
 					exit = false;
 				
 				}
-				break;
 			}
 			
+			break;
 		case "Gym":
 			if ((playerX == 10 || playerX == 11) && playerY == 14) {
-			
+				exit = true;
+				
 				nextMap = "Horizon City";
 				
 				playerSpawnX = 10;

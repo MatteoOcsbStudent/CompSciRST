@@ -109,13 +109,15 @@ public class Boot extends Application {
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
-	//Starter Choice Labels/Imageviews
+	// Starter Choice Labels/Imageviews
 	ImageView imgStarterChoice1, imgStarterChoice2, imgStarterChoice3;
 
 	Label lblStarterText, lblStarterInstructions;
-	
+
+	Scene starterScene;
+
 	String choice;
-	
+
 	// Battle labels/buttons
 	Label lblFightButton;
 	Label lblPokemonButton;
@@ -128,6 +130,10 @@ public class Boot extends Application {
 	Label lblOpponentBar;
 	Label lblCToContinue;
 	Label lblXToBack;
+
+	Label lblHowToPlay;
+
+	int instructionsCount = 0;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
@@ -153,7 +159,7 @@ public class Boot extends Application {
 
 	ProgressBar xpBar;
 
-	public void save() {
+	public void save(Stage myStage) {
 
 		FileWriter saveFile;
 		try {
@@ -211,6 +217,8 @@ public class Boot extends Application {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			Console.print("Error with Loading, creating new game");
+			myStage.setScene(starterScene);
 		}
 
 	}
@@ -448,7 +456,7 @@ public class Boot extends Application {
 		 */
 
 		GridPane starterChoice = new GridPane();
-		Scene starterScene = new Scene(starterChoice, sceneWidth, sceneHeight);
+		starterScene = new Scene(starterChoice, sceneWidth, sceneHeight);
 		starterChoice.setGridLinesVisible(false);
 
 		starterChoice.setHgap(GAP);
@@ -456,13 +464,13 @@ public class Boot extends Application {
 		starterChoice.setPadding(new Insets(GAP, GAP, GAP, GAP));
 
 		// Starter Choice Background
-				Image starterBackground = new Image("images/BattleBackgrounds/PokemonSwitchBackground.png");
+		Image starterBackground = new Image("images/BattleBackgrounds/PokemonSwitchBackground.png");
 
-				BackgroundImage starterBackgroundImage = new BackgroundImage(starterBackground, BackgroundRepeat.REPEAT,
-						BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+		BackgroundImage starterBackgroundImage = new BackgroundImage(starterBackground, BackgroundRepeat.REPEAT,
+				BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
-				starterChoice.setBackground(new Background(starterBackgroundImage));
-		
+		starterChoice.setBackground(new Background(starterBackgroundImage));
+
 		imgStarterChoice1 = new ImageView(
 				new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString()));
 		imgStarterChoice1.setFitHeight(POKESPRITEDIMENSION);
@@ -497,6 +505,64 @@ public class Boot extends Application {
 		lblStarterInstructions.setAlignment(Pos.CENTER_RIGHT);
 
 		/**
+		 * How to Play Scene
+		 * 
+		 */
+
+		GridPane howToPlay = new GridPane();
+		Scene howToPlayScene = new Scene(howToPlay, sceneWidth, sceneHeight);
+		howToPlay.setGridLinesVisible(false);
+
+		howToPlay.setHgap(GAP);
+		howToPlay.setVgap(GAP);
+		howToPlay.setPadding(new Insets(GAP, GAP, GAP, GAP));
+
+		// Title of How To Play Scene
+		lblHowToPlay = new Label("How to Play");
+		lblHowToPlay.setFont(Font.font(MEDIUM_FONT));
+		lblStarterText.setAlignment(Pos.CENTER_LEFT);
+		howToPlay.add(lblHowToPlay, 0, 0, 130, 10);
+		lblHowToPlay.setPrefWidth(888);
+
+		// Second Instruction Image
+		ImageView imgInstructions1 = new ImageView("/images/MainMenu/WASDInstructions.png");
+		imgInstructions1.setFitHeight(POKESPRITEDIMENSION);
+		imgInstructions1.setFitWidth(POKESPRITEDIMENSION);
+		howToPlay.add(imgInstructions1, 0, 10);
+
+		// Second Instruction Image
+		ImageView imgInstructions2 = new ImageView("/images/MainMenu/BattleInstruction.png");
+		imgInstructions2.setFitHeight(POKESPRITEDIMENSION);
+		imgInstructions2.setFitWidth(POKESPRITEDIMENSION);
+		howToPlay.add(imgInstructions2, 25, 10);
+
+		// First Instruction label
+		Label lblInstructions1 = new Label("WASD Keys to move");
+		lblInstructions1.setFont(Font.font(MEDIUM_FONT));
+		lblInstructions1.setAlignment(Pos.CENTER_LEFT);
+		howToPlay.add(lblInstructions1, 0, 15, 100, 10);
+		lblInstructions1.setPrefWidth(888);
+
+		// Second Instruction label
+		Label lblInstructions2 = new Label("AD Keys to use the battle menu");
+		lblInstructions2.setFont(Font.font(MEDIUM_FONT));
+		lblInstructions2.setAlignment(Pos.CENTER_LEFT);
+		howToPlay.add(lblInstructions2, 25, 15, 100, 10);
+		lblInstructions2.setPrefWidth(888);
+
+		// Prompt to continue the how to play scene
+		Label continueInstructions = new Label("'C' to continue ->");
+		continueInstructions.setFont(Font.font(SMALL_FONT));
+		continueInstructions.setAlignment(Pos.CENTER_LEFT);
+		howToPlay.add(continueInstructions, 25, 25);
+		continueInstructions.setPrefWidth(888);
+
+		// Returning to main menu
+		Button btnReturn = new Button("Return");
+		btnReturn.setMinWidth(100);
+		howToPlay.add(btnReturn, 0, 25);
+
+		/**
 		 * Main Menu Scene
 		 */
 
@@ -507,6 +573,9 @@ public class Boot extends Application {
 		mainMenu.setHgap(GAP);
 		mainMenu.setVgap(GAP);
 		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
+
+		// Returning to main menu when hitting return
+		btnReturn.setOnAction(event -> myStage.setScene(mainMenuScene));
 
 		// Title
 		ImageView title = new ImageView("images/MainMenu/PokemonTitle.png");
@@ -522,20 +591,91 @@ public class Boot extends Application {
 
 		mainMenu.setBackground(new Background(mainMenuBackgroundImage));
 
+		// New Game Button
 		Button btnNewGame = new Button("New Game");
 		btnNewGame.setMinWidth(100);
 		btnNewGame.setOnAction(event -> myStage.setScene(starterScene));
 		mainMenu.add(btnNewGame, 54, 35);
 
+		// Load Button
 		Button btnLoad = new Button("Load");
 		btnLoad.setMinWidth(100);
 		btnLoad.setOnAction(event -> load(myStage));
 		mainMenu.add(btnLoad, 54, 40);
 
+		// How to Play Button
+		Button btnHowToPlay = new Button("How to Play");
+		btnHowToPlay.setMinWidth(100);
+		btnHowToPlay.setOnAction(event -> myStage.setScene(howToPlayScene));
+		mainMenu.add(btnHowToPlay, 54, 45);
+
+		// Exit Button
 		Button btnExit = new Button("Exit");
 		btnExit.setMinWidth(100);
 		btnExit.setOnAction(event -> System.exit(0));
-		mainMenu.add(btnExit, 54, 45);
+		mainMenu.add(btnExit, 54, 50);
+
+		// Key Logic for the How to Play Scene
+		howToPlayScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+
+				switch (event.getCode()) {
+
+				case C:
+
+					switch (instructionsCount) {
+
+					// First Page of instructions
+					case 0:
+						imgInstructions1.setImage(
+								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
+						lblInstructions1.setText("Interact with the world\nby using 'C'");
+
+						imgInstructions2.setImage(
+								new Image(getClass().getResource("/images/MainMenu/PkmnCenterHeal.png").toString()));
+						lblInstructions2.setText("Get healed at the Pokemon Center");
+						break;
+
+					// Second Page of instructions
+					case 1:
+						imgInstructions1.setImage(
+								new Image(getClass().getResource("/images/MainMenu/MoveInstructions.png").toString()));
+						lblInstructions1.setText("Use powerful moves to\n defeat other pokemon");
+
+						imgInstructions2.setImage(
+								new Image(getClass().getResource("/images/MainMenu/CatchInstructions.png").toString()));
+						lblInstructions2.setText("Catch pokemon along the way\nto add to your team");
+						break;
+
+					// Third Page of instructions
+					case 2:
+						imgInstructions1.setImage(
+								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
+						lblInstructions1.setText("When in doubt\nrun away!");
+
+						imgInstructions2.setImage(
+								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
+						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies");
+						break;
+						
+					case 3:
+						imgInstructions1.setImage(
+								new Image(getClass().getResource("/images/MainMenu/SaveGame.png").toString()));
+						lblInstructions1.setText("Press 'V' to\nsave the game, and 'Z'\n to revisit this screen");
+
+						imgInstructions2.setImage(
+								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
+						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies");
+					}
+
+					instructionsCount++;
+					break;
+
+				}
+			}
+
+		});
 
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -635,11 +775,17 @@ public class Boot extends Application {
 
 					case C:
 
+						// Checks for interactions via where the player is facing
 						switch (direction) {
 
 						case "Right":
+							// Checks if the heal NPC (Non-player-Character) is being faced and is only one
+							// tile ahead
 							if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkHeal() == true) {
+
+								// Fully heals the team, and lets the user know with a prompt
 								Dialog.print("Your Team has been healed");
+
 								for (int i = 0; i < player.getTeamSize(); i++) {
 									player.getPokemon(i).setCurrentHP(player.getPokemon(i).totalHP);
 								}
@@ -675,12 +821,19 @@ public class Boot extends Application {
 						}
 						break;
 
+					// Saves game
 					case V:
 
-						save();
-						Console.print("Game Saved");
+						save(myStage);
+						Dialog.print("Game Saved");
 
 						break;
+						
+					case Z:
+						save(myStage);
+						Dialog.print("Game Saved");
+						myStage.setScene(howToPlayScene);
+						
 					default:
 						break;
 
@@ -1007,38 +1160,35 @@ public class Boot extends Application {
 		movementLock = true;
 
 		// Checks to see if the player is on an exit tile
-		map.checkExit(currentMapName);
+		if (map.checkExit(currentMapName) == true) {
 
-		// Changes the currentMapName to the next map's
-		currentMapName = map.getNextMap();
+			// Changes the currentMapName to the next map's
+			currentMapName = map.getNextMap();
 
-		// Changes the loading screen text to the new map's name
-		lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
+			// Changes the loading screen text to the new map's name
+			lblLoadingScreen.setText("Now Entering: " + currentMapName + "...");
 
-		// Sets the loading screen
-		myStage.setScene(loading);
+			// Sets the loading screen
+			myStage.setScene(loading);
 
-		// Puts the player in their new spawnpoint
-		playerStackX = map.getPlayerSpawnX();
-		playerStackY = map.getPlayerSpawnY();
+			// Puts the player in their new spawnpoint
+			playerStackX = map.getPlayerSpawnX();
+			playerStackY = map.getPlayerSpawnY();
 
-		Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+			Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
 
-			// Instantiates the new map
-			map = new TileGrid(map.getNextMap(), map.getNextSpawn());
+				// Instantiates the new map
+				map = new TileGrid(map.getNextMap(), map.getNextSpawn());
 
-			// Displays the next map
-			displayBoard(root);
+				// Displays the next map
+				displayBoard(root);
 
-			// Sets the scene to the new map
-			myStage.setScene(scene);
+				// Sets the scene to the new map
+				myStage.setScene(scene);
+			}));
 
-			// removes the movement lock
-			movementLock = false;
-		}));
-
-		delay.play();
-
+			delay.play();
+		}
 		// removes the movement lock
 		movementLock = false;
 	}
@@ -1047,15 +1197,18 @@ public class Boot extends Application {
 
 		switch (starterChoiceIndex) {
 
+		//Checks the index for which pokemon is selected, and allows the user to choose that pokemon as their starter
 		case 1:
 			lblStarterText.setText("Torchic, the Fire Chicken Pokemon!");
+			
+			//Changes images to display the look of the selected pokemon
 			imgStarterChoice1
 					.setImage(new Image(getClass().getResource("/images/PokemonSprites/TorchicFront.png").toString()));
 			imgStarterChoice2
 					.setImage(new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString()));
 			imgStarterChoice3
 					.setImage(new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString()));
-			
+
 			choice = "Torchic";
 			break;
 
@@ -1067,7 +1220,7 @@ public class Boot extends Application {
 					.setImage(new Image(getClass().getResource("/images/PokemonSprites/TotodileFront.png").toString()));
 			imgStarterChoice3
 					.setImage(new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString()));
-			
+
 			choice = "Totodile";
 			break;
 
@@ -1079,7 +1232,7 @@ public class Boot extends Application {
 					.setImage(new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString()));
 			imgStarterChoice3
 					.setImage(new Image(getClass().getResource("/images/PokemonSprites/TurtwigFront.png").toString()));
-			
+
 			choice = "Turtwig";
 			break;
 
