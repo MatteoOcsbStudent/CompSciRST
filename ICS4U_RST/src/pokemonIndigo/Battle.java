@@ -320,7 +320,7 @@ public class Battle {
 		if (defending.currentHP <= 0) {
 
 			// Sets to zero for health bar purposes
-			defending.setCurrentHp(0);
+			defending.setCurrentHP(0);
 
 			// Informs user it was fainted
 			battleResponses.add(defending.getName() + " has fainted");
