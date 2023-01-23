@@ -46,7 +46,6 @@ public class Player {
 	public void removePokemon(int index) {
 		team.remove(index);
 	}
-	
 }
 
 	

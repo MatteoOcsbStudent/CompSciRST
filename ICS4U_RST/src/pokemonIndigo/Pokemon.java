@@ -129,10 +129,10 @@ public class Pokemon {
 
 					// Learns move if theres space, max is 4
 					if (currentMoves.size() < 4) {
-            
+
 						changeMoveSet((movePool[c]));
-					
-					//Checking for oldest move to replace if pokemon already has 4 moves
+
+						// Checking for oldest move to replace if pokemon already has 4 moves
 					} else {
 
 						// Populates an array with the index at which the moves a pokemon knows is in
@@ -173,12 +173,12 @@ public class Pokemon {
 		// Tracking level
 		level++;
 
-		// Next level up 
-		nextLevelUp = level * level * level - ((level-1) * (level-1) * (level-1));
-		
-		//Resets exp to whats carried over from last threshhold
+		// Next level up
+		nextLevelUp = level * level * level - ((level - 1) * (level - 1) * (level - 1));
+
+		// Resets exp to whats carried over from last threshhold
 		int tempXp = exp;
-		exp = (tempXp) - ((level-1) * (level-1) * (level-1));
+		exp = (tempXp) - ((level - 1) * (level - 1) * (level - 1));
 
 		// HP Stat
 		int temp = totalHP;
@@ -234,7 +234,7 @@ public class Pokemon {
 	public void setCurrentHP(int newHP) {
 		currentHP = newHP;
 	}
-	
+
 	public int getExp() {
 		return exp;
 	}
@@ -274,7 +274,7 @@ public class Pokemon {
 	public String getName() {
 		return name;
 	}
-	
+
 	public int getNextEvolution() {
 		int evolution = -1;
 		for (int i = 0; i < evoLevels.length; i++) {
@@ -282,7 +282,7 @@ public class Pokemon {
 				evolution = i;
 			}
 		}
-		
+
 		return evolution;
 	}
 
@@ -334,30 +334,30 @@ public class Pokemon {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getNextMoveLearn() {
-		
+
 		String nextMoveLearn = "";
-		
+
 		for (int i = 0; i < movePoolLevels.length; i++) {
 			if (level == movePoolLevels[i]) {
 				nextMoveLearn = movePool[i];
 			}
 		}
-		
+
 		return nextMoveLearn;
 	}
 
 	public void changeMoveSet(String newMoveName, int indexToReplace) {
-		
+
 		Move newMove = new Move(newMoveName);
-		
+
 		currentMoves.remove(indexToReplace);
 		currentMoves.add(indexToReplace, newMove);
 	}
 
 	public void changeMoveSet(String newMoveName) {
-		
+
 		Move newMove = new Move(newMoveName);
 		currentMoves.add(newMove);
 	}
