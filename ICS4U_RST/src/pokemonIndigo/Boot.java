@@ -111,14 +111,23 @@ public class Boot extends Application {
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
-	// Starter Choice Labels/Imageviews
+	// Starter Choice Scene's Datafields
 	ImageView imgStarterChoice1, imgStarterChoice2, imgStarterChoice3;
 
-	Label lblStarterText, lblStarterInstructions;
+	Label lblStarterText, lblStarterInstructions, lblContinueInstructions;
 
 	Scene starterScene;
 
 	String choice;
+	
+	Button btnReturn;
+	
+	//Main Menu Scene
+	
+	Scene mainMenuScene;
+	
+	//How To Play Scene
+	Scene howToPlayScene;
 
 	ImageView imgPokeBall1, imgPokeBall2, imgPokeBall3, imgPokeBall4, imgPokeBall5, imgPokeBall6, imgPokeMenuSprite;
 
@@ -550,7 +559,7 @@ switch (direction) {
 		 */
 
 		GridPane howToPlay = new GridPane();
-		Scene howToPlayScene = new Scene(howToPlay, sceneWidth, sceneHeight);
+		howToPlayScene = new Scene(howToPlay, sceneWidth, sceneHeight);
 		howToPlay.setGridLinesVisible(false);
 
 		howToPlay.setHgap(GAP);
@@ -591,14 +600,14 @@ switch (direction) {
 		lblInstructions2.setPrefWidth(888);
 
 		// Prompt to continue the how to play scene
-		Label continueInstructions = new Label("'C' to continue ->");
-		continueInstructions.setFont(Font.font(SMALL_FONT));
-		continueInstructions.setAlignment(Pos.CENTER_LEFT);
-		howToPlay.add(continueInstructions, 25, 25);
-		continueInstructions.setPrefWidth(888);
+		lblContinueInstructions = new Label("'C' to continue ->");
+		lblContinueInstructions.setFont(Font.font(SMALL_FONT));
+		lblContinueInstructions.setAlignment(Pos.CENTER_LEFT);
+		howToPlay.add(lblContinueInstructions, 25, 25);
+		lblContinueInstructions.setPrefWidth(888);
 
 		// Returning to main menu
-		Button btnReturn = new Button("Return");
+		btnReturn = new Button("Return");
 		btnReturn.setMinWidth(100);
 		howToPlay.add(btnReturn, 0, 25);
 
@@ -607,15 +616,12 @@ switch (direction) {
 		 */
 
 		GridPane mainMenu = new GridPane();
-		Scene mainMenuScene = new Scene(mainMenu, sceneWidth, sceneHeight);
+		mainMenuScene = new Scene(mainMenu, sceneWidth, sceneHeight);
 		mainMenu.setGridLinesVisible(false);
 
 		mainMenu.setHgap(GAP);
 		mainMenu.setVgap(GAP);
-		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
-
-		// Returning to main menu when hitting return
-		btnReturn.setOnAction(event -> myStage.setScene(mainMenuScene));
+		mainMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));		
 
 		// Title
 		ImageView title = new ImageView("images/MainMenu/PokemonTitle.png");
@@ -646,7 +652,7 @@ switch (direction) {
 		// How to Play Button
 		Button btnHowToPlay = new Button("How to Play");
 		btnHowToPlay.setMinWidth(100);
-		btnHowToPlay.setOnAction(event -> myStage.setScene(howToPlayScene));
+		btnHowToPlay.setOnAction(event -> updateHowToPlay("Main Menu", myStage));
 		mainMenu.add(btnHowToPlay, 54, 45);
 
 		// Exit Button
@@ -675,6 +681,8 @@ switch (direction) {
 						imgInstructions2.setImage(
 								new Image(getClass().getResource("/images/MainMenu/PkmnCenterHeal.png").toString()));
 						lblInstructions2.setText("Get healed at the Pokemon Center");
+						
+						lblContinueInstructions.setVisible(true);
 						break;
 
 					// Second Page of instructions
@@ -686,27 +694,23 @@ switch (direction) {
 						imgInstructions2.setImage(
 								new Image(getClass().getResource("/images/MainMenu/CatchInstructions.png").toString()));
 						lblInstructions2.setText("Catch pokemon along the way\nto add to your team");
+						
+						lblContinueInstructions.setVisible(true);
 						break;
 
 					// Third Page of instructions
 					case 2:
 						imgInstructions1.setImage(
-								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
-						lblInstructions1.setText("When in doubt\nrun away!");
-
-						imgInstructions2.setImage(
-								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
-						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies");
-						break;
-
-					case 3:
-						imgInstructions1.setImage(
 								new Image(getClass().getResource("/images/MainMenu/SaveGame.png").toString()));
 						lblInstructions1.setText("Press 'V' to\nsave the game, and 'Z'\n to revisit this screen");
 
+
 						imgInstructions2.setImage(
-								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
-						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies");
+								new Image(getClass().getResource("/images/MainMenu/SwapPokemon.png").toString()));
+						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies\neither during fights or with 'P' in the \noverworld!");
+						
+						lblContinueInstructions.setVisible(false);
+						break;
 					}
 
 					instructionsCount++;
@@ -993,9 +997,7 @@ switch (direction) {
 						break;
 
 					case Z:
-						save(myStage);
-						Dialog.print("Game Saved");
-						myStage.setScene(howToPlayScene);
+						updateHowToPlay("Overworld", myStage);
 
 						break;
 
@@ -1606,6 +1608,22 @@ switch (direction) {
 		}
 	}
 
+	public void updateHowToPlay(String playedFrom, Stage myStage) {
+		
+		myStage.setScene(howToPlayScene);
+		
+		switch (playedFrom) {
+			
+		case "Main Menu":
+			btnReturn.setOnAction(event -> myStage.setScene(mainMenuScene));
+			break;
+			
+		case "Overworld":
+			btnReturn.setOnAction(event -> myStage.setScene(scene));
+		}
+		
+	}
+	
 	public void nextBattleMenu(Stage myStage, String newMenu) {
 
 		// Different function based on current menu
