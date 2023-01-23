@@ -1609,6 +1609,8 @@ switch (direction) {
 	}
 
 	public void updateHowToPlay(String playedFrom, Stage myStage) {
+		instructionsCount = 0;
+		lblContinueInstructions.setVisible(true);
 		
 		myStage.setScene(howToPlayScene);
 		
