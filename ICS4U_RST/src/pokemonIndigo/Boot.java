@@ -978,6 +978,8 @@ public class Boot extends Application {
 						save(myStage);
 						Dialog.print("Game Saved");
 						myStage.setScene(howToPlayScene);
+						
+						break;
 
 					case P:
 
@@ -985,6 +987,7 @@ public class Boot extends Application {
 						updatePokeMenu(myStage);
 						myStage.setScene(pokeMenuScene);
 
+						break;
 
 					default:
 						break;
@@ -1223,7 +1226,7 @@ public class Boot extends Application {
 								
 								//Otherwise, next battle reponse, goes to general
 							} else if (pokeMenuOrigin.equals("fainted")) {
-								nextBattleResponse();
+								nextBattleMenu(myStage, "General");
 							}
               
 							// If no more responses
