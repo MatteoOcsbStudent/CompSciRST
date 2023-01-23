@@ -2,7 +2,7 @@ Electric
 Null
 45
 65
-55
+46
 95
 11
 Quick Attack
@@ -30,16 +30,16 @@ Earthquake
 2
 Electabuzz
 65
-95
-85
+89
+71
 105
 30
 Electric
 Null
 Electivire
 75
-123
-85
+94
+76
 95
 45
 Electric
