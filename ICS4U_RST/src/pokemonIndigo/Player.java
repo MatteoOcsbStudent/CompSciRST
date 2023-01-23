@@ -17,6 +17,7 @@ public class Player {
 		name = playerName;
 	}
 	
+	//Adding a pokemon to the player's team
 	public void addPokemon(Pokemon newPokemon) {
 		team.add(newPokemon);
 	}
