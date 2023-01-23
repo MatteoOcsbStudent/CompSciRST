@@ -10,6 +10,7 @@ public class Battle {
 	boolean opponentFainted;
 	boolean playerFainted;
 	boolean goingToEvolve;
+	boolean noEffect;
 
 	Move opponentMove;
 
@@ -241,34 +242,39 @@ public class Battle {
 
 	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
 
+		playerFainted = false;
+		opponentFainted = false;
+
 		double damage = 0;
 
 		if (Math.random() * 100 <= usedMove.getAccuracy()) {
 
 			battleResponses.add(attacking.getName() + " used " + usedMove.getName() + "!");
 
-			// Types of attacking pokemon
-			String[] attackingTypes = attacking.getTypes().split("-");
+			//Doesn't calculate damage or display effectiveness if damage = 0
+			if (usedMove.getDamage() != 0) {
+				// Types of attacking pokemon
+				String[] attackingTypes = attacking.getTypes().split("-");
 
-			// Portion of damage equation
-			double temp = ((2 * attacking.getLevel()) / 5.0 + 2) * usedMove.getDamage()
-					* (attacking.getAttack() / defending.getDefense());
+				// Portion of damage equation
+				double temp = ((2 * attacking.getLevel()) / 5.0 + 2) * usedMove.getDamage()
+						* (attacking.getAttack() / defending.getDefense());
 
-			// Calculating stab (same type attack bonus)
-			double stab;
-			if (attackingTypes[0] == usedMove.getType() || attackingTypes[1] == usedMove.getType()) {
-				stab = 1.5;
-			} else {
-				stab = 1;
+				// Calculating stab (same type attack bonus)
+				double stab;
+				if (attackingTypes[0] == usedMove.getType() || attackingTypes[1] == usedMove.getType()) {
+					stab = 1.5;
+				} else {
+					stab = 1;
+				}
+
+				// Last part of damage equation
+				damage = ((temp / 50) + 2) * stab * typeCompare(usedMove.getType(), defending);
+
+				Math.round(damage);
 			}
-
-			// Last part of damage equation
-			damage = ((temp / 50) + 2) * stab * typeCompare(usedMove.getType(), defending);
-
-			Math.round(damage);
-
 			// Status moves
-			if (usedMove.getStatus() != "Null") {
+			if (usedMove.getStatus() != "Null" && noEffect == false) {
 
 				// Healing
 				if (usedMove.getStatus().equals("Heal")) {
@@ -307,7 +313,7 @@ public class Battle {
 			break;
 		}
 
-		if (damage <= 1) {
+		if (damage <= 1 && noEffect == false && usedMove.getDamage() != 0) {
 			damage = 1;
 		}
 
@@ -326,13 +332,14 @@ public class Battle {
 			// If opponent fainted, gain exp
 			if (defending.equals(opponentPokemon)) {
 				opponentFainted = true;
-				int expGain = (int) (((64 * opponentPokemon.getLevel()) / 7) * 8);
+				int expGain = (int) (((64 * opponentPokemon.getLevel()) / 7) * 12);
 				battleResponses.add(attacking.getName() + " gained " + expGain + " exp");
+				playerPokemon.gainExp(expGain);
 
 				// Level up as many times as necessary for exp gain
 				do {
 					attacking.levelUp();
-					battleResponses.add(attacking.getName() + " leveled up!");
+					battleResponses.add(attacking.getName() + " leveled up to" + playerPokemon.getLevel() + " !");
 
 					// If evolution level is hit, evolve pokemon and inform user
 					if (attacking.getNextEvolution() != -1) {
@@ -373,6 +380,7 @@ public class Battle {
 
 	public double typeCompare(String type1, Pokemon defending) {
 
+		noEffect = false;
 		double amp = 1;
 		String[] defendingTypes = defending.getTypes().split("-");
 
@@ -1004,9 +1012,10 @@ public class Battle {
 		}
 		if (amp == 0) {
 			battleResponses.add("It had no effect...");
+			noEffect = true;
 		}
 
-		else if (amp == 0.5) {
+		else if (amp == 0.5 || amp == 0.25) {
 			battleResponses.add("It was not very effective...");
 		}
 
@@ -1048,9 +1057,10 @@ public class Battle {
 
 		// Can't flee a trainer battle
 		if (isTrainerBattle == false) {
-			// 90% chance of fleeing
+			// 85% chance of fleeing
 
-			if (Math.random() < 1) {
+			if (Math.random() < 0.85) {
+
 				success = true;
 			}
 		}

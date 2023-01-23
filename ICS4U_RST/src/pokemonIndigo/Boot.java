@@ -114,7 +114,9 @@ public class Boot extends Application {
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
+
 	// Menu Scenes' Datafields
+
 	ImageView imgStarterChoice1, imgStarterChoice2, imgStarterChoice3;
 
 	Label lblStarterText, lblStarterInstructions, lblContinueInstructions;
@@ -997,8 +999,8 @@ public class Boot extends Application {
 						break;
 
 					case Z:
-						updateHowToPlay("Overworld", myStage);
 
+						updateHowToPlay("Overworld", myStage);
 						break;
 
 					case P:
@@ -1095,7 +1097,7 @@ public class Boot extends Application {
 							}
 
 							// Only scrolls through two options, yes and no
-						} else if (battleMenu.equals("MoveLearning")) {
+						} else if (battleMenu.equals("MoveLearning") || battleMenu.equals("Release")) {
 							if (battleButtonIndex == 1 || battleButtonIndex == 2) {
 								battleButtonIndex = 3;
 								buttonUpdate();
@@ -1125,7 +1127,7 @@ public class Boot extends Application {
 								battleButtonIndex++;
 								buttonUpdate();
 							}
-						} else if (battleMenu.equals("MoveLearning")) {
+						} else if (battleMenu.equals("MoveLearning") || battleMenu.equals("Release")) {
 							if (battleButtonIndex == 3 || battleButtonIndex == 4) {
 								battleButtonIndex = 2;
 								buttonUpdate();
@@ -1185,9 +1187,40 @@ public class Boot extends Application {
 
 							// go to main scene if pokemon caught, add caught pokemon to player team
 						} else if (lblBattleResponse.getText().contains("caught!")) {
-							player.addPokemon(opponentPokemon);
-							myStage.setScene(scene);
 
+							if (player.getTeamSize() < 6) {
+								player.addPokemon(opponentPokemon);
+								myStage.setScene(scene);
+							} else {
+								lblBattleResponse.setText("You have too many pokemon!");
+
+							}
+						} else if (lblBattleResponse.getText().equals("You have too many pokemon!")) {
+
+							lblBattleResponse.setText("would you like to release one?");
+
+						} else if (lblBattleResponse.getText().equals("would you like to release one?")) {
+
+							nextBattleMenu(myStage, "Release");
+
+						} else if (lblBattleResponse.getText().equals("Please select a pokemon to release")) {
+
+							pokeMenuOrigin = "Release";
+							updatePokeMenu(myStage);
+							myStage.setScene(pokeMenuScene);
+
+						} else if (lblBattleResponse.getText().contains("has been released")) {
+
+							if (lblBattleResponse.getText()
+									.equals("caught " + opponentPokemon.getName() + " has been released")) {
+								myStage.setScene(scene);
+							} else {
+								player.replaceTeamMember(opponentPokemon, pokeMenuIndex - 1);
+								lblBattleResponse.setText(opponentPokemon.getName() + " has been added to your team");
+							}
+
+						} else if (lblBattleResponse.getText().contains("has been added to your team")) {
+							myStage.setScene(scene);
 							// Shows yes and no options if prompted to learn a new move
 						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
 
@@ -1260,6 +1293,7 @@ public class Boot extends Application {
 						} else if (lblBattleResponse.getText().contains("You sent out")) {
 
 							// resets responses
+							responseCounter = 0;
 							battle.clearResponses();
 
 							// If from switch, opponent takes turn
@@ -1302,6 +1336,21 @@ public class Boot extends Application {
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse.setText(
 									playerPokemon.getName() + " did not learn " + playerPokemon.getNextMoveLearn());
+						}
+
+						break;
+
+					case "Release":
+
+						// Yes button, prompts for pokemon to be released
+						if (battleButtonIndex == 2) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText("Please select a pokemon to release");
+
+							// No button, informs user pokemon caught has been released
+						} else if (battleButtonIndex == 3) {
+							nextBattleMenu(myStage, "battleResponses");
+							lblBattleResponse.setText("caught " + opponentPokemon.getName() + " has been released");
 						}
 
 						break;
@@ -1421,6 +1470,10 @@ public class Boot extends Application {
 					} else if (pokeMenuOrigin.equals("switch")) {
 						myStage.setScene(battleScene);
 						nextBattleMenu(myStage, "General");
+					} else if (pokeMenuOrigin.equals("Release")) {
+						lblBattleResponse.setText("You have too many pokemon!");
+						myStage.setScene(battleScene);
+						nextBattleMenu(myStage, "battleResponses");
 					}
 					break;
 
@@ -1470,6 +1523,11 @@ public class Boot extends Application {
 
 						}
 
+					} else if (pokeMenuOrigin.equals("Release")) {
+						lblBattleResponse
+								.setText(player.getPokemon(pokeMenuIndex - 1).getName() + " has been released");
+						nextBattleMenu(myStage, "battleResponses");
+						myStage.setScene(battleScene);
 					}
 
 				}
@@ -1734,6 +1792,7 @@ public class Boot extends Application {
 
 			if (lblBattleResponse.getText().contains("caught!")) {
 				// do nothing if pokemon is caught
+
 			}
 			// if trainer battle, opponent does not take turn on catch attempt
 			// informs user you cannot catch another trainers pokemon
@@ -1774,6 +1833,25 @@ public class Boot extends Application {
 
 			// sets battlemenu
 			battleMenu = "MoveLearning";
+
+			// Sets button text and visibility
+			lblCatchButton.setText("No");
+			lblPokemonButton.setText("Yes");
+			lblCatchButton.setTextFill(Color.BLACK);
+			lblPokemonButton.setTextFill(Color.BLACK);
+			lblCatchButton.setVisible(true);
+			lblPokemonButton.setVisible(true);
+			lblRunButton.setVisible(false);
+			lblFightButton.setVisible(false);
+			lblXToBack.setVisible(false);
+			lblBattleResponse.setVisible(false);
+
+			break;
+
+		case "Release":
+
+			// sets battlemenu
+			battleMenu = "Release";
 
 			// Sets button text and visibility
 			lblCatchButton.setText("No");
@@ -1859,7 +1937,11 @@ public class Boot extends Application {
 			lblPokeMenuX.setVisible(true);
 		} else if (pokeMenuOrigin.equals("fainted")) {
 			lblPokeMenuX.setVisible(false);
+		} else if (pokeMenuOrigin.equals("Release")) {
+			lblPokeMenuC.setText("'C' to release");
+			lblPokeMenuX.setVisible(true);
 		}
+
 		switch (player.getTeamSize()) {
 
 		// Only enough pokeballs for teamsize are visible
@@ -3509,7 +3591,20 @@ public class Boot extends Application {
 
 			opponentPokemon = new Pokemon(encounter, highestLevel);
 
-			playerPokemon = player.getPokemon(0);
+			Boolean firstNonFainted = false;
+
+			// Finds first nonfainted pokemon to send into battle
+
+			for (int i = 0; i < player.getTeamSize(); i++) {
+
+				if (firstNonFainted == false) {
+					if (player.getPokemon(i).getCurrentHP() != 0) {
+						firstNonFainted = true;
+						playerPokemon = player.getPokemon(i);
+					}
+				}
+
+			}
 
 			// Instantiates new battle, istrainer false
 

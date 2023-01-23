@@ -193,18 +193,19 @@ public class Pokemon {
 	 */
 	public void levelUp() {
 		// Tracking level
+		
+		if(exp > (nextLevelUp)) {
+			int tempExp = exp - (nextLevelUp);
+			exp = tempExp;
+		}
+		
 		level++;
 
-		// Next level up
-		nextLevelUp = level * level * level - ((level - 1) * (level - 1) * (level - 1));
-
-		// Resets exp to whats carried over from last threshhold
-
-		if (exp > ((level - 1) * (level - 1) * (level - 1))) {
-			int tempXp = exp;
-			exp = (tempXp) - ((level - 1) * (level - 1) * (level - 1));
-		}
-
+		// Next level up 
+		nextLevelUp = (int)(level * level * level) - ((level-1) * (level-1) * (level-1));
+		
+		//Resets exp to whats carried over from last threshhold
+    
 		// HP Stat
 		int temp = totalHP;
 		totalHP = ((2 * baseHP * level) / 100) + level + 10;
@@ -302,11 +303,6 @@ public class Pokemon {
 	 */
 	public void gainExp(int expGain) {
 		exp += expGain;
-
-		if (exp >= nextLevelUp) {
-			levelUp();
-		}
-	}
 
 	/**Mutator Method
 	 * sets the current HP to the given amount
@@ -512,4 +508,7 @@ public class Pokemon {
 		return currentMoves.size();
 	}
 
+	public void setCurrentHp(int hp) {
+		currentHP = hp;
+	}
 }
