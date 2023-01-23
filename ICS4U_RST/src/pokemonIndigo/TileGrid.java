@@ -65,16 +65,9 @@ public class TileGrid {
 			if (spawnpoint == 1) {
 				playerX = 14;
 				playerY = 50;
-				
-				//Setting the playerStack
-				playerSpawnX = 10;
-				playerSpawnY = 11;
 			} else if (spawnpoint == 2) {
 				playerX = 24;
 				playerY = 0;
-				
-				playerSpawnX = 10;
-				playerSpawnY = 0;
 			}
 
 			// Names the map accordingly
@@ -87,21 +80,12 @@ public class TileGrid {
 			if (spawnpoint == 1) {
 				playerX = 10;
 				playerY = 10;
-				
-				playerSpawnX = 10;
-				playerSpawnY = 6;
 			} else if (spawnpoint == 2) {
 				playerX = 12;
 				playerY = 0;
-				
-				playerSpawnX = 10;
-				playerSpawnY = 0;
 			} else if (spawnpoint == 3) {
 				playerX = 20;
 				playerY = 7;
-				
-				playerSpawnX = 13;					
-				playerSpawnY = 7;
 			}
 			currentMapName = "Orilon Town";
 			break;
@@ -131,6 +115,7 @@ public class TileGrid {
 		
 		case "Gym":
 			tileLayout = new File("data/maps/gym.map");
+			backgroundImage = backgroundImageGym;
 			playerX = 11;
 			playerY = 14;
 		}
@@ -157,32 +142,26 @@ public class TileGrid {
 
 					switch (tileType) {
 
-					// If its a null tile
 					case '-':
 						break;
 
-					// Tree Tile
 					case 'T':
 						map[y][x] = new Tile("Tree");
 						break;
 
-					// Dirt Tile
 					case 'D':
 						map[y][x] = new Tile("Dirt");
 						break;
 
-					// TallGrass Tile
 					case 'W':
 						map[y][x] = new Tile("TallGrass");
 
 						break;
 
-					// Normal Grass Tile
 					case 'G':
 						map[y][x] = new Tile("Grass");
 						break;
 
-					// Floor
 					case 'F':
 						map[y][x] = new Tile("InsideFloor");
 						break;
@@ -325,6 +304,10 @@ public class TileGrid {
 						}
 						x--;
 						break;
+					
+					case 'N':
+						map[y][x] = new Tile ("NurseJoy");
+						break;
 
 					}
 
@@ -357,12 +340,12 @@ public class TileGrid {
 		return playerY;
 	}
 
-	public void setPlayerX(int newPlayerX) {
-		playerX = newPlayerX;
+	public void setPlayerX(int newX) {
+		playerX = newX;
 	}
 	
-	public void setPlayerY(int newPlayerY) {
-		playerY = newPlayerY;
+	public void setPlayerY(int newY) {
+		playerY = newY;
 	}
 	
 	public int getPlayerSpawnX() {
@@ -518,12 +501,13 @@ public class TileGrid {
 					exit = false;
 				
 				}
-				break;
 			}
 			
+			break;
 		case "Gym":
 			if ((playerX == 10 || playerX == 11) && playerY == 14) {
-			
+				exit = true;
+				
 				nextMap = "Horizon City";
 				
 				playerSpawnX = 10;
