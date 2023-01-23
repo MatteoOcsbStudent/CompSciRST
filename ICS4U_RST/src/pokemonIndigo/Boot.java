@@ -295,7 +295,7 @@ public class Boot extends Application {
 		// Hardcoded start point for New Game
 		map = new TileGrid("Orilon Town", 1);
 		currentMapName = "Orilon Town";
-    
+
 		direction = "Up";
 
 		// Declaring gridpane
@@ -658,7 +658,7 @@ public class Boot extends Application {
 								new Image(getClass().getResource("/images/MainMenu/InteractButton.png").toString()));
 						lblInstructions2.setText("Swap the pokemon in your team\nto enable amazing strategies");
 						break;
-						
+
 					case 3:
 						imgInstructions1.setImage(
 								new Image(getClass().getResource("/images/MainMenu/SaveGame.png").toString()));
@@ -828,12 +828,12 @@ public class Boot extends Application {
 						Dialog.print("Game Saved");
 
 						break;
-						
+
 					case Z:
 						save(myStage);
 						Dialog.print("Game Saved");
 						myStage.setScene(howToPlayScene);
-						
+
 					default:
 						break;
 
@@ -1197,11 +1197,12 @@ public class Boot extends Application {
 
 		switch (starterChoiceIndex) {
 
-		//Checks the index for which pokemon is selected, and allows the user to choose that pokemon as their starter
+		// Checks the index for which pokemon is selected, and allows the user to choose
+		// that pokemon as their starter
 		case 1:
 			lblStarterText.setText("Torchic, the Fire Chicken Pokemon!");
-			
-			//Changes images to display the look of the selected pokemon
+
+			// Changes images to display the look of the selected pokemon
 			imgStarterChoice1
 					.setImage(new Image(getClass().getResource("/images/PokemonSprites/TorchicFront.png").toString()));
 			imgStarterChoice2
@@ -1537,20 +1538,18 @@ public class Boot extends Application {
 
 			// Updates hp bars if pokemon was fainted
 			if (battle.battleResponses(responseCounter).contains("fainted")) {
-					if (battle.isOpponentFainted() == true) {
-						updateProgressBar("opponent");
-						
-						//If wild encounter, endbattle
-						if (battle.isTrainerBattle == false) {
-							endBattle = true;
-						}
-					} else if (battle.isPlayerFainted() == true){
-							updateProgressBar("player");
-							updateProgressBar("opponent");
+				if (battle.isOpponentFainted() == true) {
+					updateProgressBar("opponent");
+
+					// If wild encounter, endbattle
+					if (battle.isTrainerBattle == false) {
+						endBattle = true;
 					}
 				} else if (battle.isPlayerFainted() == true) {
 					updateProgressBar("player");
+					updateProgressBar("opponent");
 				}
+
 			}
 
 			// Updates progress bar if pokemon levels up
@@ -1580,7 +1579,6 @@ public class Boot extends Application {
 		}
 
 		return lastResponse;
-
 	}
 
 	public Color typeColor(Move move) {
@@ -1714,36 +1712,37 @@ public class Boot extends Application {
 		// 10% chance of wild encounter happening
 		if (Math.random() * 100 < 10) {
 
-			//Puts levels of all team members in an array
-			int [] teamLevels = new int [player.getTeamSize()];
-			
-			for(int i = 0; i < player.getTeamSize(); i++) {
+			// Puts levels of all team members in an array
+			int[] teamLevels = new int[player.getTeamSize()];
+
+			for (int i = 0; i < player.getTeamSize(); i++) {
 				teamLevels[i] = player.getPokemon(i).getLevel();
 			}
-			
-			//Sort in descending order
+
+			// Sort in descending order
 			Sort.selectionSort(teamLevels, 2);
-			
+
 			int highestLevel = teamLevels[0];
-			
+
 			double randomLevelChange = Math.random();
-			
-			//40% chance of encounter being 5 or 4 levels down from your highest leveled pokemon
-			//20% chance of encounter being 3 level down from your highest level pokemon
-			
+
+			// 40% chance of encounter being 5 or 4 levels down from your highest leveled
+			// pokemon
+			// 20% chance of encounter being 3 level down from your highest level pokemon
+
 			if (randomLevelChange < 0.40) {
 				highestLevel -= 3;
 			} else if (randomLevelChange >= 0.40 && randomLevelChange <= 0.80) {
-				highestLevel -=2;
+				highestLevel -= 2;
 			} else {
-				highestLevel -=1;
+				highestLevel -= 1;
 			}
-			
+
 			double randomEncounter = Math.random();
 			String encounter;
-			
-			//8.3% chance for every pokemon
-			
+
+			// 8.3% chance for every pokemon
+
 			if (randomEncounter <= 0.083) {
 				encounter = "Aron";
 			} else if (randomEncounter > 0.083 && randomEncounter <= 0.166) {
@@ -1769,14 +1768,14 @@ public class Boot extends Application {
 			} else {
 				encounter = "Starly";
 			}
-			
+
 			// Sets pokemon
 
 			opponentPokemon = new Pokemon(encounter, highestLevel);
 
 			playerPokemon = player.getPokemon(0);
 
-			//Instantiates new battle, istrainer false
+			// Instantiates new battle, istrainer false
 
 			battle = new Battle(playerPokemon, opponentPokemon, false);
 
