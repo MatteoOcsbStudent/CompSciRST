@@ -1210,7 +1210,7 @@ public class Boot extends Application {
 							// TODO - black out logic, sends back to pokemon center, heals all pokemon.
 
 							//When player sends out new pokemon
-						} else if (lblBattleResponse.getText().equals("You sent out " + playerPokemon.getName())) {
+						} else if (lblBattleResponse.getText().contains("You sent out")) {
 
 							//resets responses
 							battle.clearResponses();
@@ -1417,7 +1417,7 @@ public class Boot extends Application {
 							playerPokeSprite.setImage(playerPokemon.getBackSprite());
 							
 							//Update battle response and back to battle scene
-							lblBattleResponse.setText("You have sent out " + playerPokemon.getName());
+							lblBattleResponse.setText("You sent out " + playerPokemon.getName());
 							nextBattleMenu(myStage, "battleResponses");
 							myStage.setScene(battleScene);
 							
