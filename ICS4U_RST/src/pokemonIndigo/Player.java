@@ -42,8 +42,8 @@ public class Player {
 		return name;
 	}
 	
-	public void removePokemon(int index) {
-		team.remove(index);
+	public void replaceTeamMember(Pokemon newPoke, int indexToReplace) {
+		team.set(indexToReplace, newPoke);
 	}
 }
 

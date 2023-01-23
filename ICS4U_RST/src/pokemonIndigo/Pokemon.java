@@ -175,17 +175,19 @@ public class Pokemon {
 
 	public void levelUp() {
 		// Tracking level
+		
+		if(exp > (nextLevelUp)) {
+			int tempExp = exp - (nextLevelUp);
+			exp = tempExp;
+		}
+		
 		level++;
 
 		// Next level up 
-		nextLevelUp = level * level * level - ((level-1) * (level-1) * (level-1));
+		nextLevelUp = (int)(level * level * level) - ((level-1) * (level-1) * (level-1));
 		
 		//Resets exp to whats carried over from last threshhold
 		
-		if (exp > ((level-1) * (level-1) * (level-1))) {
-			int tempXp = exp;
-			exp = (tempXp) - ((level-1) * (level-1) * (level-1));
-		}
 
 		// HP Stat
 		int temp = totalHP;
@@ -223,10 +225,6 @@ public class Pokemon {
 
 	public void gainExp(int expGain) {
 		exp += expGain;
-
-		if (exp >= nextLevelUp) {
-			levelUp();
-		}
 
 	}
 
@@ -388,4 +386,5 @@ public class Pokemon {
 	public void setCurrentHp(int hp) {
 		currentHP = hp;
 	}
+	
 }
