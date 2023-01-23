@@ -29,11 +29,9 @@ public class Player {
 	public void reorderTeam(int index1, int index2) {
 		Pokemon temp2 = team.get(index2);
 		Pokemon temp1 = team.get(index1);
-		team.remove(index2);
-		team.remove(index1);
-		team.add(index2, temp1);
-		team.add(index1, temp2);
-		
+		team.set(index2, temp1);
+		team.set(index1, temp2);
+	
 	}
 	
 	public int getTeamSize() {

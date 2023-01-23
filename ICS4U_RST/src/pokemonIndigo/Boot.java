@@ -34,7 +34,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import simpleIO.Console;
-
+import simpleIO.Dialog;
 import sortAlgorithim.Sort;
 
 public class Boot extends Application {
@@ -85,7 +85,7 @@ public class Boot extends Application {
 
 	// The map name used for transitions
 	private String currentMapName;
-	
+
 	private String pokeMenuOrigin;
 
 	// Global reference for pokemon
@@ -108,12 +108,15 @@ public class Boot extends Application {
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
-	ImageView imgPokeBall1, imgPokeBall2,imgPokeBall3,imgPokeBall4, imgPokeBall5,imgPokeBall6;
-	
+	ImageView imgPokeBall1, imgPokeBall2, imgPokeBall3, imgPokeBall4, imgPokeBall5, imgPokeBall6, imgPokeMenuSprite;
+
 	final Image normalPokeBall = new Image(getClass().getResource("/images/Pokeballs/PokeballNormal.png").toString());
 	final Image faintedPokeBall = new Image(getClass().getResource("/images/Pokeballs/PokeballFainted.png").toString());
-	final Image selectedPokeBall = new Image(getClass().getResource("/images/Pokeballs/PokeballSelected.png").toString());
-	
+	final Image selectedNormalPokeBall = new Image(
+			getClass().getResource("/images/Pokeballs/PokeballNormalSelected.png").toString());
+	final Image selectedFaintedPokeBall = new Image(
+			getClass().getResource("/images/Pokeballs/PokeballFaintedSelected.png").toString());
+
 	// Battle labels/buttons
 	Label lblFightButton;
 	Label lblPokemonButton;
@@ -126,6 +129,19 @@ public class Boot extends Application {
 	Label lblOpponentBar;
 	Label lblCToContinue;
 	Label lblXToBack;
+
+	// PokeMenu labels
+	Label lblPokeMenuName;
+	Label lblPokeMenuHp;
+	Label lblPokeMenuXp;
+	Label lblPokeMenuMove1;
+	Label lblPokeMenuMove2;
+	Label lblPokeMenuMove3;
+	Label lblPokeMenuMove4;
+	Label lblPokeMenuC;
+	Label lblPokeMenuX;
+	Label lblPokeMenuStats;
+	Label lblPokeMenuTypes;
 
 	// Default player sprite is upwards facing
 	ImageView playerSprite = playerUp;
@@ -155,52 +171,52 @@ public class Boot extends Application {
 
 		FileWriter saveFile;
 		try {
-			
-			//Saved File
+
+			// Saved File
 			saveFile = new FileWriter("data/saveFile");
 			PrintWriter savePrinter = new PrintWriter(saveFile);
 
-			//Saves the map's name
+			// Saves the map's name
 			savePrinter.println(currentMapName);
 
-			//Saves the Spawnpoint
+			// Saves the Spawnpoint
 			savePrinter.println(map.getNextSpawn());
-			
-			//Saves player's direction
+
+			// Saves player's direction
 			savePrinter.println(direction);
 
-			//Saves the X and Y of the player
+			// Saves the X and Y of the player
 			savePrinter.println(map.getPlayerY());
 			savePrinter.println(map.getPlayerX());
 
-			//Saves the Playerstack's X and Y
+			// Saves the Playerstack's X and Y
 			savePrinter.println(playerStackX);
 			savePrinter.println(playerStackY);
 
-			//Saves the size of the player's team
+			// Saves the size of the player's team
 			savePrinter.println(player.getTeamSize());
-			
-			//Saving Pokemon
+
+			// Saving Pokemon
 			for (int i = 0; i < player.getTeamSize(); i++) {
-				
-				//Pokemon's Name
+
+				// Pokemon's Name
 				savePrinter.println(player.getPokemon(i).getFirstEvo());
-				
-				//Pokemon's Level
+
+				// Pokemon's Level
 				savePrinter.println(player.getPokemon(i).getLevel());
-				
-				//Pokemon's Current HP
+
+				// Pokemon's Current HP
 				savePrinter.println(player.getPokemon(i).getCurrentHP());
-				
-				//Pokemon's Status (If afflicted)
+
+				// Pokemon's Status (If afflicted)
 				savePrinter.println(player.getPokemon(i).getStatus());
-				
-				//Size of Pokemon's move pool (1 to 4)
+
+				// Size of Pokemon's move pool (1 to 4)
 				savePrinter.println(player.getPokemon(i).getMovePoolSize());
-				
-				//Loops through all the moves, saving them
+
+				// Loops through all the moves, saving them
 				for (int j = 0; j < player.getPokemon(i).getMovePoolSize(); j++) {
-					
+
 					savePrinter.println(player.getPokemon(i).getMove(j).getName());
 				}
 			}
@@ -220,47 +236,47 @@ public class Boot extends Application {
 			FileReader loadFile = new FileReader("data/saveFile");
 			BufferedReader loadStream = new BufferedReader(loadFile);
 
-			//Reads map name
+			// Reads map name
 			currentMapName = loadStream.readLine();
 
-			//Creates a new map based on the saved one
+			// Creates a new map based on the saved one
 			map = new TileGrid(currentMapName, Integer.parseInt(loadStream.readLine()));
-			
+
 			direction = loadStream.readLine();
 
-			//Sets the player's X and Y
+			// Sets the player's X and Y
 			map.setPlayerY(Integer.parseInt(loadStream.readLine()));
 			map.setPlayerX(Integer.parseInt(loadStream.readLine()));
 
-			//Sets the playerStack's X and Y
+			// Sets the playerStack's X and Y
 			playerStackX = (Integer.parseInt(loadStream.readLine()));
 			playerStackY = (Integer.parseInt(loadStream.readLine()));
 
-			//Checks the player's team size
+			// Checks the player's team size
 			int teamSize = Integer.parseInt(loadStream.readLine());
-			
-			//Loops through every pokemon based on the team's size
+
+			// Loops through every pokemon based on the team's size
 			for (int i = 0; i < teamSize; i++) {
-				
-				//Adds a new pokemon using the name saved
+
+				// Adds a new pokemon using the name saved
 				player.addPokemon(new Pokemon(loadStream.readLine(), Integer.parseInt(loadStream.readLine())));
-				
-				//Sets the pokemon's current HP
+
+				// Sets the pokemon's current HP
 				player.getPokemon(i).setCurrentHP(Integer.parseInt(loadStream.readLine()));
-				
-				//Sets any status it is afflicted with
+
+				// Sets any status it is afflicted with
 				player.getPokemon(i).setStatus(loadStream.readLine());
-				
-				//Sets the movepool's size
+
+				// Sets the movepool's size
 				int movePoolSize = Integer.parseInt(loadStream.readLine());
-				
+
 				for (int j = 0; j < movePoolSize; j++) {
-					
-					//Adds all the moves
+
+					// Adds all the moves
 					player.getPokemon(i).changeMoveSet((loadStream.readLine()), j);
 				}
 			}
-			
+
 			displayBoard(root);
 
 			loadFile.close();
@@ -282,13 +298,12 @@ public class Boot extends Application {
 	@Override
 	public void start(Stage myStage) throws Exception {
 
-
 		player.addPokemon(new Pokemon("Torchic", 15));
-		
-    // Hardcoded start point for New Game
+
+		// Hardcoded start point for New Game
 		map = new TileGrid("Orilon Town", 1);
 		currentMapName = "Orilon Town";
-    
+
 		direction = "Up";
 
 		// Declaring gridpane
@@ -304,23 +319,23 @@ public class Boot extends Application {
 
 		StackPane loadingPane = new StackPane();
 
-		//Loading screen text
+		// Loading screen text
 		lblLoadingScreen = new Label();
 		lblLoadingScreen.setTextFill(Color.WHITE);
 		lblLoadingScreen.setFont(Font.font(LOADINGFONT));
 		loadingPane.getChildren().addAll(new Rectangle(sceneWidth, sceneHeight, Color.BLACK), lblLoadingScreen);
 
-		//Loading screen 
+		// Loading screen
 		loading = new Scene(loadingPane, sceneWidth, sceneHeight);
 
 		/**
 		 * Battle Scene
 		 */
 
-		//Battle UI gridpane and scene
+		// Battle UI gridpane and scene
 		GridPane battleRoot = new GridPane();
 		battleScene = new Scene(battleRoot, sceneWidth, sceneHeight);
-    
+
 		battleRoot.setHgap(GAP);
 		battleRoot.setVgap(GAP);
 		battleRoot.setPadding(new Insets(GAP, GAP, GAP, GAP));
@@ -337,14 +352,14 @@ public class Boot extends Application {
 		playerHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
 		battleRoot.add(playerHpBar, 4, 8, 2, 1);
 
-		//label for player pokemons name and level
+		// label for player pokemons name and level
 		lblPlayerBar = new Label();
 		lblPlayerBar.setTextFill(Color.BLACK);
 		lblPlayerBar.setFont(Font.font(SMALL_FONT));
 		battleRoot.add(lblPlayerBar, 4, 7, 1, 1);
 		lblPlayerBar.setAlignment(Pos.BOTTOM_CENTER);
 
-		//label for player pokemons hp
+		// label for player pokemons hp
 		lblPlayerHp = new Label();
 		lblPlayerHp.setTextFill(Color.BLACK);
 		lblPlayerHp.setFont(Font.font(SMALL_FONT));
@@ -363,14 +378,14 @@ public class Boot extends Application {
 		opponentHpBar.setPrefHeight(POKESPRITEDIMENSION / 8);
 		battleRoot.add(opponentHpBar, 2, 3, 2, 1);
 
-		//Label for opponent pokemons name and level
+		// Label for opponent pokemons name and level
 		lblOpponentBar = new Label();
 		lblOpponentBar.setTextFill(Color.BLACK);
 		lblOpponentBar.setFont(Font.font(SMALL_FONT));
 		battleRoot.add(lblOpponentBar, 2, 2, 1, 1);
 		lblOpponentBar.setAlignment(Pos.BOTTOM_CENTER);
 
-		//Label for opponent pokemons hp
+		// Label for opponent pokemons hp
 		lblOpponentHp = new Label();
 		lblOpponentHp.setTextFill(Color.BLACK);
 		lblOpponentHp.setFont(Font.font(SMALL_FONT));
@@ -483,35 +498,122 @@ public class Boot extends Application {
 		mainMenu.add(btnExit, 54, 45);
 
 		/**
-		 * Pokemon Menu 
+		 * Pokemon Menu
 		 */
-		
+
+		//Gridpane for main pokemon menu
 		GridPane pokeMenu = new GridPane();
 		pokeMenuScene = new Scene(pokeMenu, sceneWidth, sceneHeight);
-		
+
+		//Plain white background
+		pokeMenu.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+
 		pokeMenu.setHgap(GAP);
 		pokeMenu.setVgap(GAP);
 		pokeMenu.setPadding(new Insets(GAP, GAP, GAP, GAP));
-		
+
+		//Pokeball images
 		imgPokeBall1 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall1 ,0, 0, 1, 1);
-		
+		pokeMenu.add(imgPokeBall1, 0, 0, 1, 1);
+
 		imgPokeBall2 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall2 ,0, 1, 1, 1);
-		
+		pokeMenu.add(imgPokeBall2, 0, 1, 1, 1);
+
 		imgPokeBall3 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall3 ,0, 2, 1, 1);
-		
+		pokeMenu.add(imgPokeBall3, 0, 2, 1, 1);
+
 		imgPokeBall4 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall4 ,0, 3, 1, 1);
-		
+		pokeMenu.add(imgPokeBall4, 0, 3, 1, 1);
+
 		imgPokeBall5 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall5 ,0, 4, 1, 1);
-		
+		pokeMenu.add(imgPokeBall5, 0, 4, 1, 1);
+
 		imgPokeBall6 = new ImageView(normalPokeBall);
-		pokeMenu.add(imgPokeBall6 ,0, 5, 1, 1);
-		
-		
+		pokeMenu.add(imgPokeBall6, 0, 5, 1, 1);
+
+		//Sprite image
+		imgPokeMenuSprite = new ImageView();
+		imgPokeMenuSprite.setFitHeight(POKESPRITEDIMENSION / 1.5);
+		imgPokeMenuSprite.setFitWidth(POKESPRITEDIMENSION / 1.5);
+		pokeMenu.add(imgPokeMenuSprite, 4, 0, 2, 4);
+
+		//Labels
+		lblPokeMenuName = new Label();
+		lblPokeMenuName.setTextFill(Color.BLACK);
+		lblPokeMenuName.setFont(Font.font(MEDIUM_FONT));
+		lblPokeMenuName.setAlignment(Pos.CENTER);
+		pokeMenu.add(lblPokeMenuName, 1, 0, 12, 1);
+
+		lblPokeMenuTypes = new Label();
+		lblPokeMenuTypes.setTextFill(Color.BLACK);
+		lblPokeMenuTypes.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuTypes.setAlignment(Pos.CENTER);
+		lblPokeMenuTypes.setMinWidth(150);
+		pokeMenu.add(lblPokeMenuTypes, 10, 1, 2, 2);
+
+		lblPokeMenuStats = new Label();
+		lblPokeMenuStats.setTextFill(Color.BLACK);
+		lblPokeMenuStats.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuStats.setAlignment(Pos.CENTER);
+		lblPokeMenuStats.setMinWidth(150);
+		pokeMenu.add(lblPokeMenuStats, 7, 1, 2, 2);
+
+		lblPokeMenuHp = new Label();
+		lblPokeMenuHp.setTextFill(Color.BLACK);
+		lblPokeMenuHp.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuHp.setAlignment(Pos.CENTER);
+		pokeMenu.add(lblPokeMenuHp, 1, 1, 2, 1);
+
+		lblPokeMenuXp = new Label();
+		lblPokeMenuXp.setTextFill(Color.BLACK);
+		lblPokeMenuXp.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuXp.setAlignment(Pos.CENTER);
+		pokeMenu.add(lblPokeMenuXp, 1, 2, 2, 1);
+
+		lblPokeMenuMove1 = new Label();
+		lblPokeMenuMove1.setTextFill(Color.BLACK);
+		lblPokeMenuMove1.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuMove1.setAlignment(Pos.TOP_CENTER);
+		lblPokeMenuMove1.setMinWidth(150);
+		lblPokeMenuMove1.setMinHeight(192);
+		pokeMenu.add(lblPokeMenuMove1, 1, 5, 2, 10);
+
+		lblPokeMenuMove2 = new Label();
+		lblPokeMenuMove2.setTextFill(Color.BLACK);
+		lblPokeMenuMove2.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuMove2.setAlignment(Pos.TOP_CENTER);
+		lblPokeMenuMove2.setMinWidth(150);
+		lblPokeMenuMove2.setMinHeight(192);
+		pokeMenu.add(lblPokeMenuMove2, 4, 5, 2, 10);
+
+		lblPokeMenuMove3 = new Label();
+		lblPokeMenuMove3.setTextFill(Color.BLACK);
+		lblPokeMenuMove3.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuMove3.setAlignment(Pos.TOP_CENTER);
+		lblPokeMenuMove3.setMinWidth(150);
+		lblPokeMenuMove3.setMinHeight(192);
+		pokeMenu.add(lblPokeMenuMove3, 7, 5, 2, 10);
+
+		lblPokeMenuMove4 = new Label();
+		lblPokeMenuMove4.setTextFill(Color.BLACK);
+		lblPokeMenuMove4.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuMove4.setAlignment(Pos.TOP_CENTER);
+		lblPokeMenuMove4.setMinWidth(150);
+		lblPokeMenuMove4.setMinHeight(192);
+		pokeMenu.add(lblPokeMenuMove4, 10, 5, 2, 10);
+
+		lblPokeMenuC = new Label();
+		lblPokeMenuC.setTextFill(Color.BLACK);
+		lblPokeMenuC.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuC.setAlignment(Pos.CENTER);
+		pokeMenu.add(lblPokeMenuC, 12, 15, 1, 1);
+
+		lblPokeMenuX = new Label("'X' to go back");
+		lblPokeMenuX.setTextFill(Color.BLACK);
+		lblPokeMenuX.setFont(Font.font(SMALL_FONT));
+		lblPokeMenuX.setAlignment(Pos.CENTER);
+		pokeMenu.add(lblPokeMenuX, 0, 15, 1, 1);
+
 		// Moving player WASD
 		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
@@ -611,9 +713,16 @@ public class Boot extends Application {
 					case V:
 
 						save();
-						Console.print("Game Saved");
+						Dialog.print("Game Saved");
 
 						break;
+
+					case P:
+
+						pokeMenuOrigin = "swapTeam";
+						updatePokeMenu(myStage);
+						myStage.setScene(pokeMenuScene);
+
 					default:
 						break;
 
@@ -644,9 +753,9 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 
-							//Only scrolls through as many buttons as there are moves
+							// Only scrolls through as many buttons as there are moves
 						} else if (battleMenu.equals("Moves") || battleMenu.equals("MovesToReplace")) {
-              
+
 							if (battleButtonIndex == 1 || battleButtonIndex == 0) {
 								battleButtonIndex = playerPokemon.getMovePoolSize();
 								buttonUpdate();
@@ -655,7 +764,7 @@ public class Boot extends Application {
 								buttonUpdate();
 							}
 
-							//Only scrolls through two options, yes and no
+							// Only scrolls through two options, yes and no
 						} else if (battleMenu.equals("MoveLearning")) {
 							if (battleButtonIndex == 1 || battleButtonIndex == 2) {
 								battleButtonIndex = 3;
@@ -717,6 +826,7 @@ public class Boot extends Application {
 							break;
 						case 2:
 							nextBattleMenu(myStage, "PokemonMenu");
+							pokeMenuOrigin = "switch";
 							break;
 						case 3:
 							nextBattleMenu(myStage, "Catch");
@@ -734,29 +844,32 @@ public class Boot extends Application {
 					// Cycles through battle responses
 					case "battleResponses":
 
-						//Start of battle
+						// Start of battle
 						if (lblBattleResponse.getText().contains("appeared!")) {
 							nextBattleMenu(myStage, "General");
 							movementLock = false;
 
-						//Do nothing if got away safely
+							// go to main scene if ran away
 						} else if (lblBattleResponse.getText().equals("You got away safely!")) {
-
-						//Do nothing if caught pokemon
+							myStage.setScene(scene);
+							// go to main scene if pokemon caught, add caught pokemon to player team
 						} else if (lblBattleResponse.getText().contains("caught!")) {
+							player.addPokemon(opponentPokemon);
+							myStage.setScene(scene);
 
-						//Shows yes and no options if prompted to learn a new move
+							// Shows yes and no options if prompted to learn a new move
 						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
 
 							nextBattleMenu(myStage, "MoveLearning");
-						
-						//shows moves to replace
+
+							// shows moves to replace
 						} else if (lblBattleResponse.getText().equals("Please select a move to replace")) {
 
 							nextBattleMenu(myStage, "MovesToReplace");
-						
-						//Searches for available pokemon to send out
-						} else if (lblBattleResponse.getText().equals(playerPokemon.getName() + " has fainted")){
+
+							// Searches for available pokemon to send out
+						} else if (lblBattleResponse.getText().contains("has fainted")
+								&& battle.isPlayerFainted() == true) {
 							
 							int nonFaintedPokemon = player.getTeamSize();
 							for (int i = 0; i < player.getTeamSize(); i++) {
@@ -764,34 +877,57 @@ public class Boot extends Application {
 									nonFaintedPokemon--;
 								}
 							}
-							
-							//If available, prompts user to select a new pokemon
+
+							// If available, prompts user to select a new pokemon
 							if (nonFaintedPokemon > 0) {
 								lblBattleResponse.setText("Please choose another pokemon to send out");
-							
-							//Otherwise, informs user they have no other pokemon
+
+								// Otherwise, informs user they have no other pokemon
 							} else {
 								lblBattleResponse.setText("You have no other Pokemon able to fight...");
 							}
-						
-						//If no other pokemon, tell user they blacked out, end battle
+
+							//Directs user to pokemon menu
+						} else if (lblBattleResponse.getText().equals("Please choose another pokemon to send out")) {
+
+							pokeMenuOrigin = "fainted";
+							updatePokeMenu(myStage);
+							myStage.setScene(pokeMenuScene);
+
+							// If no other pokemon, tell user they blacked out, end battle
 						} else if (lblBattleResponse.getText().equals("You have no other Pokemon able to fight...")) {
 							lblBattleResponse.setText("... you blacked out!");
 							endBattle = true;
-							
-						//If blacked out, sends back to pokemon center and heals all pokemon
+
+							// If blacked out, sends back to pokemon center and heals all pokemon
 						} else if (lblBattleResponse.getText().equals("... you blacked out")) {
-							//TODO - black out logic, sends back to pokemon center, heals all pokemon.
-						
-						//If no more responses
+							// TODO - black out logic, sends back to pokemon center, heals all pokemon.
+
+							//When player sends out new pokemon
+						} else if (lblBattleResponse.getText().equals("You sent out " + playerPokemon.getName())) {
+
+							//resets responses
+							battle.clearResponses();
+							
+							//If from switch, opponent takes turn
+							if (pokeMenuOrigin.equals("switch")) {
+								battle.turnPlan(playerPokemon.getMove(0));
+								battle.turnExecution("opponent only");
+								nextBattleResponse();
+								
+								//Otherwise, next battle reponse, goes to general
+							} else if (pokeMenuOrigin.equals("fainted")) {
+								nextBattleResponse();
+							}
+							// If no more responses
 						} else if (nextBattleResponse() == true) {
 
-							//If battle is to be ended, sets scene to main scene. resets endbattle
+							// If battle is to be ended, sets scene to main scene. resets endbattle
 							if (endBattle == true) {
 								myStage.setScene(scene);
 								endBattle = false;
-							
-							//Otherwise, goes back to main battle menu
+
+								// Otherwise, goes back to main battle menu
 							} else {
 								nextBattleMenu(myStage, "General");
 							}
@@ -799,15 +935,15 @@ public class Boot extends Application {
 
 						break;
 
-					//Move learning menu
+					// Move learning menu
 					case "MoveLearning":
 
-						//Yes button, prompts for move to replace
+						// Yes button, prompts for move to replace
 						if (battleButtonIndex == 2) {
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse.setText("Please select a move to replace");
-						
-						//No button, informs user pokemon did not learn the move
+
+							// No button, informs user pokemon did not learn the move
 						} else if (battleButtonIndex == 3) {
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse.setText(
@@ -818,8 +954,9 @@ public class Boot extends Application {
 
 					case "MovesToReplace":
 
-						//Moves to be replaced with a new move
-						//Informs user of their selection, changes pokemons moveset respective to selection
+						// Moves to be replaced with a new move
+						// Informs user of their selection, changes pokemons moveset respective to
+						// selection
 						switch (battleButtonIndex) {
 						case 1:
 							nextBattleMenu(myStage, "battleResponses");
@@ -885,43 +1022,106 @@ public class Boot extends Application {
 			}
 		});
 		
-		
+		//Controls for pokemon menu
+
 		pokeMenuScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-			
+
 				switch (event.getCode()) {
-				
-					case W:
+
+				case W:
+
+					//Scrolls pokeballs and pokemon profiles up
+					if (pokeMenuIndex == 0 || pokeMenuIndex == 1) {
+						pokeMenuIndex = player.getTeamSize();
+					} else {
+						pokeMenuIndex--;
+					}
+
+					updatePokeMenu(myStage);
+					break;
+
+				case S:
+
+					//Scrolls pokeballs and pokemon profils down
+					if (pokeMenuIndex == player.getTeamSize()) {
+						pokeMenuIndex = 1;
+					} else {
+						pokeMenuIndex++;
+					}
+
+					updatePokeMenu(myStage);
+					break;
+
+				default:
+					break;
+
+				case X:
+					
+					//Goes back to main scene if from main scene
+					if (pokeMenuOrigin.equals("swapTeam")) {
+						myStage.setScene(scene);
 						
-						if(pokeMenuIndex == 0 || pokeMenuIndex == 1) {
-							pokeMenuIndex = player.getTeamSize();
-						} else {
-							pokeMenuIndex--;
-						}
+					//Goes back to battle if from battle
+					} else if (pokeMenuOrigin.equals("switch")) {
+						myStage.setScene(battleScene);
+						nextBattleMenu(myStage, "General");
+					}
+					break;
+
+				case C:
+
+					//If swapping team around and pokemon hasn't been selected
+					if (pokeMenuOrigin.equals("swapTeam") && pokeSwapIndex == 0) {
 						
+						//Select pokemon
+						pokeSwapIndex = pokeMenuIndex;
 						updatePokeMenu(myStage);
-						break;
 						
-					case S:
+					//If swapping team and pokemon been selected
+					} else if (pokeMenuOrigin.equals("swapTeam") && pokeSwapIndex != 0) {
 						
-						if(pokeMenuIndex == player.getTeamSize()) {
-							pokeMenuIndex =1;
-						} else {
-							pokeMenuIndex++;
-						}
-						
+						//Swaps selected pokemon, resets selected pokemon for swap value
+						player.reorderTeam(pokeMenuIndex - 1, pokeSwapIndex - 1);
+						pokeSwapIndex = 0;
 						updatePokeMenu(myStage);
-						break;
 						
-					default:
-						break;
-				
+						//If to switch into battle
+					} else if (pokeMenuOrigin.equals("switch") || pokeMenuOrigin.equals("fainted")) {
+						
+						//Can't switch into pokemon already in battle
+						if (playerPokemon.equals(player.getPokemon(pokeMenuIndex - 1))) {
+							Dialog.print("that pokemon is already in battle!");
+							
+						//Can't switch fainted pokemon into battle
+						} else if(player.getPokemon(pokeMenuIndex-1).getCurrentHP() == 0) {
+							Dialog.print("That pokemon can't battle right now!");
+						} else {
+							
+							//Sets playerPokemon
+							playerPokemon = player.getPokemon(pokeMenuIndex - 1);
+							
+							//Swtiches pokemon in battle
+							battle.switchPokemon(playerPokemon);
+							
+							//Update UI
+							updateProgressBar("player");
+							playerPokeSprite.setImage(playerPokemon.getBackSprite());
+							
+							//Update battle response and back to battle scene
+							lblBattleResponse.setText("You have sent out " + playerPokemon.getName());
+							nextBattleMenu(myStage, "battleResponses");
+							myStage.setScene(battleScene);
+							
+							
+						}
+
+					}
+
 				}
 			}
 		});
-		
-			
 
 		myStage.setTitle("Pokemon Indigo");
 		myStage.setScene(mainMenuScene);
@@ -1072,7 +1272,7 @@ public class Boot extends Application {
 			lblFightButton.setText(playerPokemon.getMove(0).getName());
 			lblFightButton.setTextFill(typeColor(playerPokemon.getMove(0)));
 
-			//Displays all moves available to be displayed
+			// Displays all moves available to be displayed
 			if (playerPokemon.getMovePoolSize() > 1) {
 				lblPokemonButton.setText(playerPokemon.getMove(1).getName());
 				lblPokemonButton.setTextFill(typeColor(playerPokemon.getMove(1)));
@@ -1097,68 +1297,12 @@ public class Boot extends Application {
 			break;
 
 		case "PokemonMenu":
-			
-			switch(player.getTeamSize()) {
-			
-			case 1: 
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(false);
-				imgPokeBall3.setVisible(false);
-				imgPokeBall4.setVisible(false);
-				imgPokeBall5.setVisible(false);
-				imgPokeBall6.setVisible(false);
-				break;
-				
-			case 2:
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(true);
-				imgPokeBall3.setVisible(false);
-				imgPokeBall4.setVisible(false);
-				imgPokeBall5.setVisible(false);
-				imgPokeBall6.setVisible(false);
-				break;
-				
-			case 3:
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(true);
-				imgPokeBall3.setVisible(true);
-				imgPokeBall4.setVisible(false);
-				imgPokeBall5.setVisible(false);
-				imgPokeBall6.setVisible(false);
-				break;
-				
-			case 4:
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(true);
-				imgPokeBall3.setVisible(true);
-				imgPokeBall4.setVisible(true);
-				imgPokeBall5.setVisible(false);
-				imgPokeBall6.setVisible(false);
-				break;
-			
-			case 5:
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(true);
-				imgPokeBall3.setVisible(true);
-				imgPokeBall4.setVisible(true);
-				imgPokeBall5.setVisible(true);
-				imgPokeBall6.setVisible(false);
-				break;
-				
-			case 6:
-				imgPokeBall1.setVisible(true);
-				imgPokeBall2.setVisible(true);
-				imgPokeBall3.setVisible(true);
-				imgPokeBall4.setVisible(true);
-				imgPokeBall5.setVisible(true);
-				imgPokeBall6.setVisible(true);
-				
-			}
-			
-			pokeMenuIndex = 0;
-			myStage.setScene(pokeMenuScene);
-			pokeMenuOrigin = "battle";
 
+			//Goes to pokemon menu, keeps track that it was from switch option in battle
+			pokeMenuOrigin = "switch";
+			updatePokeMenu(myStage);
+			myStage.setScene(pokeMenuScene);
+			
 			break;
 
 		case "Catch":
@@ -1167,26 +1311,19 @@ public class Boot extends Application {
 			battleMenu = "battleResponses";
 			nextBattleMenu(myStage, "battleResponses");
 
-			// displays response
+			// displays response, calls catch
 			lblBattleResponse.setText(battle.catchPokemon());
 
-			//Delay if needed when caught pokemon
-			Timeline delayCatch = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
-				myStage.setScene(scene);
-			}));
-
-			// If caught, adds to player array, back to main scene
-			if (lblBattleResponse.getText().contains("has been caught!")) {
-				player.addPokemon(opponentPokemon);
-				delayCatch.play();
-
-				// if trainer battle, opponent does not take turn on catch attempt
-				// informs user you cannot catch another trainers pokemon
-			} else if (lblBattleResponse.getText()
-					.equals("You can't catch another trainer's Pokemon! are you crazy?")) {
+			if (lblBattleResponse.getText().contains("caught!")) {
+				// do nothing if pokemon is caught
+			}
+			// if trainer battle, opponent does not take turn on catch attempt
+			// informs user you cannot catch another trainers pokemon
+			else if (lblBattleResponse.getText().equals("You can't catch another trainer's Pokemon! are you crazy?")) {
 
 				// otherwise, wild pokemon takes turn
 			} else {
+				battle.turnPlan(playerPokemon.getMove(0));
 				battle.turnExecution("Opponent only");
 			}
 
@@ -1203,18 +1340,13 @@ public class Boot extends Application {
 				lblBattleResponse.setText("You got away safely!");
 				battle.clearResponses();
 				responseCounter = 0;
-				movementLock = true;
 
-				Timeline delayRun = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
-					myStage.setScene(scene);
-					movementLock = false;
-				}));
-
-				delayRun.play();
-
+			} else if (battle.isTrainerBattle == true) {
+				lblBattleResponse.setText("");
 				// Otherwise, battle continues, opponent takes turn
 			} else {
 				lblBattleResponse.setText("You couldn't get away!");
+				battle.turnPlan(playerPokemon.getMove(0));
 				battle.turnExecution("Opponent only");
 			}
 
@@ -1222,10 +1354,10 @@ public class Boot extends Application {
 
 		case "MoveLearning":
 
-			//sets battlemenu
+			// sets battlemenu
 			battleMenu = "MoveLearning";
 
-			//Sets button text and visibility
+			// Sets button text and visibility
 			lblCatchButton.setText("No");
 			lblPokemonButton.setText("Yes");
 			lblCatchButton.setTextFill(Color.BLACK);
@@ -1287,190 +1419,1332 @@ public class Boot extends Application {
 	}
 
 	public void updatePokeMenu(Stage myStage) {
-		
-	/*	for (int i = 0; i < player.getTeamSize(); i++) {
-			if (player.getPokemon(i).getStatus() != "Null") {
-				
-				switch (i) {
-					
-				case 1:
-					
-					imgPokeBall1.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 1) {
-						imgPokeBall1.setImage(selectedStatusPokeBall);
-					}
-					break;
-					
-				case 2:
-				
-					imgPokeBall2.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 2) {
-						imgPokeBall1.setImage(selectedstatusPokeBall);
-					}
-					break;
-				
-				case 3:
-					
-					imgPokeBall3.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 3) {
-						imgPokeBall1.setImage(selectedStatusPokeBall);
-					}
-					break;
-					
-				case 4:
-					
-					imgPokeBall4.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 4) {
-						imgPokeBall1.setImage(selectedStatusPokeBall);
-					}
-					break;
-					
-				case 5:
-					
-					imgPokeBall5.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 5) {
-						imgPokeBall1.setImage(selectedStatusPokeBall);
-					}
-					break;
-				
-				case 6:
-					
-					imgPokeBall6.setImage(statusPokeBall);
-					
-					if (pokeSwapIndex == 5) {
-						imgPokeBall1.setImage(selectedStatusPokeBall);
-					}
-					
-					break;
-					
-				default:
-					break;
-				
-				
-				}
-			}
+
+		//Variables
+		String lblPokeMenuMove1Text = "";
+		String lblPokeMenuMove2Text = "";
+		String lblPokeMenuMove3Text = "";
+		String lblPokeMenuMove4Text = "";
+
+		//C and X control instruction based on situation
+		if (pokeMenuOrigin.equals("swapTeam") && pokeSwapIndex != 0) {
+			lblPokeMenuC.setText("'C' to swap");
+			lblPokeMenuX.setVisible(true);
+		} else if (pokeMenuOrigin.equals("swapTeam") && pokeSwapIndex == pokeMenuIndex) {
+			lblPokeMenuC.setText("'C' to deselect");
+			lblPokeMenuX.setVisible(true);
+		} else if (pokeMenuOrigin.equals("swapTeam")) {
+			lblPokeMenuC.setText("'C' to select");
+			lblPokeMenuX.setVisible(true);
+		} else if (pokeMenuOrigin.equals("switch")) {
+			lblPokeMenuC.setText("'C' to switch into battle");
+			lblPokeMenuX.setVisible(true);
+		} else if (pokeMenuOrigin.equals("fainted")) {
+			lblPokeMenuX.setVisible(false);
 		}
-		
-		for (int i = 0; i < player.getTeamSize(); i++) {
-			if (player.getPokemon(i).getCurrentHP() == 0) {
-				
-				switch (i) {
-					
-				case 1:
-					
-					imgPokeBall1.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 1) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					break;
-					
-				case 2:
-				
-					imgPokeBall2.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 2) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					break;
-				
-				case 3:
-					
-					imgPokeBall3.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 3) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					break;
-					
-				case 4:
-					
-					imgPokeBall4.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 4) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					break;
-					
-				case 5:
-					
-					imgPokeBall5.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 5) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					break;
-				
-				case 6:
-					
-					imgPokeBall6.setImage(faintedPokeBall);
-					
-					if (pokeSwapIndex == 5) {
-						imgPokeBall1.setImage(selectedFaintedPokeBall);
-					}
-					
-					break;
-					
-				default:
-					break;
-				
-				
+		switch (player.getTeamSize()) {
+
+		//Only enough pokeballs for teamsize are visible
+		case 1:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(false);
+			imgPokeBall3.setVisible(false);
+			imgPokeBall4.setVisible(false);
+			imgPokeBall5.setVisible(false);
+			imgPokeBall6.setVisible(false);
+			break;
+
+		case 2:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(true);
+			imgPokeBall3.setVisible(false);
+			imgPokeBall4.setVisible(false);
+			imgPokeBall5.setVisible(false);
+			imgPokeBall6.setVisible(false);
+			break;
+
+		case 3:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(true);
+			imgPokeBall3.setVisible(true);
+			imgPokeBall4.setVisible(false);
+			imgPokeBall5.setVisible(false);
+			imgPokeBall6.setVisible(false);
+			break;
+
+		case 4:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(true);
+			imgPokeBall3.setVisible(true);
+			imgPokeBall4.setVisible(true);
+			imgPokeBall5.setVisible(false);
+			imgPokeBall6.setVisible(false);
+			break;
+
+		case 5:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(true);
+			imgPokeBall3.setVisible(true);
+			imgPokeBall4.setVisible(true);
+			imgPokeBall5.setVisible(true);
+			imgPokeBall6.setVisible(false);
+			break;
+
+		case 6:
+			imgPokeBall1.setVisible(true);
+			imgPokeBall2.setVisible(true);
+			imgPokeBall3.setVisible(true);
+			imgPokeBall4.setVisible(true);
+			imgPokeBall5.setVisible(true);
+			imgPokeBall6.setVisible(true);
+
+		}
+
+		//Pokemon to display
+		Pokemon selectedPokemon;
+
+		if (pokeMenuIndex == 0) {
+			//Null pointer fix
+			selectedPokemon = player.getPokemon(pokeMenuIndex);
+		} else {
+			selectedPokemon = player.getPokemon(pokeMenuIndex - 1);
+		}
+
+		//Pokemons types
+		String selectedPokemonTypes[] = selectedPokemon.getTypes().split("-");
+
+		switch (pokeMenuIndex) {
+
+		//Displays pokemon who's pokeball is highlighted/selected
+		case 1:
+
+			//Sets image display to pokemons sprite
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource("/images/PokemonSprites/" + selectedPokemon.getName() + "Front.png").toString()));
+
+			//Starts lable with name and level
+			String lblPokeMenuNameText = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			//Adds status if possible
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText += "\t\t\t" + selectedPokemon.getStatus() + "d";
+				} else {
+					lblPokeMenuNameText += "\t\t\t" + selectedPokemon.getStatus() + "ed";
 				}
 			}
-		} */
-		
-		
-		switch (pokeMenuIndex) {
-		
-		case 0:
-			
-			break;
-			
-		case 1:
-			
-			if(player.getPokemon(0).getCurrentHP() == 0) {
+
+			//Sets text
+			lblPokeMenuName.setText(lblPokeMenuNameText);
+
+			//Sets hp and xp fraction label
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			//Move 1 text starts with type, damage, and accuracy
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			//If status applied by move
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				//If status is heal, message differs
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+					//Otherwise, displays default status application informtation
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			//Adds priority if move has priority
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			//Sets text
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			//If theres another move to be displayed, same process as move 1
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				//If no move 2, set to invisilbe
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			//Same process repeated for all moves
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+
+			//Sets stats label with attack, defense and speed
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			//Displays both types if pokemon has 2 types
+			//Displays one type if pokemon has 1 type
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			//Sets to highlighted pokeball image
+			if (player.getPokemon(0).getCurrentHP() == 0) {
+				//Fainted ball if pokemon hp is 0
 				imgPokeBall1.setImage(selectedFaintedPokeBall);
 			} else {
+				//Otherwise, normal ball
 				imgPokeBall1.setImage(selectedNormalPokeBall);
 			}
-			
-			if(pokeSwapIndex)
-			
-			
+
+			//Sets all other pokeballs to not highlighted, stays fainted ball if pokemon is fainted
+			if (pokeSwapIndex != 2 && player.getTeamSize() > 1) {
+				if (player.getPokemon(1).getCurrentHP() == 0) {
+					imgPokeBall2.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall2.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 3 && player.getTeamSize() > 2) {
+				if (player.getPokemon(2).getCurrentHP() == 0) {
+					imgPokeBall3.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall3.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 4 && player.getTeamSize() > 3) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall4.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall4.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 5 && player.getTeamSize() > 4) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall5.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall5.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 6 && player.getTeamSize() > 5) {
+				if (player.getPokemon(5).getCurrentHP() == 0) {
+					imgPokeBall6.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall6.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-			
+
+		//Same process for cases 2 through 6
 		case 2:
-		
+
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource(
+							"/images/PokemonSprites/" + player.getPokemon(pokeMenuIndex - 1).getName() + "Front.png")
+					.toString()));
+
+			String lblPokeMenuNameText2 = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText2 += "\t\t\t" + selectedPokemon.getStatus() + "d";
+				} else {
+					lblPokeMenuNameText2 += "\t\t\t" + selectedPokemon.getStatus() + "ed";
+				}
+			}
+
+			lblPokeMenuName.setText(lblPokeMenuNameText2);
+
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			if (player.getPokemon(1).getCurrentHP() == 0) {
+				imgPokeBall2.setImage(selectedFaintedPokeBall);
+			} else {
+				imgPokeBall2.setImage(selectedNormalPokeBall);
+			}
+
+			if (pokeSwapIndex != 1 && player.getTeamSize() > 0) {
+				if (player.getPokemon(0).getCurrentHP() == 0) {
+					imgPokeBall1.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall1.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 3 && player.getTeamSize() > 2) {
+				if (player.getPokemon(2).getCurrentHP() == 0) {
+					imgPokeBall3.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall3.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 4 && player.getTeamSize() > 3) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall4.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall4.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 5 && player.getTeamSize() > 4) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall5.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall5.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 6 && player.getTeamSize() > 5) {
+				if (player.getPokemon(5).getCurrentHP() == 0) {
+					imgPokeBall6.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall6.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-		
+
 		case 3:
-			
+
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource(
+							"/images/PokemonSprites/" + player.getPokemon(pokeMenuIndex - 1).getName() + "Front.png")
+					.toString()));
+
+			String lblPokeMenuNameText3 = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText3 += "\t\t\t" + selectedPokemon.getStatus() + "d";
+				} else {
+					lblPokeMenuNameText3 += "\t\t\t" + selectedPokemon.getStatus() + "ed";
+				}
+			}
+
+			lblPokeMenuName.setText(lblPokeMenuNameText3);
+
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			if (player.getPokemon(2).getCurrentHP() == 0) {
+				imgPokeBall3.setImage(selectedFaintedPokeBall);
+			} else {
+				imgPokeBall3.setImage(selectedNormalPokeBall);
+			}
+
+			if (pokeSwapIndex != 1 && player.getTeamSize() > 0) {
+				if (player.getPokemon(0).getCurrentHP() == 0) {
+					imgPokeBall1.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall1.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 2 && player.getTeamSize() > 1) {
+				if (player.getPokemon(1).getCurrentHP() == 0) {
+					imgPokeBall2.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall2.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 4 && player.getTeamSize() > 3) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall4.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall4.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 5 && player.getTeamSize() > 4) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall5.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall5.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 6 && player.getTeamSize() > 5) {
+				if (player.getPokemon(5).getCurrentHP() == 0) {
+					imgPokeBall6.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall6.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-			
+
 		case 4:
+
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource(
+							"/images/PokemonSprites/" + player.getPokemon(pokeMenuIndex - 1).getName() + "Front.png")
+					.toString()));
 			
+			String lblPokeMenuNameText4 = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText4 += "\t\t\t" + selectedPokemon.getStatus() + "d";
+				} else {
+					lblPokeMenuNameText4 += "\t\t\t" + selectedPokemon.getStatus() + "ed";
+				}
+			}
+
+			lblPokeMenuName.setText(lblPokeMenuNameText4);
+
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			if (player.getPokemon(3).getCurrentHP() == 0) {
+				imgPokeBall4.setImage(selectedFaintedPokeBall);
+			} else {
+				imgPokeBall4.setImage(selectedNormalPokeBall);
+			}
+
+			if (pokeSwapIndex != 1 && player.getTeamSize() > 0) {
+				if (player.getPokemon(0).getCurrentHP() == 0) {
+					imgPokeBall1.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall1.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 2 && player.getTeamSize() > 1) {
+				if (player.getPokemon(1).getCurrentHP() == 0) {
+					imgPokeBall2.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall2.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 3 && player.getTeamSize() > 2) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall3.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall3.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 5 && player.getTeamSize() > 4) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall5.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall5.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 6 && player.getTeamSize() > 5) {
+				if (player.getPokemon(5).getCurrentHP() == 0) {
+					imgPokeBall6.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall6.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-			
+
 		case 5:
-		
+
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource(
+							"/images/PokemonSprites/" + player.getPokemon(pokeMenuIndex - 1).getName() + "Front.png")
+					.toString()));
+			
+			String lblPokeMenuNameText5 = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText5 += "\t\t\t" + selectedPokemon.getStatus() + "d";
+			
+				} else {
+					lblPokeMenuNameText5 += "\t\t\t" + selectedPokemon.getStatus() + "ed";
+				}
+			}
+
+			lblPokeMenuName.setText(lblPokeMenuNameText5);
+
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			if (player.getPokemon(4).getCurrentHP() == 0) {
+				imgPokeBall5.setImage(selectedFaintedPokeBall);
+			} else {
+				imgPokeBall5.setImage(selectedNormalPokeBall);
+			}
+
+			if (pokeSwapIndex != 1 && player.getTeamSize() > 0) {
+				if (player.getPokemon(0).getCurrentHP() == 0) {
+					imgPokeBall1.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall1.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 2 && player.getTeamSize() > 1) {
+				if (player.getPokemon(1).getCurrentHP() == 0) {
+					imgPokeBall2.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall2.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 3 && player.getTeamSize() > 2) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall3.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall3.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 4 && player.getTeamSize() > 3) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall4.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall4.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 6 && player.getTeamSize() > 5) {
+				if (player.getPokemon(5).getCurrentHP() == 0) {
+					imgPokeBall6.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall6.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-		
+
 		case 6:
+
+			imgPokeMenuSprite.setImage(new Image(getClass()
+					.getResource(
+							"/images/PokemonSprites/" + player.getPokemon(pokeMenuIndex - 1).getName() + "Front.png")
+					.toString()));
 			
+			String lblPokeMenuNameText6 = (selectedPokemon.getName() + " L." + selectedPokemon.getLevel());
+
+			if (selectedPokemon.getStatus().equals("Null") == false) {
+				if (selectedPokemon.getStatus().substring(selectedPokemon.getStatus().length() - 1).equals("e")) {
+					lblPokeMenuNameText6 += "\t\t\t" + selectedPokemon.getStatus() + "d";
+				} else {
+					lblPokeMenuNameText6 += "\t\t\t" + selectedPokemon.getStatus() + "ed";
+				}
+			}
+
+			lblPokeMenuName.setText(lblPokeMenuNameText6);
+
+			lblPokeMenuHp.setText(selectedPokemon.getCurrentHP() + "/" + selectedPokemon.getTotalHP() + "HP");
+			lblPokeMenuXp.setText(selectedPokemon.getExp() + "/" + selectedPokemon.getNextLevelUp() + "EXP");
+
+			lblPokeMenuMove1Text = (selectedPokemon.getMove(0).getName() + "\nType: "
+					+ selectedPokemon.getMove(0).getType() + "\nDamage: " + selectedPokemon.getMove(0).getDamage()
+					+ "\nAccuracy: " + selectedPokemon.getMove(0).getAccuracy());
+
+			if (selectedPokemon.getMove(0).getStatus().equals("Null") == false) {
+
+				if (selectedPokemon.getMove(0).getStatus().equals("Heal")) {
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " will\n"
+							+ selectedPokemon.getMove(0).getStatus() + "for \n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
+				} else {
+					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+							+ selectedPokemon.getMove(0).getName() + " has a\n"
+							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
+							+ selectedPokemon.getMove(0).getStatus());
+				}
+
+			}
+
+			if (selectedPokemon.getMove(0).isPriority() == true) {
+				lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + " has \nspeed priority");
+			}
+
+			lblPokeMenuMove1.setText(lblPokeMenuMove1Text);
+
+			if (selectedPokemon.getMovePoolSize() > 1) {
+				lblPokeMenuMove2.setVisible(true);
+
+				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
+						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+
+				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(1).getStatus().equals("Heal")) {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " will\n"
+								+ selectedPokemon.getMove(1).getStatus() + " for \n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has a\n"
+								+ selectedPokemon.getMove(1).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(1).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(1).isPriority() == true) {
+					lblPokeMenuMove2Text += ("\n\n" + selectedPokemon.getMove(1).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove2.setText(lblPokeMenuMove2Text);
+
+			} else {
+				lblPokeMenuMove2.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 2) {
+				lblPokeMenuMove3.setVisible(true);
+
+				lblPokeMenuMove3Text = (selectedPokemon.getMove(2).getName() + "\nType: "
+						+ selectedPokemon.getMove(2).getType() + "\nDamage: " + selectedPokemon.getMove(2).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(2).getAccuracy());
+
+				if (selectedPokemon.getMove(2).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(2).getStatus().equals("Heal")) {
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " will\n"
+								+ selectedPokemon.getMove(2).getStatus() + " for \n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(2).getName() + " has a\n"
+								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(2).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(2).isPriority() == true) {
+					lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove3.setText(lblPokeMenuMove3Text);
+
+			} else {
+				lblPokeMenuMove3.setVisible(false);
+			}
+
+			if (selectedPokemon.getMovePoolSize() > 3) {
+
+				lblPokeMenuMove4.setVisible(true);
+
+				lblPokeMenuMove4Text = (selectedPokemon.getMove(3).getName() + "\nType: "
+						+ selectedPokemon.getMove(3).getType() + "\nDamage: " + selectedPokemon.getMove(3).getDamage()
+						+ "\nAccuracy: " + selectedPokemon.getMove(3).getAccuracy());
+
+				if (selectedPokemon.getMove(3).getStatus().equals("Null") == false) {
+
+					if (selectedPokemon.getMove(3).getStatus().equals("Heal")) {
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " will\n"
+								+ selectedPokemon.getMove(3).getStatus() + " for \n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
+					} else {
+						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+								+ selectedPokemon.getMove(3).getName() + " has a\n"
+								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
+								+ selectedPokemon.getMove(3).getStatus());
+					}
+
+				}
+
+				if (selectedPokemon.getMove(3).isPriority() == true) {
+					lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + " has \nspeed priority");
+				}
+
+				lblPokeMenuMove4.setText(lblPokeMenuMove4Text);
+
+			} else {
+				lblPokeMenuMove4.setVisible(false);
+			}
+
+			lblPokeMenuStats.setText("Attack: " + selectedPokemon.getAttack() + "\nDefense: "
+					+ selectedPokemon.getDefense() + "\nSpeed: " + selectedPokemon.getSpeed());
+
+			if (selectedPokemonTypes[1].equals("Null")) {
+				lblPokeMenuTypes.setText("Types:\n" + selectedPokemonTypes[0]);
+			} else {
+				lblPokeMenuTypes.setText("Types: \n" + selectedPokemonTypes[0] + "\n" + selectedPokemonTypes[1]);
+			}
+
+			if (player.getPokemon(5).getCurrentHP() == 0) {
+				imgPokeBall6.setImage(selectedFaintedPokeBall);
+			} else {
+				imgPokeBall6.setImage(selectedNormalPokeBall);
+			}
+
+			if (pokeSwapIndex != 1 && player.getTeamSize() > 0) {
+				if (player.getPokemon(0).getCurrentHP() == 0) {
+					imgPokeBall1.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall1.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 2 && player.getTeamSize() > 1) {
+				if (player.getPokemon(1).getCurrentHP() == 0) {
+					imgPokeBall2.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall2.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 3 && player.getTeamSize() > 2) {
+				if (player.getPokemon(3).getCurrentHP() == 0) {
+					imgPokeBall3.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall3.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 4 && player.getTeamSize() > 3) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall4.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall4.setImage(normalPokeBall);
+				}
+			}
+
+			if (pokeSwapIndex != 5 && player.getTeamSize() > 4) {
+				if (player.getPokemon(4).getCurrentHP() == 0) {
+					imgPokeBall5.setImage(faintedPokeBall);
+				} else {
+					imgPokeBall5.setImage(normalPokeBall);
+				}
+			}
+
 			break;
-			
+
 		default:
 			break;
 		}
-		
-		
+
 	}
-	
+
 	public void useMove(Stage myStage) {
 
 		switch (battleButtonIndex) {
@@ -1495,8 +2769,8 @@ public class Boot extends Application {
 		// Exectues whole turn
 		battle.turnExecution("First");
 		battle.turnExecution("Second");
-		
-		//Calls battle response, sets battle menu to responses
+
+		// Calls battle response, sets battle menu to responses
 		nextBattleResponse();
 		nextBattleMenu(myStage, "battleResponses");
 
@@ -1512,28 +2786,28 @@ public class Boot extends Application {
 
 			// Updates hp bars if pokemon was fainted
 			if (battle.battleResponses(responseCounter).contains("fainted")) {
-					if (battle.isOpponentFainted() == true) {
-						updateProgressBar("opponent");
-						
-						//If wild encounter, endbattle
-						if (battle.isTrainerBattle == false) {
-							endBattle = true;
-						}
-					} else if (battle.isPlayerFainted() == true){
-							updateProgressBar("player");
-							updateProgressBar("opponent");
+				if (battle.isOpponentFainted() == true) {
+					updateProgressBar("opponent");
+
+					// If wild encounter, endbattle
+					if (battle.isTrainerBattle == false) {
+						endBattle = true;
 					}
+				} else if (battle.isPlayerFainted() == true) {
+					updateProgressBar("player");
+					updateProgressBar("opponent");
+				}
 			}
-			
-			//Updates progress bar if pokemon levels up
+
+			// Updates progress bar if pokemon levels up
 			if (battle.battleResponses(responseCounter).contains("leveled up")) {
 				if (battle.isGoingToEvolve() == true) {
-					//waits to update progress bar if pokemon is going to evolve
+					// waits to update progress bar if pokemon is going to evolve
 				} else {
 					updateProgressBar("player");
 				}
 			}
-			
+
 			// Updates sprite and hp bar if pokemon evolved
 			if (battle.battleResponses(responseCounter).contains("evolved")) {
 				playerPokeSprite.setImage(playerPokemon.getBackSprite());
@@ -1542,7 +2816,7 @@ public class Boot extends Application {
 
 			responseCounter++;
 
-		// resets responses, updates health bars, returns true
+			// resets responses, updates health bars, returns true
 		} else {
 			responseCounter = 0;
 			updateProgressBar("player");
@@ -1683,36 +2957,37 @@ public class Boot extends Application {
 		// 10% chance of wild encounter happening
 		if (Math.random() * 100 < 10) {
 
-			//Puts levels of all team members in an array
-			int [] teamLevels = new int [player.getTeamSize()];
-			
-			for(int i = 0; i < player.getTeamSize(); i++) {
+			// Puts levels of all team members in an array
+			int[] teamLevels = new int[player.getTeamSize()];
+
+			for (int i = 0; i < player.getTeamSize(); i++) {
 				teamLevels[i] = player.getPokemon(i).getLevel();
 			}
-			
-			//Sort in descending order
+
+			// Sort in descending order
 			Sort.selectionSort(teamLevels, 2);
-			
+
 			int highestLevel = teamLevels[0];
-			
+
 			double randomLevelChange = Math.random();
-			
-			//40% chance of encounter being 5 or 4 levels down from your highest leveled pokemon
-			//20% chance of encounter being 3 level down from your highest level pokemon
-			
+
+			// 40% chance of encounter being 5 or 4 levels down from your highest leveled
+			// pokemon
+			// 20% chance of encounter being 3 level down from your highest level pokemon
+
 			if (randomLevelChange < 0.40) {
 				highestLevel -= 3;
 			} else if (randomLevelChange >= 0.40 && randomLevelChange <= 0.80) {
-				highestLevel -=2;
+				highestLevel -= 2;
 			} else {
-				highestLevel -=1;
+				highestLevel -= 1;
 			}
-			
+
 			double randomEncounter = Math.random();
 			String encounter;
-			
-			//8.3% chance for every pokemon
-			
+
+			// 8.3% chance for every pokemon
+
 			if (randomEncounter <= 0.083) {
 				encounter = "Aron";
 			} else if (randomEncounter > 0.083 && randomEncounter <= 0.166) {
@@ -1738,25 +3013,26 @@ public class Boot extends Application {
 			} else {
 				encounter = "Starly";
 			}
-			
+
 			// Sets pokemon
 
 			opponentPokemon = new Pokemon(encounter, highestLevel);
 
 			playerPokemon = player.getPokemon(0);
 
-			//Instantiates new battle, istrainer false
+			// Instantiates new battle, istrainer false
 			battle = new Battle(playerPokemon, opponentPokemon, false);
 
 			// Sets the sprites for the pokemon
 			playerPokeSprite.setImage(playerPokemon.getBackSprite());
 			opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 
-			//Updates progress bars
+			// Updates progress bars
 			updateProgressBar("player");
 			updateProgressBar("opponent");
 
-			//battlemenu to responses, calls next response
+			// battlemenu to responses, calls next response
+			responseCounter = 0;
 			battleMenu = "battleResponses";
 			nextBattleResponse();
 
@@ -1832,15 +3108,15 @@ public class Boot extends Application {
 				playerStackY--;
 			}
 		}
-		
+
 		// Top & Bottom & Left & Right
 		if ((botBarrier == true || topBarrier == true) && (leftBarrier == true || rightBarrier == true)) {
-		    if (direction.equals("Left") || direction.equals("Right")) {
-		        playerStackX++;
-		    }
-		    if (direction.equals("Right") || direction.equals("Left")) {
-		        playerStackX--;
-		    }
+			if (direction.equals("Left") || direction.equals("Right")) {
+				playerStackX++;
+			}
+			if (direction.equals("Right") || direction.equals("Left")) {
+				playerStackX--;
+			}
 		}
 
 		// Player sprite is in direct middle if no barriers are encountered

@@ -307,11 +307,15 @@ public class Battle {
 			break;
 		}
 
+		if (damage <= 1) {
+			damage = 1;
+		}
+		
 		// Applies damage
 		defending.hpChange((int) damage);
 
 		// Determines if defending pokemon fainted
-		if (defending.currentHP < 0) {
+		if (defending.currentHP <= 0) {
 
 			// Sets to zero for health bar purposes
 			defending.setCurrentHp(0);
@@ -360,6 +364,7 @@ public class Battle {
 
 			} else if (defending.equals(playerPokemon)) {
 				playerFainted = true;
+				battleResponses.add(playerPokemon.getName() + " has fainted");
 
 			}
 		}
@@ -1023,7 +1028,7 @@ public class Battle {
 
 			// Calculates catch rate
 		} else {
-			catchRate = (((3 * opponentPokemon.getTotalHP()) - (2 * opponentPokemon.getCurrentHP())) * 200)
+			catchRate = (((3 * opponentPokemon.getTotalHP()) - (2 * opponentPokemon.getCurrentHP())) * 150)
 					/ (3 * opponentPokemon.getTotalHP());
 
 			// If random number below catchrate, return that pokemon has been caught
@@ -1039,20 +1044,22 @@ public class Battle {
 
 	public boolean flee() {
 
-		// 90% chance of fleeing
 		boolean success = false;
-
+		
+		//Can't flee a trainer battle
+	if (isTrainerBattle == false) {
+		// 90% chance of fleeing
+		
 		if (Math.random() < 1) {
 			success = true;
 		}
-
+	}
 		return success;
 	}
 
 	public void switchPokemon(Pokemon newPokemon) {
 
 		playerPokemon = newPokemon;
-		battleResponses.add("You have sent out " + playerPokemon.getName());
 	}
 
 	public void switchPokemon() {
