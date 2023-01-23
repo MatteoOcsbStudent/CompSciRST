@@ -1057,9 +1057,9 @@ public class Battle {
 
 		// Can't flee a trainer battle
 		if (isTrainerBattle == false) {
-			// 90% chance of fleeing
+			// 85% chance of fleeing
 
-			if (Math.random() < 1) {
+			if (Math.random() < 0.85) {
 				success = true;
 			}
 		}
