@@ -18,13 +18,19 @@ public class Tile extends ImageView {
 	private final Image imgWALLLEFT = new Image(getClass().getResource("/images/PokemonCenterInside/WallLeft.png").toString());
 	private final Image imgWALLBACK = new Image(getClass().getResource("/images/PokemonCenterInside/WallBack.png").toString());
 	private final Image imgBLACKTILE = new Image(getClass().getResource("/images/PokemonCenterInside/BlackTile.png").toString());
+	private final Image imgNURSEJOY = new Image(getClass().getResource("/images/OtherCharacters/NurseJoy.png").toString());
 	
-	//Barrier boolean
+	//Barrier boolean, the player shouldnt be allowed to go through these tiles
 	private boolean barrier = false;
 	
+	//door Boolean so that it can run a special exit clause
 	private boolean door = false;
 	
+	//tiles that prompt a wild encounter
 	private boolean wildEncounter = false;
+	
+	//tiles that when interacted with, heal the team
+	private boolean heal = false;
 	
 	// Size
 	private final int DIMENSION = 32;
@@ -93,6 +99,12 @@ public class Tile extends ImageView {
 		
 		case "BlackTile":
 			this.setImage(imgBLACKTILE);
+			break;
+		
+		case "NurseJoy":
+			this.setImage(imgNURSEJOY);
+			barrier = true;
+			heal = true;
 			break;
 		}
 	}
@@ -168,5 +180,10 @@ public class Tile extends ImageView {
 	public Boolean checkEncounter() {
 		return wildEncounter;
 	}
+	
+	public Boolean checkHeal() {
+		return heal;
+	}
 
 }
+
