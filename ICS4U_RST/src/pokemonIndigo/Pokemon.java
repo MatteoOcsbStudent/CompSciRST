@@ -11,36 +11,48 @@ import sortAlgorithim.Sort;
 
 public class Pokemon {
 
-	int baseHP;
-	int baseAtk;
-	int baseDef;
-	int baseSpd;
-	int level = 0;
-	int nextLevelUp;
-	int exp;
-	int currentHP;
-	int attack;
-	int defense;
-	int speed;
-	int totalHP;
+	//Pokemon Stats
+	int baseHP, baseAtk, baseDef, baseSpd, currentHP, totalHP, attack, defense, speed;
 
+	//Pokemon Level Datafields
+	int level = 0;
+	int nextLevelUp, exp;
+
+	//Pokemon Status
 	String status = "Null";
+	
+	//Pokemon Name
 	String name;
+	
+	//Pokemon first evolution Name
 	String firstEvo;
 
+	//Sprites
 	Image spriteFront;
 	Image spriteBack;
 
+	//Types
 	String[] types = new String[2];
+	
+	//Evolutions
 	String[] evolutions;
+	int[] evoLevels;
+	
+	//MovePool
 	String[] movePool;
 	int[] movePoolLevels;
-	int[] evoLevels;
-
 	ArrayList<Move> currentMoves = new ArrayList<Move>();
 
+	//File to be read for the all the content in a specific pokemon species
 	File pokemonInfo;
 
+	/**
+	 * Overloaded Constructor 
+	 * Creates the pokemon, setting its stats and moves
+	 * according to the level and name given runs levelUp() to help with the logic
+	 * @param species
+	 * @param foundLevel
+	 */
 	public Pokemon(String species, int foundLevel) {
 
 		// Setting name
@@ -120,8 +132,8 @@ public class Pokemon {
 		// Levels up pokemon to instantiated level
 		for (int i = 0; i < foundLevel; i++) {
 			levelUp();
-			
-			if(getNextEvolution() != -1) {
+
+			if (getNextEvolution() != -1) {
 				evolve(getNextEvolution());
 			}
 
@@ -173,6 +185,12 @@ public class Pokemon {
 
 	}
 
+	/**
+	 * Instance Method 
+	 * adds stats to the pokemon by comparing their level to their
+	 * base stats when the pokemon reaches a certain level threshhold, it runs the
+	 * evolve() method to boost their power
+	 */
 	public void levelUp() {
 		// Tracking level
 		
@@ -187,8 +205,7 @@ public class Pokemon {
 		nextLevelUp = (int)(level * level * level) - ((level-1) * (level-1) * (level-1));
 		
 		//Resets exp to whats carried over from last threshhold
-		
-
+    
 		// HP Stat
 		int temp = totalHP;
 		totalHP = ((2 * baseHP * level) / 100) + level + 10;
@@ -207,94 +224,10 @@ public class Pokemon {
 		speed = ((2 * baseSpd * level) / 100) + 5;
 	}
 
-	public void hpChange(int damage) {
-		currentHP -= damage;
-	}
-
-	public void changeStatus(String newStatus) {
-		status = newStatus;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String affliction) {
-		status = affliction;
-	}
-
-	public void gainExp(int expGain) {
-		exp += expGain;
-
-	}
-
-	public int getLevel() {
-		return level;
-	}
-
-	public int getCurrentHP() {
-		return currentHP;
-	}
-
-	public void setCurrentHP(int newHP) {
-		currentHP = newHP;
-	}
-
-	public int getExp() {
-		return exp;
-	}
-
-	public int getNextLevelUp() {
-		return nextLevelUp;
-	}
-
-	public Image getFrontSprite() {
-		return spriteFront;
-	}
-
-	public Image getBackSprite() {
-		return spriteBack;
-	}
-
-	public String getTypes() {
-		return types[0] + "-" + types[1];
-	}
-
-	public int getAttack() {
-		return attack;
-	}
-
-	public int getDefense() {
-		return defense;
-	}
-
-	public int getTotalHP() {
-		return totalHP;
-	}
-
-	public int getSpeed() {
-		return speed;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public int getNextEvolution() {
-		int evolution = -1;
-		for (int i = 0; i < evoLevels.length; i++) {
-			if (level == evoLevels[i]) {
-				evolution = i;
-			}
-		}
-
-		return evolution;
-	}
-
-	public String getFirstEvo() {
-		return firstEvo;
-	}
-
+	/**Instance Method
+	 * when ran, increases the base stats of the pokemon, and changes its name and sprite to make it seem stronger
+	 * @param evolution
+	 */
 	public void evolve(int evolution) {
 
 		// Changing name
@@ -340,6 +273,176 @@ public class Pokemon {
 		}
 	}
 
+	/**Mutator Method
+	 * lowers hp by the amount of damage the pokemon takes
+	 * @param damage
+	 */
+	public void hpChange(int damage) {
+		currentHP -= damage;
+	}
+
+	/**Mutator Method
+	 * lowers hp by the amount of damage the pokemon takes
+	 * @param newStatus
+	 */
+	public void changeStatus(String newStatus) {
+		status = newStatus;
+	}
+
+	/**Mutator Method
+	 * sets the status a pokemon is afflicted with (example: Paralyze, Sleep,)
+	 * @param affliction
+	 */
+	public void setStatus(String affliction) {
+		status = affliction;
+	}
+
+	/**Mutator Method
+	 * increases exp by the amount given
+	 * @param expGain
+	 */
+	public void gainExp(int expGain) {
+		exp += expGain;
+
+	/**Mutator Method
+	 * sets the current HP to the given amount
+	 * @param newHP
+	 */
+	public void setCurrentHP(int newHP) {
+		currentHP = newHP;
+	}
+
+	/**Accessor Method
+	 * returns the status the pokemon is afflicted with
+	 * @return status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**Accessor Method
+	 * returns the level the pokemon has
+	 * @return level
+	 */
+	public int getLevel() {
+		return level;
+	}
+
+	/**Accessor Method
+	 * returns the current hp of the pokemon
+	 * @return currentHP
+	 */
+	public int getCurrentHP() {
+		return currentHP;
+	}
+
+	/**Accessor Method
+	 * returns the current exp the pokemon has
+	 * @return exp
+	 */
+	public int getExp() {
+		return exp;
+	}
+	
+	/**Accessor Method
+	 * returns the next exp threshhold the pokemon has to level up
+	 * @return nextLevelUp
+	 */
+	public int getNextLevelUp() {
+		return nextLevelUp;
+	}
+
+	/**Accessor Method
+	 * returns the front sprite of the pokemon
+	 * @return spriteFront
+	 */
+	public Image getFrontSprite() {
+		return spriteFront;
+	}
+
+	/**Accessor Method
+	 * returns the back sprite of the pokemon
+	 * @return spriteBack
+	 */
+	public Image getBackSprite() {
+		return spriteBack;
+	}
+
+	/**Accessor Method
+	 * returns the types of the pokemon (example: Fire, Water, Electric)
+	 * @return types
+	 */
+	public String getTypes() {
+		return types[0] + "-" + types[1];
+	}
+
+	/**Accessor Method
+	 * returns the attack value of the pokemon
+	 * @return attack
+	 */
+	public int getAttack() {
+		return attack;
+	}
+
+	/**Accessor Method
+	 * returns the defense value of the pokemon
+	 * @return defense
+	 */
+	public int getDefense() {
+		return defense;
+	}
+
+	/**Accessor Method
+	 * returns the totalHP value of the pokemon
+	 * @return totalHP
+	 */
+	public int getTotalHP() {
+		return totalHP;
+	}
+
+	/**Accessor Method
+	 * returns the speed value of the pokemon
+	 * @return speed
+	 */
+	public int getSpeed() {
+		return speed;
+	}
+
+	/**Accessor Method
+	 * returns the name of the pokemon
+	 * @return name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**Accessor Method
+	 * returns the level threshhold for the next evolution
+	 * @return evolution
+	 */
+	public int getNextEvolution() {
+		int evolution = -1;
+		for (int i = 0; i < evoLevels.length; i++) {
+			if (level == evoLevels[i]) {
+				evolution = i;
+			}
+		}
+
+		return evolution;
+	}
+
+	/**Accessor Method
+	 * returns the name of the first evolution of the pokemon (for saving and loading purposes)
+	 * @return firstEvo
+	 */
+	public String getFirstEvo() {
+		return firstEvo;
+	}
+
+	/**Accessor Method
+	 * returns the name of the next move to learn
+	 * @return nextMoveLearn
+	 */
 	public String getNextMoveLearn() {
 
 		String nextMoveLearn = "";
@@ -353,6 +456,11 @@ public class Pokemon {
 		return nextMoveLearn;
 	}
 
+	/**Mutator Method
+	 * changes the moveset of the pokemon
+	 * @param newMoveName
+	 * @param indexToReplace
+	 */
 	public void changeMoveSet(String newMoveName, int indexToReplace) {
 
 		Move newMove = new Move(newMoveName);
@@ -361,24 +469,41 @@ public class Pokemon {
 		currentMoves.add(indexToReplace, newMove);
 	}
 
+	/**Mutator Method
+	 * adds to the moveset of the pokemon (if there's less than 4 moves)
+	 * @param newMoveName
+	 */
 	public void changeMoveSet(String newMoveName) {
 
 		Move newMove = new Move(newMoveName);
 		currentMoves.add(newMove);
 	}
-	
+
+	/** Mutator Method
+	 * Increases the pokemon's HP (For healing moves)
+	 * @param heal
+	 */
 	public void moveHeal(int heal) {
-		currentHP+=heal;
-		
+		currentHP += heal;
+
 		if (currentHP > totalHP) {
 			currentHP = totalHP;
 		}
 	}
 
+	/**Accessor Method
+	 * returns the move at the given index
+	 * @param index
+	 * @return
+	 */
 	public Move getMove(int index) {
 		return currentMoves.get(index);
 	}
 
+	/**Accessor Method
+	 * returns the size of the pokemon's movepool
+	 *@return currentMoves.size()
+	 */
 	public int getMovePoolSize() {
 		return currentMoves.size();
 	}
@@ -386,5 +511,4 @@ public class Pokemon {
 	public void setCurrentHp(int hp) {
 		currentHP = hp;
 	}
-	
 }

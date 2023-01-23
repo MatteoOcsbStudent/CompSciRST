@@ -324,7 +324,7 @@ public class Battle {
 		if (defending.currentHP <= 0) {
 
 			// Sets to zero for health bar purposes
-			defending.setCurrentHp(0);
+			defending.setCurrentHP(0);
 
 			// Informs user it was fainted
 			battleResponses.add(defending.getName() + " has fainted");
@@ -1060,6 +1060,7 @@ public class Battle {
 			// 85% chance of fleeing
 
 			if (Math.random() < 0.85) {
+
 				success = true;
 			}
 		}
@@ -1071,11 +1072,14 @@ public class Battle {
 		playerPokemon = newPokemon;
 	}
 
-	public void switchPokemon() {
+	public void switchOpponentPokemon(Player player, String starterChoice) {
 
-		Pokemon temp = opponentPokemon;
+		if (isTrainerBattle == true) {
 
+			
+		}
 		// TODO - opponentPokemon = arraylist.get(tempindex+1)
+
 	}
 
 	public String battleResponses(int index) {
