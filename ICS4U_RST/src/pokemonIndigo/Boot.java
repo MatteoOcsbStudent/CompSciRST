@@ -700,6 +700,8 @@ public class Boot extends Application {
 
 					instructionsCount++;
 					break;
+				default:
+					break;
 
 				}
 			}
@@ -1053,6 +1055,8 @@ public class Boot extends Application {
 					player.addPokemon(new Pokemon(choice, 5));
 					myStage.setScene(scene);
 					Dialog.print(choice + " has been selected as your Starter Pokemon!");
+				default:
+					break;
 				}
 			}
 		});

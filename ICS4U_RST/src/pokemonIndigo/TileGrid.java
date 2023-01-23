@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
 import javafx.scene.image.Image;
-import simpleIO.Console;
 
 public class TileGrid {
 

@@ -2,8 +2,6 @@ package pokemonIndigo;
 
 import java.util.ArrayList;
 
-import sortAlgorithim.Sort;
-
 public class Battle {
 
 	Pokemon playerPokemon;

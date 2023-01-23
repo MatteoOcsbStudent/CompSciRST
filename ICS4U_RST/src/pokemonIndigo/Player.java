@@ -2,8 +2,6 @@ package pokemonIndigo;
 
 import java.util.ArrayList;
 
-import javafx.scene.image.Image;
-
 public class Player {
 
 	//Arraylist containing the pokemon on the player's team
