@@ -4,26 +4,36 @@ import java.util.ArrayList;
 
 public class Battle {
 
+	//Pokemon in the battle
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
-
-	boolean opponentFainted;
-	boolean playerFainted;
-	boolean goingToEvolve;
-	boolean noEffect;
-
-	Move opponentMove;
-
+	
+	//Will always be player or opponent pokemon
 	Pokemon firstToMove;
 	Pokemon secondToMove;
 
-	Move fasterMove;
-	Move slowerMove;
-
+	//If pokemon has been fainted
+	boolean opponentFainted;
+	boolean playerFainted;
+	
+	//if player pokemon is going to evolve, holds health bar update in boot if true
+	boolean goingToEvolve;
+	
+	//If move has no effect, does 0 damage, cannot apply status's
+	boolean noEffect;
+	
+	//If battle is wild encounter or trainer
 	boolean isTrainerBattle = false;
 
+	//Move used
+	Move opponentMove;
+	Move fasterMove;
+	Move slowerMove;
+	
+	//Turn to be executed 
 	String currentTurn;
 
+	//Text to display, informing user what happened in the battle
 	ArrayList<String> battleResponses = new ArrayList<String>();
 
 	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
@@ -1072,13 +1082,9 @@ public class Battle {
 		playerPokemon = newPokemon;
 	}
 
-	public void switchOpponentPokemon(Player player, String starterChoice) {
+	public void nextOpponentPokemon(Pokemon nextPokemon) {
 
-		if (isTrainerBattle == true) {
-
-			
-		}
-		// TODO - opponentPokemon = arraylist.get(tempindex+1)
+		opponentPokemon = nextPokemon;
 
 	}
 

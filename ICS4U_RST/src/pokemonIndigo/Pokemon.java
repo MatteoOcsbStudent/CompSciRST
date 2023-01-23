@@ -303,11 +303,12 @@ public class Pokemon {
 	 */
 	public void gainExp(int expGain) {
 		exp += expGain;
-
+	}
 	/**Mutator Method
 	 * sets the current HP to the given amount
 	 * @param newHP
 	 */
+	
 	public void setCurrentHP(int newHP) {
 		currentHP = newHP;
 	}

@@ -37,7 +37,7 @@ import simpleIO.Console;
 import simpleIO.Dialog;
 import sortAlgorithim.Sort;
 
-public class Boot extends Application {
+public class PokemonIndigo extends Application {
 
 	// Declares window dimensions
 	private final int CAMERAHEIGHT = 6;
