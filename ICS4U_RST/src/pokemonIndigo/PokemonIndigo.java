@@ -114,8 +114,7 @@ public class PokemonIndigo extends Application {
 	ImageView playerRight = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerRight.png").toString());
 	ImageView playerDown = new ImageView(getClass().getResource("/images/TrainerSprites/PlayerDown.png").toString());
 
-
-	// Menu Scenes' Datafields
+	// Starter Scenes' Datafields
 
 	ImageView imgStarterChoice1, imgStarterChoice2, imgStarterChoice3;
 
@@ -165,6 +164,7 @@ public class PokemonIndigo extends Application {
 
 	// player instantiation
 	Player player = new Player();
+	Player gymLeader;
 
 	// Battle reference
 	Battle battle;
@@ -174,9 +174,7 @@ public class PokemonIndigo extends Application {
 	ProgressBar playerHpBar;
 	ProgressBar opponentHpBar;
 
-	// xpBar
-
-	ProgressBar xpBar;
+	String moveToLearn;
 
 	public void save(Stage myStage) {
 
@@ -955,8 +953,8 @@ public class PokemonIndigo extends Application {
 									player.getPokemon(i).setStatus("Null");
 								}
 							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() - 1).checkBattle() == true) {
-								Console.print("test");
-								// TODO The battle needs to start here
+
+								gymBattle(myStage);
 							}
 							break;
 
@@ -968,8 +966,7 @@ public class PokemonIndigo extends Application {
 									player.getPokemon(i).setStatus("Null");
 								}
 							} else if (map.getTile(map.getPlayerY() - 1, map.getPlayerX()).checkBattle() == true) {
-								Console.print("test");
-								// TODO The battle needs to start here
+								gymBattle(myStage);
 							}
 
 							break;
@@ -981,8 +978,8 @@ public class PokemonIndigo extends Application {
 									player.getPokemon(i).setStatus("Null");
 								}
 							} else if (map.getTile(map.getPlayerY() + 1, map.getPlayerX()).checkBattle() == true) {
-								Console.print("test");
-								// TODO the battle needs to start here
+
+								gymBattle(myStage);
 							}
 							break;
 
@@ -1053,7 +1050,7 @@ public class PokemonIndigo extends Application {
 					break;
 
 				case C:
-
+					
 					player.addPokemon(new Pokemon(choice, 5));
 					myStage.setScene(scene);
 					Dialog.print(choice + " has been selected as your Starter Pokemon!");
@@ -1222,6 +1219,7 @@ public class PokemonIndigo extends Application {
 						} else if (lblBattleResponse.getText().contains("has been added to your team")) {
 							myStage.setScene(scene);
 							// Shows yes and no options if prompted to learn a new move
+						
 						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
 
 							nextBattleMenu(myStage, "MoveLearning");
@@ -1302,19 +1300,28 @@ public class PokemonIndigo extends Application {
 								battle.turnExecution("opponent only");
 								nextBattleResponse();
 
-								// Otherwise, next battle reponse, goes to general
-							} else if (pokeMenuOrigin.equals("fainted")) {
+								// Otherwise goes to general battle menu
+							} else {
 								nextBattleMenu(myStage, "General");
 							}
-
+							
+						} else if (lblBattleResponse.getText().equals("Grrr, you win this time!")) {
+							myStage.setScene(scene);
+							endBattle = false;
+							
+						} else if (lblBattleResponse.getText().contains("sent out")) {
+							opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
+							updateProgressBar("opponent");
 							// If no more responses
 						} else if (nextBattleResponse() == true) {
 
-							// If battle is to be ended, sets scene to main scene. resets endbattle
-							if (endBattle == true) {
+							if (endBattle == true && battle.isTrainerBattle == true) {
+								lblBattleResponse.setText("Grrr, you win this time!");
+								// If battle is to be ended and wild battle, sets scene to main scene. resets endbattle
+							} else if (endBattle == true && battle.isTrainerBattle == false) {
+			
 								myStage.setScene(scene);
 								endBattle = false;
-
 								// Otherwise, goes back to main battle menu
 							} else {
 								nextBattleMenu(myStage, "General");
@@ -1335,7 +1342,7 @@ public class PokemonIndigo extends Application {
 						} else if (battleButtonIndex == 3) {
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse.setText(
-									playerPokemon.getName() + " did not learn " + playerPokemon.getNextMoveLearn());
+									playerPokemon.getName() + " did not learn " + moveToLearn);
 						}
 
 						break;
@@ -1365,29 +1372,29 @@ public class PokemonIndigo extends Application {
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse
 									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(0).getName()
-											+ "... and learned " + playerPokemon.getNextMoveLearn());
-							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 0);
+											+ "... and learned " + moveToLearn);
+							playerPokemon.changeMoveSet(moveToLearn, 0);
 							break;
 						case 2:
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse
 									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(1).getName()
-											+ "... and learned " + playerPokemon.getNextMoveLearn());
-							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 1);
+											+ "... and learned " + moveToLearn);
+							playerPokemon.changeMoveSet(moveToLearn, 1);
 							break;
 						case 3:
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse
 									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(2).getName()
-											+ "... and learned " + playerPokemon.getNextMoveLearn());
-							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 2);
+											+ "... and learned " + moveToLearn);
+							playerPokemon.changeMoveSet(moveToLearn, 2);
 							break;
 						case 4:
 							nextBattleMenu(myStage, "battleResponses");
 							lblBattleResponse
 									.setText(playerPokemon.getName() + " forgot " + playerPokemon.getMove(3).getName()
-											+ "... and learned " + playerPokemon.getNextMoveLearn());
-							playerPokemon.changeMoveSet(playerPokemon.getNextMoveLearn(), 3);
+											+ "... and learned " + moveToLearn);
+							playerPokemon.changeMoveSet(moveToLearn, 3);
 							break;
 						default:
 							break;
@@ -3290,6 +3297,24 @@ public class PokemonIndigo extends Application {
 					// If wild encounter, endbattle
 					if (battle.isTrainerBattle == false) {
 						endBattle = true;
+					} else if (battle.isTrainerBattle == true) {
+
+						Boolean firstNonFainted = false;
+
+						for (int i = 0; i < gymLeader.getTeamSize(); i++) {
+
+							if (firstNonFainted == false) {
+								if (gymLeader.getPokemon(i).getCurrentHP() != 0) {
+									firstNonFainted = true;
+									opponentPokemon = gymLeader.getPokemon(i);
+									battle.nextOpponentPokemon(gymLeader.getPokemon(i));
+								}
+							}
+						}
+						
+						if (firstNonFainted == false) {
+							endBattle = true;
+						}
 					}
 				} else if (battle.isPlayerFainted() == true) {
 					updateProgressBar("player");
@@ -3310,6 +3335,10 @@ public class PokemonIndigo extends Application {
 			if (battle.battleResponses(responseCounter).contains("evolved")) {
 				playerPokeSprite.setImage(playerPokemon.getBackSprite());
 				updateProgressBar("player");
+			}
+			
+			if(battle.battleResponses(responseCounter).contains("is trying to learn")) {
+				moveToLearn = battle.battleResponses(responseCounter).replace(playerPokemon.getName() + " is trying to learn ", "");
 			}
 
 			responseCounter++;
@@ -3452,10 +3481,7 @@ public class PokemonIndigo extends Application {
 
 	public void gymBattle(Stage myStage) {
 
-		// TODO Implement this gymLeader instantiation to the battle up in Case 'C' of
-		// overworld
-
-		Player gymLeader = new Player("Jack");
+		gymLeader = new Player("GymLeader Jack");
 
 		// Puts levels of all team members in an array
 		int[] teamLevels = new int[player.getTeamSize()];
@@ -3504,7 +3530,7 @@ public class PokemonIndigo extends Application {
 
 			// Sets pokemon
 
-			gymLeader.addPokemon(new Pokemon(encounter, highestLevel - 1));
+			gymLeader.addPokemon(new Pokemon(encounter, highestLevel - 2));
 		}
 
 		// Sets the last pokemon you'll have to fight as the starter that has an
@@ -3523,6 +3549,34 @@ public class PokemonIndigo extends Application {
 			gymLeader.addPokemon(new Pokemon("Torchic", highestLevel + 1));
 			break;
 		}
+
+		// Finds first nonfainted pokemon to send into battle
+
+		boolean firstNonFainted = false;
+		for (int i = 0; i < player.getTeamSize(); i++) {
+
+			if (firstNonFainted == false) {
+				if (player.getPokemon(i).getCurrentHP() != 0) {
+					firstNonFainted = true;
+					playerPokemon = player.getPokemon(i);
+				}
+			}
+
+		}
+		
+		
+		//Updates battle UI display
+		playerPokeSprite.setImage(playerPokemon.getBackSprite());
+		opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
+		updateProgressBar("player");
+		updateProgressBar("opponent");
+
+		battle = new Battle(playerPokemon, gymLeader);
+		responseCounter = 0;
+		battleMenu = "battleResponses";
+		nextBattleResponse();
+		myStage.setScene(battleScene);
+
 	}
 
 	public void wildEncounter(Stage myStage) {
@@ -3608,7 +3662,7 @@ public class PokemonIndigo extends Application {
 
 			// Instantiates new battle, istrainer false
 
-			battle = new Battle(playerPokemon, opponentPokemon, false);
+			battle = new Battle(playerPokemon, opponentPokemon);
 
 			// Sets the sprites for the pokemon
 			playerPokeSprite.setImage(playerPokemon.getBackSprite());

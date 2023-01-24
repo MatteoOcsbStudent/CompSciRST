@@ -11,6 +11,9 @@ public class Battle {
 	//Will always be player or opponent pokemon
 	Pokemon firstToMove;
 	Pokemon secondToMove;
+	
+	//Trainer player object reference
+	Player trainer;
 
 	//If pokemon has been fainted
 	boolean opponentFainted;
@@ -36,19 +39,33 @@ public class Battle {
 	//Text to display, informing user what happened in the battle
 	ArrayList<String> battleResponses = new ArrayList<String>();
 
-	public Battle(Pokemon p1, Pokemon p2, boolean trainer) {
+	public Battle(Pokemon p1, Pokemon p2) {
 		playerPokemon = p1;
 		opponentPokemon = p2;
-		isTrainerBattle = trainer;
+		isTrainerBattle = false;
+		
 
 		if (isTrainerBattle == false) {
 			battleResponses.add("A wild " + opponentPokemon.getName() + " has appeared!");
 		}
 
+	}
+	
+	public Battle(Pokemon p1, Player trainerToBattle) {
+		
+		trainer = trainerToBattle;
+		
+		playerPokemon = p1;
+		opponentPokemon = trainer.getPokemon(0);
+		isTrainerBattle = true;
+		
 		if (isTrainerBattle == true) {
-			battleResponses.add("Opponent sent out " + opponentPokemon.getName() + "!");
+			battleResponses.add("You challenged " + trainer.getName() + "!");
+			
+			String nameNoTitle = trainer.getName().replace("GymLeader ", "");	
+					
+			battleResponses.add(nameNoTitle + " sent out" + opponentPokemon.getName() + "!");
 		}
-
 	}
 
 	public void turnPlan(Move playerMove) {
@@ -349,7 +366,7 @@ public class Battle {
 				// Level up as many times as necessary for exp gain
 				do {
 					attacking.levelUp();
-					battleResponses.add(attacking.getName() + " leveled up to" + playerPokemon.getLevel() + " !");
+					battleResponses.add(attacking.getName() + " leveled up to " + playerPokemon.getLevel() + "!");
 
 					// If evolution level is hit, evolve pokemon and inform user
 					if (attacking.getNextEvolution() != -1) {
@@ -1085,6 +1102,10 @@ public class Battle {
 	public void nextOpponentPokemon(Pokemon nextPokemon) {
 
 		opponentPokemon = nextPokemon;
+		
+		String nameNoTitle = trainer.getName().replace("GymLeader ", "");	
+		
+		battleResponses.add(nameNoTitle + " sent out " + opponentPokemon.getName() + "!");
 
 	}
 
