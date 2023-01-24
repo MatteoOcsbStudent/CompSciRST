@@ -122,6 +122,7 @@ public class PokemonIndigo extends Application {
 
 	Scene starterScene;
 
+	//Choice of starter, used for gym battle
 	String choice;
 
 	Button btnReturn;
@@ -229,6 +230,8 @@ public class PokemonIndigo extends Application {
 					savePrinter.println(player.getPokemon(i).getMove(j).getName());
 				}
 			}
+			
+			savePrinter.println(choice);
 
 			saveFile.close();
 
@@ -308,6 +311,8 @@ public class PokemonIndigo extends Application {
 					player.getPokemon(i).changeMoveSet((loadStream.readLine()), j);
 				}
 			}
+			
+			choice = loadStream.readLine();
 
 			displayBoard(root);
 
@@ -941,7 +946,7 @@ public class PokemonIndigo extends Application {
 								}
 							} else if (map.getTile(map.getPlayerY(), map.getPlayerX() + 1).checkBattle() == true) {
 								Console.print("test");
-								// TODO The battle needs to start here
+								gymBattle(myStage);
 							}
 							break;
 
@@ -1192,20 +1197,24 @@ public class PokemonIndigo extends Application {
 								lblBattleResponse.setText("You have too many pokemon!");
 
 							}
+							//Prompt if caught and too many pokemon
 						} else if (lblBattleResponse.getText().equals("You have too many pokemon!")) {
 
 							lblBattleResponse.setText("would you like to release one?");
 
+							//Goes to release menu, yes or no
 						} else if (lblBattleResponse.getText().equals("would you like to release one?")) {
 
 							nextBattleMenu(myStage, "Release");
 
+							//Goes to pokemon menu with intention to release
 						} else if (lblBattleResponse.getText().equals("Please select a pokemon to release")) {
 
 							pokeMenuOrigin = "Release";
 							updatePokeMenu(myStage);
 							myStage.setScene(pokeMenuScene);
 
+							//If released
 						} else if (lblBattleResponse.getText().contains("has been released")) {
 
 							if (lblBattleResponse.getText()
@@ -1216,10 +1225,11 @@ public class PokemonIndigo extends Application {
 								lblBattleResponse.setText(opponentPokemon.getName() + " has been added to your team");
 							}
 
+							//Back to main scene 
 						} else if (lblBattleResponse.getText().contains("has been added to your team")) {
 							myStage.setScene(scene);
+							
 							// Shows yes and no options if prompted to learn a new move
-						
 						} else if (lblBattleResponse.getText().equals("Would you like to forget an old move?")) {
 
 							nextBattleMenu(myStage, "MoveLearning");
@@ -1286,9 +1296,11 @@ public class PokemonIndigo extends Application {
 								player.getPokemon(i).setCurrentHP(player.getPokemon(i).totalHP);
 								player.getPokemon(i).setStatus("Null");
 							}
+							
+							endBattle = false;
 
 							// When player sends out new pokemon
-						} else if (lblBattleResponse.getText().contains("You sent out")) {
+						} else if (lblBattleResponse.getText().equals("You sent out " + playerPokemon.getName())) {
 
 							// resets responses
 							responseCounter = 0;
@@ -1298,7 +1310,10 @@ public class PokemonIndigo extends Application {
 							if (pokeMenuOrigin.equals("switch")) {
 								battle.turnPlan(playerPokemon.getMove(0));
 								battle.turnExecution("opponent only");
-								nextBattleResponse();
+								
+								if (nextBattleResponse() == true) {
+									nextBattleMenu(myStage, "General");
+								}
 
 								// Otherwise goes to general battle menu
 							} else {
@@ -1312,6 +1327,9 @@ public class PokemonIndigo extends Application {
 						} else if (lblBattleResponse.getText().contains("sent out")) {
 							opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 							updateProgressBar("opponent");
+							responseCounter = 0;
+							battle.clearResponses();
+							nextBattleMenu(myStage, "General");
 							// If no more responses
 						} else if (nextBattleResponse() == true) {
 
@@ -1803,7 +1821,7 @@ public class PokemonIndigo extends Application {
 			}
 			// if trainer battle, opponent does not take turn on catch attempt
 			// informs user you cannot catch another trainers pokemon
-			else if (lblBattleResponse.getText().equals("You can't catch another trainer's Pokemon! are you crazy?")) {
+			else if (lblBattleResponse.getText().equals("You can't catch another trainer's Pokemon!")) {
 
 				// otherwise, wild pokemon takes turn
 			} else {
@@ -1826,7 +1844,7 @@ public class PokemonIndigo extends Application {
 				responseCounter = 0;
 
 			} else if (battle.isTrainerBattle == true) {
-				lblBattleResponse.setText("");
+				lblBattleResponse.setText("You can't run from a gym battle!");
 				// Otherwise, battle continues, opponent takes turn
 			} else {
 				lblBattleResponse.setText("You couldn't get away!");
@@ -2062,7 +2080,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 					// Otherwise, displays default status application informtation
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -2126,7 +2144,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -2159,7 +2177,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -2276,7 +2294,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatus() + "for \n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -2335,7 +2353,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -2368,7 +2386,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -2476,7 +2494,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatus() + "for \n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -2535,7 +2553,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -2568,7 +2586,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -2676,7 +2694,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatus() + "for \n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -2735,7 +2753,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -2768,7 +2786,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -2877,7 +2895,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatus() + "for \n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + "\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -2936,7 +2954,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + "\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -2969,7 +2987,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n" + selectedPokemon.getMove(3).getName() + "\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -3077,7 +3095,7 @@ public class PokemonIndigo extends Application {
 							+ selectedPokemon.getMove(0).getStatus() + "for \n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% of damage");
 				} else {
-					lblPokeMenuMove1Text += (selectedPokemon.getMove(0).getAccuracy() + "\n\n"
+					lblPokeMenuMove1Text += ("\n\n" + selectedPokemon.getMove(0).getName() + "\n\n"
 							+ selectedPokemon.getMove(0).getName() + " has a\n"
 							+ selectedPokemon.getMove(0).getStatusRate() + "% chance" + "\nto inflict "
 							+ selectedPokemon.getMove(0).getStatus());
@@ -3096,7 +3114,7 @@ public class PokemonIndigo extends Application {
 
 				lblPokeMenuMove2Text = (selectedPokemon.getMove(1).getName() + "\nType: "
 						+ selectedPokemon.getMove(1).getType() + "\nDamage: " + selectedPokemon.getMove(1).getDamage()
-						+ "\nAccuracy: " + selectedPokemon.getMove(1).getAccuracy());
+						+ "\nAccuracy: " + selectedPokemon.getMove(1).getName());
 
 				if (selectedPokemon.getMove(1).getStatus().equals("Null") == false) {
 
@@ -3136,7 +3154,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(2).getStatus() + " for \n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove3Text += (selectedPokemon.getMove(2).getAccuracy() + "\n\n"
+						lblPokeMenuMove3Text += ("\n\n" + selectedPokemon.getMove(2).getName() + "\n\n"
 								+ selectedPokemon.getMove(2).getName() + " has a\n"
 								+ selectedPokemon.getMove(2).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(2).getStatus());
@@ -3169,7 +3187,7 @@ public class PokemonIndigo extends Application {
 								+ selectedPokemon.getMove(3).getStatus() + " for \n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% of damage");
 					} else {
-						lblPokeMenuMove4Text += (selectedPokemon.getMove(3).getAccuracy() + "\n\n"
+						lblPokeMenuMove4Text += ("\n\n"
 								+ selectedPokemon.getMove(3).getName() + " has a\n"
 								+ selectedPokemon.getMove(3).getStatusRate() + "% chance" + "\nto inflict "
 								+ selectedPokemon.getMove(3).getStatus());
@@ -3530,11 +3548,12 @@ public class PokemonIndigo extends Application {
 
 			// Sets pokemon
 
-			gymLeader.addPokemon(new Pokemon(encounter, highestLevel - 2));
+			gymLeader.addPokemon(new Pokemon(encounter, highestLevel - 1));
 		}
 
 		// Sets the last pokemon you'll have to fight as the starter that has an
 		// advantage over yours
+		
 		switch (choice) {
 
 		case "Torchic":
@@ -3550,7 +3569,7 @@ public class PokemonIndigo extends Application {
 			break;
 		}
 
-		// Finds first nonfainted pokemon to send into battle
+		// Finds first nonfainted player pokemon to send into battle
 
 		boolean firstNonFainted = false;
 		for (int i = 0; i < player.getTeamSize(); i++) {
@@ -3564,12 +3583,14 @@ public class PokemonIndigo extends Application {
 
 		}
 		
+		opponentPokemon = gymLeader.getPokemon(0);
 		
 		//Updates battle UI display
 		playerPokeSprite.setImage(playerPokemon.getBackSprite());
-		opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 		updateProgressBar("player");
+		opponentPokeSprite.setImage(opponentPokemon.getFrontSprite());
 		updateProgressBar("opponent");
+
 
 		battle = new Battle(playerPokemon, gymLeader);
 		responseCounter = 0;

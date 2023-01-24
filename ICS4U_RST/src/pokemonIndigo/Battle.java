@@ -4,69 +4,91 @@ import java.util.ArrayList;
 
 public class Battle {
 
-	//Pokemon in the battle
+	// Pokemon in the battle
 	Pokemon playerPokemon;
 	Pokemon opponentPokemon;
-	
-	//Will always be player or opponent pokemon
+
+	// Will always be player or opponent pokemon
 	Pokemon firstToMove;
 	Pokemon secondToMove;
-	
-	//Trainer player object reference
+
+	// Trainer player object reference
 	Player trainer;
 
-	//If pokemon has been fainted
+	// If pokemon has been fainted
 	boolean opponentFainted;
 	boolean playerFainted;
-	
-	//if player pokemon is going to evolve, holds health bar update in boot if true
+
+	// if player pokemon is going to evolve, holds health bar update in boot if true
 	boolean goingToEvolve;
-	
-	//If move has no effect, does 0 damage, cannot apply status's
+
+	// If move has no effect, does 0 damage, cannot apply status's
 	boolean noEffect;
-	
-	//If battle is wild encounter or trainer
+
+	// If battle is wild encounter or trainer
 	boolean isTrainerBattle = false;
 
-	//Move used
+	// Move used
 	Move opponentMove;
 	Move fasterMove;
 	Move slowerMove;
-	
-	//Turn to be executed 
+
+	// Turn to be executed
 	String currentTurn;
 
-	//Text to display, informing user what happened in the battle
+	// Text to display, informing user what happened in the battle
 	ArrayList<String> battleResponses = new ArrayList<String>();
+
+	/**
+	 * Overloaded Constructor Sets the pokemon to be battled against sets
+	 * isTrainerBattle to false
+	 * 
+	 * @param Pokemon p1, Pokemon p2
+	 */
 
 	public Battle(Pokemon p1, Pokemon p2) {
 		playerPokemon = p1;
 		opponentPokemon = p2;
 		isTrainerBattle = false;
-		
 
 		if (isTrainerBattle == false) {
 			battleResponses.add("A wild " + opponentPokemon.getName() + " has appeared!");
 		}
 
 	}
-	
+
+	/**
+	 * Overloaded Constructor Sets the trainer to be battled against sets
+	 * isTrainerBattle to true
+	 * 
+	 * @param Pokemon p1, Player trainerToBattle
+	 */
 	public Battle(Pokemon p1, Player trainerToBattle) {
-		
+
 		trainer = trainerToBattle;
-		
+
 		playerPokemon = p1;
 		opponentPokemon = trainer.getPokemon(0);
 		isTrainerBattle = true;
-		
+
 		if (isTrainerBattle == true) {
+
+			// UI text display
 			battleResponses.add("You challenged " + trainer.getName() + "!");
-			
-			String nameNoTitle = trainer.getName().replace("GymLeader ", "");	
-					
-			battleResponses.add(nameNoTitle + " sent out" + opponentPokemon.getName() + "!");
+
+			String nameNoTitle = trainer.getName().replace("GymLeader ", "");
+
+			battleResponses.add(nameNoTitle + " sent out " + opponentPokemon.getName() + "!");
 		}
 	}
+
+	/**
+	 * Instance Method Randomizes opponents move Determines which pokemon goes
+	 * first, based on pokemon speed and move priority
+	 * 
+	 * @param move playerMove
+	 * @return
+	 */
 
 	public void turnPlan(Move playerMove) {
 
@@ -199,6 +221,14 @@ public class Battle {
 
 	}
 
+	/**
+	 * Instance Method runs first or second turn Calculates if pokemon takes turn,
+	 * may not due to status
+	 * 
+	 * @param String firstOrSecond
+	 * @return
+	 */
+
 	public void turnExecution(String firstOrSecond) {
 
 		// Intializing variables based on which pokemon is attacking
@@ -267,6 +297,18 @@ public class Battle {
 
 	}
 
+	/**
+	 * Instance Method Determines if pokemon's move misses or not based on move's
+	 * accuracy calculates damage and adds it if move doesn't miss and is effective
+	 * applies status of usedMove to defending pokemon at the status application
+	 * rate of usedMove, if applicable attacking takes damage from their status if
+	 * applicable if defending is fainted and attacking is a player's pokemon, gains
+	 * exp levels up if gained enough xp. Checks for move learning and evolution
+	 * opportunity Adds all actions taken to battleResponses for UI display
+	 * 
+	 * @param Pokemon attacking, Pokemon defending, Move usedMove
+	 * @return
+	 */
 	public void damageCalc(Pokemon attacking, Pokemon defending, Move usedMove) {
 
 		playerFainted = false;
@@ -274,11 +316,12 @@ public class Battle {
 
 		double damage = 0;
 
+		// If move lands
 		if (Math.random() * 100 <= usedMove.getAccuracy()) {
 
 			battleResponses.add(attacking.getName() + " used " + usedMove.getName() + "!");
 
-			//Doesn't calculate damage or display effectiveness if damage = 0
+			// Doesn't calculate damage or display effectiveness if damage = 0
 			if (usedMove.getDamage() != 0) {
 				// Types of attacking pokemon
 				String[] attackingTypes = attacking.getTypes().split("-");
@@ -393,7 +436,7 @@ public class Battle {
 							battleResponses.add("Would you like to forget an old move?");
 						}
 					}
-
+					// Levels up as many times as possible
 				} while (attacking.getExp() >= attacking.getNextLevelUp());
 
 			} else if (defending.equals(playerPokemon)) {
@@ -405,6 +448,13 @@ public class Battle {
 
 	}
 
+	/**
+	 * Instance Method Compares types for effectiveness, and determines damage
+	 * amplification
+	 * 
+	 * @param String type1, Pokemon defending
+	 * @return double amp
+	 */
 	public double typeCompare(String type1, Pokemon defending) {
 
 		noEffect = false;
@@ -1053,6 +1103,14 @@ public class Battle {
 		return amp;
 	}
 
+	/**
+	 * Instance Method runs catch rate arithmetic and randomizes success can't catch
+	 * a trainer's pokemon
+	 * 
+	 * @param
+	 * @return String result
+	 */
+
 	public String catchPokemon() {
 
 		String result;
@@ -1078,6 +1136,12 @@ public class Battle {
 		return result;
 	}
 
+	/**
+	 * Instance Method 85% of fleeing battle if not a trainer battle
+	 * 
+	 * @param
+	 * @return Boolean
+	 */
 	public boolean flee() {
 
 		boolean success = false;
@@ -1094,59 +1158,131 @@ public class Battle {
 		return success;
 	}
 
+	/**
+	 * Mutator Method changes playerPokemon
+	 * 
+	 * @param newPokemon
+	 */
+
 	public void switchPokemon(Pokemon newPokemon) {
 
 		playerPokemon = newPokemon;
 	}
 
+	/**
+	 * Mutator Method changes opponentPokemon
+	 * 
+	 * @param nextPokemon
+	 */
 	public void nextOpponentPokemon(Pokemon nextPokemon) {
 
 		opponentPokemon = nextPokemon;
-		
-		String nameNoTitle = trainer.getName().replace("GymLeader ", "");	
-		
+
+		String nameNoTitle = trainer.getName().replace("GymLeader ", "");
+
 		battleResponses.add(nameNoTitle + " sent out " + opponentPokemon.getName() + "!");
 
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param index
+	 * @return battleResponses at index
+	 */
 	public String battleResponses(int index) {
 
 		return battleResponses.get(index);
 
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return battleResponses size
+	 */
+
 	public int responseAmount() {
 		return battleResponses.size();
 	}
 
+	/**
+	 * Mutator Method Clears battleResponses
+	 * 
+	 * @param
+	 * @return
+	 */
 	public void clearResponses() {
 		battleResponses.clear();
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param firstToMove pokemon
+	 * @return
+	 */
 	public Pokemon getFirstToMove() {
 		return firstToMove;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return secondToMove pokemon
+	 */
 	public Pokemon getSecondToMove() {
 		return secondToMove;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return current turn
+	 */
 	public String getCurrentTurn() {
 		return currentTurn;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return isTrainerBattle
+	 */
 	public boolean isTrainerBattle() {
 		return isTrainerBattle;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return isOpponentFainted
+	 */
 	public boolean isOpponentFainted() {
 		return opponentFainted;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return isPlayerFainted
+	 */
 	public boolean isPlayerFainted() {
 		return playerFainted;
 	}
 
+	/**
+	 * Accessor Method
+	 * 
+	 * @param
+	 * @return isGoingToEvolve
+	 */
 	public boolean isGoingToEvolve() {
 		return goingToEvolve;
 	}
